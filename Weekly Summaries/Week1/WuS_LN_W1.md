@@ -25,16 +25,17 @@ $$ P[A] = \frac{\text{Anzahl der Elementarereignisse in } A}{\text{Anzahl der El
 ## 1.3 Bedingte Wahrscheinlichkeit
 
 **Definition:** Seien $A, \, B$ Ereignisse und $P[A] > 0$. Die *bedingte Wahrscheinlichkeit* von $B$ unter der Bedingung. dass $A$ eintritt (kurz: gegeben A) wird definiert durch
-$$ P[B | A] := \frac{P[B \cap A]}{P[A]}. $$
+$$ P[B | A] := \frac{P[B \cap A]}{P[A]}.$$
 
 Direkt aus der Definition der beginten Wahrscheinlichkeit erhält man die sogenannte *Multiplikationsregel:* Für beliebige Ereignisse $A, \, B$ ist
 $$ P[A \cap B] = P[B | A] \cdot P[A].$$
+
 ---
 **Satz 1.1 (Satz der totalen Wahrscheinlichkeit)**  
 Sei $A_1, \, A_2,..., \, A_n$ eine Zerlegung von $\Omega$ (in paarweise disjunkte Ereignisse). Für beliebige Ereignisse $B$ gilt dann
 $$ P[B] = \sum_{i = 1}^{n} P[B | A_i] \cdots P[A_i].$$
----
 
+---
 ## 1.4 Unabhängigkeit von Ereignissen
 
 **Definition:** Zwei Ereignisse $A, \, B$ heissen *stochastisch unabhängig*, falls
@@ -76,6 +77,7 @@ sofern die Reihe absolut konvergiert.
 2. *Linearität:* Für beliebige $a, \, b \in \mathbb{R}$ gilt $E[aX + b] = aE[X] + b$.
 3. Falls $X$ nur Werte in $\mathbb{N}_0$ annimmt, so gilt 
    $$ E[X] = \sum_{j=1}^{\infty} P[X \geq j] = \sum_{l = 0}^{\infty} P[X > l].$$
+
 ---
 **Definition:** Sei $X$ eine diskrete Zufallsvariable. Ist $E[X^2] < \infty$, so heisst
 $$ \text{Var}[X] := E[(X - E[X])^2] $$
