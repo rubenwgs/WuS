@@ -135,3 +135,43 @@ Aus der Linearität des Erwartungswerts und der Summenformel für Varianz folgt 
 - Varianz $\text{Var}[X] = \sum_{i=1}^n \text{Var}[Y_i] = np(1-p)$
 
 ## 3.5 Geometrische Verteilung
+Betrachten wir nun eine unendliche Folge von unabhängigen 0-1-Experimenten mit Erfolgsparameter $p$. Sei $X$ die Wartezeit auf den ersten Erfolg, also
+$$ X = \inf \{i \in \mathbb{N} : A_i \text{ tritt ein} \} = \inf \{i \in \mathbb{N} : Y_i = 1 \},$$
+d.h. $X$ ist die Nummer des ersten erfolgreichen Experiments. Dann hat $X$ eine *geometrische Verteilung* mit Parameter $p$. Es gilt:
+- Wertebereich $\mathcal{W}(X) = \mathbb{N}$
+- Gewichtsfunktion $p_X(k) = P[X = k] = p(1-p)^{k-1}$ für $k = 1, \, 2, \, 3,...$
+
+Wir schreiben kurz $X \sim Geom(p)$.
+
+Desweiteren gilt:
+- Erwartungswert $E[X] = \frac{1}{p}$
+- Varianz $\text{Var}[X] = \frac{1-p}{p^2}$
+
+## 3.6 Negativbinomiale Verteilung
+Betrachten wir eine unendliche Folge von unabhängigen 0-1-Experimenten mit Erfolgsparameter $p$, so können wir für $r \in \mathbb{N}$ auch die Wartezeit auf den $r$-ten Erfolg betrachten. Dann lässt sich $X$ schreiben als
+$$ X = \inf \Big\{k \in \mathbb{N} : \sum_{i=1}^k I_{A_i} = r  \Big\} = \inf \Big\{k \in \mathbb{N} : \sum_{i = 1}'k Y_i = r \Big\}.$$
+Dann hat $X$ eine *negativbinomiale Verteilung* mit Parametern $r$ und $p$ und es gilt:
+- Wertebereich $\mathcal{W}(X) = \{r, \, r+1, \, r+2,... \}$
+- Gewichtsfunktion $p_X(k) = P[X = k] = {k -1 \choose r-1}p^r(1-p)^{k-r}$ für $k = r, \, r+1, \, r+2,...$
+
+Wir schreiben kurz $X \sim NB(r,p)$. Desweiteren gilt:
+- Erwartungswert $E[X] = \sum_{i=1}^r R[X_i] = \frac{r}{p}$
+- Varianz $\text{Var}[X] = \sum_{i=1}^r \text{Var}[X_i] = \frac{r(1-p)}{p^2}$
+
+## 3.7 Hypergeometrische Verteilung
+In einer Urne seien $n$ Gegenstände, davon $r$ vom Typ 1 und $n-r$ vom Typ 2. Man zieht ohne Zurücklegen $m$ der Gegenstände. Die Zufallsvariable $X$ beschreibe nun die Anzahl der Gegenstände vom Typ 1 in dieser Stichprobe vom Umfang $m$. Dann hat $X$ eine *hypergeometrische Verteilung* mit Parametern $n \in \mathbb{N}$ und $m,r \in \{1, \, 2,..., \, n \}$. Es gilt:
+- Wertebereich $\mathcal{W}(X) = \{0, \, 1,..., \, \min (m,r) \}$
+- Gewichtsfunktion
+  $$ p_X(k) = \frac{{r \choose k}{n-r \choose m-k}}{{n \choose m}} \text{ für } k \in \mathcal{W}(k).$$
+
+## 3.8 Poisson-Verteilung
+Die *Poisson-Verteilung* mit Parameter $\lambda \in (0, \, \infty)$ ist eine Verteilung auf der Menge $\mathbb{N}_0$ mit Gewichtsfunktion
+$$p_X(k) = e^{- \lambda} \frac{\lambda^k}{k!} \text{ für } k = 0, \, 1, \, 2,...$$
+Ist eine Zufallsvariable $X$ Poisson-verteilt mit Parameter $\lambda$, so schreiben wir dafür kurz $X \sim \mathcal{P}(\lambda)$.
+
+Sei $X_n$ für jedes $n$ eine Zufallsvariable mit $X_n \sim Bin(n, p_n)$ und $np_n = \lambda$. Lassen wir $n \to \infty$ gehen, so geht $p_n \to 0$, und $X_n$ beschreibt die Anzahl Erfolge bei sehr vielen Versuchen mit sehr kleiner Erfolgswahrscheinlichkeit, also bei seltenen Ereignissen. Es gilt:
+- $\lim_{n \to \infty} P[X_n = k] = P[X = k]$
+
+In diesem Sinn ist die Poisson-Verteilung ein Grenzwert von Binomialverteilungen bei geeigneter Skalierung der Parameter. Für eine Poisson-verteilte Zufallsvariable $X \sim \mathcal{P}(\lambda)$ gilt:
+- Erwartungswert $E[X] = \lambda$
+- Varianz $\text{Var}[X] = \lambda$
