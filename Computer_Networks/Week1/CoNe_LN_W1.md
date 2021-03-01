@@ -111,3 +111,21 @@ More specifically, each router has a `forwarding table` that maps destination ad
 ### 1.3.2 Circuit Switching
 There are two fundamental approaches to moving data through a network of links and switches: `circuit switching` and `packet switching`. 
 
+In circuit-switched networks, the resources needed along a path (buffers, link transmission rate) to provide for communication between the end systems are *reserved* for the duration of the communication session between the systems. In packet-switched networks, these resources are *not* reserved.
+
+The picture below illustrates a circuit-switched network. The hosts are each directly connected to one of the switches. When two hosts want to communicate, the network establishes a dedicated `end-to-end connection` between the two hosts.
+
+<img src="./Figures/CoNe_Fig1-13.png" alt="Circuit-Switched Network"
+	title="Figure 1.13: A simple circuit-switched network consisting of four switches and four links" width="750px"/><br>
+
+Different from circuit-switching, in a packet-switched network, a package is sent into the network without reserving any link resources whatsoever. If one of the links is congested because other packets need to be transmitted over the link at the same time, then the packet will have to wait in a buffer at the sending side of the transmission link and suffer a delay.
+
+#### Multiplexing in Circuit-Switched Networks
+A circuit in a link is implemented with either `frequency-division multiplexing (FDM)`or `time-division multiplexing (TDM)` <br>
+With FDM, the frequency spectrum of a link is divided up among the connections established across the link. Specifically, the link dedicates a frequency band to each connection for the duration of the connection. <br>
+For a TDM link, time is divided into frames of fixed duration, and each frame is divided into a fixed number of time slots. When the network establishes a connection across a link, the network ddeicates one time slot in every frame to this connection. These slots are dedicated for the sole use of that connection, with one time slot available for use (in every frame) to transmit the connection's data.
+
+<img src="./Figures/CoNe_Fig1-14.png" alt="FDM and TDM"
+	title="Figure 1.14 illustrates FDM and TDM for a specific network link supporting up to four circuits." width="750px"/><br>
+
+Proponents of packet switching have always argued that circuit switching is wasteful because the dedicated circuits are idle during `silent periods`. For example, when one person in a telephone call stops talking, the idle network resources cannot be used by other ongoing connections.
