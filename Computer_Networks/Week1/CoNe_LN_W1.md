@@ -17,3 +17,8 @@ We can also describe the Internet from an entirely different angle - namely, as 
 End systems attached to the Internet provide a `socket interface` that specifies how a program running on one end system asks the Internet infrastructure to deliver data to a specific destination program running on another system.
 
 ### 1.1.3 What Is a Protocol?
+#### Network Protocols
+All activity in the Internet that involves two or more communicating remote entities is governed by a protocol. Protocols are running everywhere in the Internet.
+> A **protocol** defines the format and the order of messages exchanged between two or more communicating entities, as well as the actions taken on the transmission and/or receipt of a message or other event.
+
+## 1.2 The Network Edge
