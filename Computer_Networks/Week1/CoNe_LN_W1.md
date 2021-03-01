@@ -22,3 +22,7 @@ All activity in the Internet that involves two or more communicating remote enti
 > A **protocol** defines the format and the order of messages exchanged between two or more communicating entities, as well as the actions taken on the transmission and/or receipt of a message or other event.
 
 ## 1.2 The Network Edge
+![Figure 1.1: Some pieces of the Internet](./Figures/CoNe_Fig1-1.png)
+In this book, end systems are also refered to as `hosts` because they host (that is, *run*) application programs such as a Web browser program, a Web server program etc. <br> Hosts are sometimes further divided into two categories: `clients` and `servers`. Informally, clients tend to be desktop and mobile PCs, smartphones and so one, whereas servers tend to be more powerful machines that store and distribute Web pages, stream video, relay e-mail, and so on.
+
+### 1.2.1 Acess Networks
