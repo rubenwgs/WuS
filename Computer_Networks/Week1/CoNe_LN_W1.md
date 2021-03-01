@@ -23,7 +23,7 @@ All activity in the Internet that involves two or more communicating remote enti
 
 ## 1.2 The Network Edge
 <img src="./Figures/CoNe_Fig1-1.png" alt="Network"
-	title="Figure 1.1: Some pieces of the Internet" height="500px"/><br>
+	title="Figure 1.1: Some pieces of the Internet" height="750px"/><br>
 
 In this book, end systems are also refered to as `hosts` because they host (that is, *run*) application programs such as a Web browser program, a Web server program etc. <br> Hosts are sometimes further divided into two categories: `clients` and `servers`. Informally, clients tend to be desktop and mobile PCs, smartphones and so one, whereas servers tend to be more powerful machines that store and distribute Web pages, stream video, relay e-mail, and so on.
 
