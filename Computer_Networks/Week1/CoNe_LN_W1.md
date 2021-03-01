@@ -28,3 +28,15 @@ All activity in the Internet that involves two or more communicating remote enti
 In this book, end systems are also refered to as `hosts` because they host (that is, *run*) application programs such as a Web browser program, a Web server program etc. <br> Hosts are sometimes further divided into two categories: `clients` and `servers`. Informally, clients tend to be desktop and mobile PCs, smartphones and so one, whereas servers tend to be more powerful machines that store and distribute Web pages, stream video, relay e-mail, and so on.
 
 ### 1.2.1 Acess Networks
+#### Home Access: DSL, Cable, FFTH, Dial-Up, and Satellite
+
+Today, the most prevalent types of broadband residential acess are `digital subscriber line (DSL)` and cable. A residence typically obtains DSL Internet access from the same local telephone company (*telco*) that provides its wired local phone access. <br>
+Each customer's DSL modem uses the existing telephone line (twisted-pair copper wire) to exchange data with a digital subscriber line access multiplexer (*DSLAM*) located in the telco's local central office (*CO*).
+
+The residential telephone line carries both data and traditional telephone signals simultaneously, which are encoded in different frequencies:
+* A high-speed downstream channel, in the 50 kHz to 1 MHz band
+* A medium-speed upstream channel, in the 4 kHz to 50kHz band
+* An ordinary two-way telephone channel, in the 0 to 4 kHz band
+
+<img src="./Figures/CoNe_Fig1-5.png" alt="DSL"
+	title="Figure 1.5: DSL Internet access" width="500px"/><br>
