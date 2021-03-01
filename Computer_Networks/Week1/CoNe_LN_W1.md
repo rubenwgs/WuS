@@ -40,3 +40,5 @@ The residential telephone line carries both data and traditional telephone signa
 
 <img src="./Figures/CoNe_Fig1-5.png" alt="DSL"
 	title="Figure 1.5: DSL Internet access" width="750px"/><br>
+
+On the customer side, a splitter separates the data and telephone signals arriving to the home and forwards the data signal to the DSL modem. On the telco side, in the CO, the DSLAM separates the data and phone signals and sends the data into the Internet.
