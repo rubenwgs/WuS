@@ -79,3 +79,14 @@ Radio channels carry signal in the electromagnetic spectrum. They are an attract
 A communication satellite links two or more Earth-based microwave transmitter/receivers, known as *ground stations*. Two types of satellites are used ind communications: `geostationary satellites` and `low-earth orbiting (LEO) satellites`. <br>
 Geostationary satellites permanently remain above the same spot on Earth at 36'000 km above Earth's surface. This huge distance from ground station through satellite back to ground station introduces a substantial signal propagation delay of 280 miliseconds. <br>
 LEO satellites are placed much closer to Earth and do not remain permanently above one spot on Eart. Therefore, to provide continuous coverage to an area, many satellites need to be placed in orbit.
+
+## 1.3 The Network Core
+The `network core` is the mesh of packet switches and links that interconnects the Internet's end systems. The following figure highlights the network core with thick lines:
+
+<img src="./Figures/CoNe_Fig1-10.png" alt="Network Core"
+	title="Figure 1.10: The network core" height="750px"/><br>
+
+### 1.3.1 Packet Switching
+To send a message from a source end system to a destination end system, the source breaks long messges into smaller chunks of data known as `packets`. Between sourceand destination, each packet travels through communication links and `packet switches` (for which there are two predominant types, `routers` and `link-layer switches`).
+
+#### Store-and-Forward Transmission
