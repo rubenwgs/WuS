@@ -90,3 +90,24 @@ The `network core` is the mesh of packet switches and links that interconnects t
 To send a message from a source end system to a destination end system, the source breaks long messges into smaller chunks of data known as `packets`. Between sourceand destination, each packet travels through communication links and `packet switches` (for which there are two predominant types, `routers` and `link-layer switches`).
 
 #### Store-and-Forward Transmission
+Most packet switches use `store-and-forward transmission` at the inputs to the links. Store-and-forward transmission means that the packet switch must receive the entire packet before it can begin to transmit the first bit of the packet onto the outbound link.
+
+If we consider the general case of sending one packet of length $L$ bits from source to destination over a path consisting of $N$ links each of rate $R$ (thus, there are $N-1$ routers between source and destination). Then the `end-to-end delay` is given by:
+$$d_{end-to-end} = NLR$$
+
+#### Queuing Delays and Packet Loss
+Each packet switch has multiple links attached to it. For each attached link, the packet switch has an `output buffer` (also called `output queue`), which stores packets that the router is about to send into that link. Thus, in addition to the store-and-forward delays, packets suffer output buffer `queuing delays`.
+
+<img src="./Figures/CoNe_Fig1-12.png" alt="Packet Switch"
+	title="Figure 1.12: Packet switching" width="750px"/><br>
+
+Since the amount of buffer space is finite, an arriving packet may find that the buffer is completely full with other packets waiting for transmission. In this case, `packet loss` will occur - either the arriving packet or one of the already queued packets will be dropped.
+
+#### Forwarding Tables and Routing Protocols
+One might ask, how the router determines which link it should forward a packet to. In the Internet, every end system has an address called an IP address. When a source end system wants to send a packet to a destination end system, the source includes the destination's IP address in the packet's header. 
+
+More specifically, each router has a `forwarding table` that maps destination addresses (or portions of those) to that router's outbound links.
+
+### 1.3.2 Circuit Switching
+There are two fundamental approaches to moving data through a network of links and switches: `circuit switching` and `packet switching`. 
+
