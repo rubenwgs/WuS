@@ -42,3 +42,40 @@ The residential telephone line carries both data and traditional telephone signa
 	title="Figure 1.5: DSL Internet access" width="750px"/><br>
 
 On the customer side, a splitter separates the data and telephone signals arriving to the home and forwards the data signal to the DSL modem. On the telco side, in the CO, the DSLAM separates the data and phone signals and sends the data into the Internet.
+
+While DSL makes use of the telco's existing local telephone infrastructure, `cable internet access` makes use of the cable television company's existing cable television infrastructure. <br>
+As illustrated in the following figure, fiber optics connect the cable head end to the neighbourhood-level junctions, from which traditional coaxial cable is then used to reach individual houses and appartements. At the cable head end, the cable modem termination system (CMTS) serves a similar function as the DSL network's DSLAM - turning the analog signal sent from the cable modems in many downstream homes back into digital format.
+
+<img src="./Figures/CoNe_Fig1-6.png" alt="HFC"
+	title="Figure 1.6: A hybrid fiber-coaxial access network" width="750px"/><br>
+
+One important characteristic of cable Internet access is that it is a *shared broadcast medium*. In particular, every packet sent by the head end travels downstream on every link to every home and every packet sent by a home travels on the upstream channel to the head end. <br>
+For this reason, if several users are simultaneously downloading a video file on the downstream channel, the actual rate at which each user receives its video file will be significantly lower than the aggregate cable downstream rate.
+
+An up-and-coming technology that provides even higher speeds is `fiber to the fome (FTTH)`. As the name suggests, the FTTH concept is simple - provide an optical fiber path from the CO directly to the home.
+
+<img src="./Figures/CoNe_Fig1-7.png" alt="HFC"
+	title="Figure 1.7 FTTH Internet access" width="750px"/><br>
+
+### 1.2.2 Physical Media
+
+Consider a bit traveling from one end system, through a series of links and routers, to another end system. The source end system first transmits the bit, and shortly thereafter the first router in the series receives the bit. The first router then transmits the bit, and shortly thereafter the second router receives the bit, and so on. Thus our bit, when traveling from source to destination, passes through a series of *transmitter-receiver pairs*. For each transmitter-receiver pair, the bit is sent across a `physical medium`.
+
+Physical media fall into two categories: `guided media` and `unguided media`. With guided media, the waves are guided along a solid medium, such as a fiber-optic cable, a twisted-pair copper wire, or a coaxial cable. With unguided media, the waves propagate in the atmosphere and in outer space, such as in a wireless LAN or a digital satellite channel.
+
+#### Twisted-Pair Copper Wire
+The least expensive and most commonly used guided transmission medium is twisted-pair copper wire. Twisted pair consists of two insulated copper wires, each about 1 mm thick, arranged in a regular spiral patternt. The wires are twisted together to reduce the electrical interference from similar pairs close by.
+
+#### Coaxial Cable
+Coaxial cable consists of two copper conductors, but the two conudctors are concentric rather than parallel. It is commonly used in cable television systems. 
+
+#### Fiber Optics
+An optical fiber is a thin, flexible medium that conducts pulses of light, with each pulse representing a bit. They are immune to elegtromagnetic interference, have very slow signal attenuation up to 100 kilometers, and are very hard to tap.
+
+#### Terrestrial Radio Channels
+Radio channels carry signal in the electromagnetic spectrum. They are an attractive medium because they require no physical wire to be installed, can penetrate walls, provide connectivity to a mobile user, and can potentially carry a signal for long distances.
+
+#### Satellite Radio Channels
+A communication satellite links two or more Earth-based microwave transmitter/receivers, known as *ground stations*. Two types of satellites are used ind communications: `geostationary satellites` and `low-earth orbiting (LEO) satellites`. <br>
+Geostationary satellites permanently remain above the same spot on Earth at 36'000 km above Earth's surface. This huge distance from ground station through satellite back to ground station introduces a substantial signal propagation delay of 280 miliseconds. <br>
+LEO satellites are placed much closer to Earth and do not remain permanently above one spot on Eart. Therefore, to provide continuous coverage to an area, many satellites need to be placed in orbit.
