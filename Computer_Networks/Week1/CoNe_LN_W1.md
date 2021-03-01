@@ -39,4 +39,4 @@ The residential telephone line carries both data and traditional telephone signa
 * An ordinary two-way telephone channel, in the 0 to 4 kHz band
 
 <img src="./Figures/CoNe_Fig1-5.png" alt="DSL"
-	title="Figure 1.5: DSL Internet access" width="500px"/><br>
+	title="Figure 1.5: DSL Internet access" width="750px"/><br>
