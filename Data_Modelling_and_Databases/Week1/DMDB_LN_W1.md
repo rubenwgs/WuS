@@ -20,3 +20,14 @@ In this section, we shall introduce the most important terminology regarding rel
 | Gone With the Wind | 1939   | 231      | drama   |
 | Star Wars          | 1977   | 124      | sciFi   |
 | Wayne's World      | 1992   | 95       | comedy  |
+
+*Table 2.3: The realtion 'Movies'*
+
+### 2.2.1 Attributes
+The columns of a relation are named by `attributes`, in Tab. 2.3 the attributes are *title, year, length* and *genre*.
+
+### 2.2.2 Schemas
+The name of a relation and the set of attributes for a relation is called the `schema`for that relation. Thus, the schema for relation *Movies* as above is
+
+```Movies(title, year, length genre)```
+
