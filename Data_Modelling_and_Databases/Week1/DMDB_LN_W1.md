@@ -148,3 +148,4 @@ As an example, we might want to use *?* as a default for *studioName* and *NULL*
 ```
 
 ### 2.3.6 Declaring Keys
+There are two way to declare an attribute or set of attributes to be a key in the `CREATE TABLE` statement that defines a stored relation:
