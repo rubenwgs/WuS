@@ -1,4 +1,9 @@
 # 1. Wahrscheinlichkeit
+- Author: Ruben Schenk
+- Date: 02.03.2021
+- Contact: ruben.schenk@inf.ethz.ch
+
+
 ## 1.1 Grundbegriffe
 
 > **Definition:** Der *Ereignisraum* $\Omega \neq \emptyset$ ist die Menge aller möglichen Ergebnisse eines betrachteten Zufallsexperiment. Die Elemente $\omega \in \Omega$ heissen *Elementarereignisse* des Experiments.
