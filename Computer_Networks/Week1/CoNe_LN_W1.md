@@ -1,4 +1,9 @@
 # Computer Networks - Week 1 (Book)
+- Author: Ruben Schenk
+- Date: 02.03.2021
+- Contact: ruben.schenk@inf.ethz.ch
+
+
 # 1. Computer Networks and the Internet
 ## 1.1 What Is the Internet?
 ### 1.1.1 A Nuts-and-Bolts Description
