@@ -149,3 +149,34 @@ As an example, we might want to use *?* as a default for *studioName* and *NULL*
 
 ### 2.3.6 Declaring Keys
 There are two way to declare an attribute or set of attributes to be a key in the `CREATE TABLE` statement that defines a stored relation:
+1. We may declare one attribute to be a key when that attribute is listed in the relation schema.
+2. We may add to the list of items declared in the schema an additional declaration that say a particular attribute or set of attributes forms the key.
+
+Remark: If the key consists of more than one attribute, we have to use method (2).
+
+There are two declarations that may be used to indicate keyness:
+- `PRIMARY KEY`, or
+- `UNIQUE`
+
+If `PRIMARY KEY` is used, then attributes in $S$, where $S$ is the set of keys, are not allowed to have *NULL* as a value. *NULL* is permitted if the set $S$ is declared as `UNQIUE`, however.
+
+```sql
+    /* Code 2.9: Making 'fullName' the key. */
+    CREATE TABLE MovieStar (
+        fullName    CHAR(30) PRIMARY KEY,
+        address     VARCHAR(255),
+        gender      CHAR(1),
+        birthdate   DATE
+    );
+
+    /* Code 2.11: Making 'title' and 'releaseYear' be the key of 'Movies'. */
+    CREATE TABLE Movies (
+        title           CHAR(100),
+        releaseYear     INT,
+        lengthMin       INT,
+        genre           CHAR(10),
+        studioName      CHAR(30),
+        producerNum     INT,
+        PRIMARY KEY (title, releaseYear)
+    );
+```
