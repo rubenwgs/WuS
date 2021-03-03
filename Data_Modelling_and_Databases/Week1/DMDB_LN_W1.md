@@ -32,7 +32,7 @@ In this section, we shall introduce the most important terminology regarding rel
 The columns of a relation are named by `attributes`, in Tab. 2.3 the attributes are *title, year, length* and *genre*.
 
 ### 2.2.2 Schemas
-The name of a relation and the set of attributes for a relation is called the `schema`for that relation. Thus, the schema for relation *Movies* as above is
+The name of a relation and the set of attributes for a relation is called the `schema` for that relation. Thus, the schema for relation *Movies* as above is
 
 > Movies(title, year, length genre)
 
@@ -180,3 +180,186 @@ If `PRIMARY KEY` is used, then attributes in $S$, where $S$ is the set of keys, 
         PRIMARY KEY (title, releaseYear)
     );
 ```
+
+## 2.4 An Algebraic Query Language
+To begin our study of operations on relations, we shall learn about a special algebra, called `relational algebra`, that consists of some simple but powerful ways to construct new relations from given relations. <br>
+Relational algebra is not used today as a query language in commercial DBMS's. Rather, the "real" query language, SQL, incorporates relational algebra at its center.
+
+### 2.4.2 What is an Algebra?
+An algebra consists of operators and atomic operands. For instance, in the algebra of arithmetic, the atomic operands are variables like $x$ and constants like $15$. The operators are the usual arithmetic ones: addition, subtraction, multiplication, and division. Any algebra allows us to build `expressions` by applying operators to atomic operands and/or other expressions of the algebra.
+
+Relational algebra is another example of an algebra. Its atomic operands are:
+1. Variables that stand for relations.
+2. Constants, which are finite relations.
+
+### 2.4.3 Overview of Relational Algebra
+The operations of the traditional relational algebra fall into four broad classes:
+- The usual *set operations* - union, intersection, and difference - applied to relations.
+- Operations that *remove parts of a relation*: "selection" eliminates some rows, and "projection" eliminates some columns.
+- Operations that *combine the tuples of two relations*, including "Cartesian product" and various kinds of "join".
+- An operation called "*renaming*" that does not affect the tuples, but changes the relation schema.
+
+We generally shall refer to expressions of relational algebra as `queries`.
+
+### 2.4.4 Set Operations on Relations
+The three operations `union`, `intersection`, and `difference` are defined as follows on arbitrary sets $R$ and $S$:
+- $R \cup S$, the `union`, is the set of elements that are in $R$ or $S$ or both.
+- $R \cap S$, the `intersection`, is the set of elements that are in both $R$ and $S$.
+- $R - S$, the `difference`. is the set of elements that are in $R$ but not in $S$.
+
+When we apply these operations to relations, we need to put some conditions on $R$ and $S$:
+1. $R$ and $S$ musthave schemas with identical sets of attributes, and the domains for each attrtibute must be the same in $R$ and $S$.
+2. Before we compute a set-theoretic operation of sets of tuples, the columns of $R$ and $S$ must be ordered so that the order of attributes is the same for both relations.
+
+### 2.4.5 Projection
+The `projection` operator is used to produce from a relation $R$ a new relation that has only some of $R$'s columns. The value of expression $\pi_{A_1, \, A_2,..., \, A_n}(R)$ is a relation that has only the columns for attributes $A_1, \, A_2,..., \, A_n$ of $R$.
+
+Example: Assume the following relation *Movies*:
+
+| title         | year | length | genre  | studioName | producerNum |
+| :------------ | :--: | :----- | :----- | :--------- | :---------- |
+| Star Wars     | 1977 | 124    | sciFi  | Fox        | 12345       |
+| Galaxy Quest  | 1999 | 104    | comedy | DreamWorks | 67890       |
+| Wayne's World | 1992 | 95     | comedy | Paramount  | 99999       |
+
+*Figure 2.13: The realtion 'Movies'.*
+
+We can now project thisrelation onto the first three attributes with the following expression:
+
+$$\pi_{\text{title, year, length}}(\text{Movies})$$
+
+The resulting relation is
+
+|title          | year | length |
+| :------------ | :--: | :----- |
+| Star Wars     | 1977 | 124    |
+| Galaxy Quest  | 1999 | 104    |
+| Wayne's World | 1992 | 95     |
+
+The result of the expression $\pi_{\text{genre}}(\text{Movies})$ is:
+
+| genre  |
+| :----- |
+| sciFi  |
+| comedy |
+
+Remark: Notice that there are only two tuples in the resulting relation, since in the relational algebra of sets, duplicate tuples are always eliminated.
+
+### 2.4.6 Selection
+The `selection` operator, applied to a relation $R$, produces a new relation with a subset of $R$'s tuples. The tuples in the resulting relations are those that satisfy some condition $C$ that involves the attributes of $R$. We denote this operation by $\sigma_C(R)$. <br>
+$C$ is a conditional expression of the type with which we are familiar from conventional programming languages. The only difference is that the operands in condition $C$ are either constants or attributes of $R$.
+
+Example: Let the relation *Movies* be as in Fig. 2.13. Then the value of expression $\sigma_{\text{length} \geq 100}(\text{Movies})$ is
+
+| title         | year | length | genre  | studioName | producerNum |
+| :------------ | :--: | :----- | :----- | :--------- | :---------- |
+| Star Wars     | 1977 | 124    | sciFi  | Fox        | 12345       |
+| Galaxy Quest  | 1999 | 104    | comedy | DreamWorks | 67890       |
+
+Another example would be the expression
+
+$$\sigma_{\text{length} \geq 100 \text{ AND studioName } = \text{ 'FOX'}}(\text{Movies})$$
+
+which results in the following relation:
+
+| title         | year | length | genre  | studioName | producerNum |
+| :------------ | :--: | :----- | :----- | :--------- | :---------- |
+| Star Wars     | 1977 | 124    | sciFi  | Fox        | 12345       |
+
+### 2.4.7 Cartesian Product
+The `Cartesian product` of two sets $R$ and $S$ is the set of pairs that can be formed by choosing the first element of the pair to be any element of $R$ and the second any element of $S$.
+
+To disambiguate an attribute $A$ that is in the schemas of both $R$ and $S$, we use $R.A$ ofr the attribute from $R$ and $S.A$ for the attribute from $S$.
+
+Example: Consider the following two relations:
+
+|  A  |  B  |
+| :-: | :-: |
+|  1  |  2  |
+|  3  |  4  |
+
+*Figure 2.14: (a) Relation $R$*
+
+|  B  |  C  |  D  |
+| :-: | :-: | :-: |
+|  2  |  5  |  6  |
+|  4  |  7  |  8  |
+|  9  |  10 |  11 |
+
+*Figure 2.14: (b) Relation $S$*
+
+Then the result of the expression $R \times S$ is given by:
+
+|  A  | R.B | S.B |  C  |  D  |
+| :-: | :-: | :-: | :-: | :-: |
+|  1  |  2  |  2  |  5  |  6  |
+|  1  |  2  |  4  |  7  |  8  |
+|  1  |  2  |  9  |  10 |  11 |
+|  3  |  4  |  2  |  5  |  6  |
+|  3  |  4  |  4  |  7  |  8  |
+|  3  |  4  |  9  |  10 |  11 |
+
+*Figure 2.14: (c) Result of $R \times S$*
+
+### 2.4.8 Natural Joins
+Often we find a need to `join` them by pairing onlythose tuples that match in some way. The simplest sort of match is the `natural join` of two relations $R$ and $S$, denoted $R \bowtie S$, in which we pair only those tuples from $R$ and $S$ that agree in whatever attributes are common to the schemas of $R$ and $S$.
+
+More precisely, let $A_1, \, A_2,..., \, A_n$ be all the attributes that are in both the schema $R$ and the schema of $S$. Then a tuple $r$ from $R$ and a tuple $s$ from $S$ are successfully paired if and only if $r$ and $s$ agree on each of the attributes $A_1, \, A_2,..., \, A_n$.
+
+If two tuples $r$ and $s$ are successfully paired, then the resulting tuple is called the `joined tuple`. A tuple that fails to pair with any tuple of the other relation in a join is said to be a `dangling tuple`.
+
+Example: The natural join of the relations $R$ and $S$ from Fig. 2.14(a) and (b) is:
+
+|  A  |  B  |  C  |  D  |
+| :-: | :-: | :-: | :-: |
+|  1  |  2  |  5  |  6  |
+|  3  |  4  |  7  |  8  |
+
+### 2.4.9 Theta-Joins
+It is sometimes desireable to pair tuples from two relations on some other basis. For that purpose, we have a related notation called the `theta-join`. Historically, the "theta" refers to an arbitrary condition, which we shall represent by $C$. <br>
+The notation for a theta-join of relations $R$ and $S$ based on condition $C$ is $R \bowtie_C S$. The result of this operation is constructed as follows:
+1. Take the product of $R$ and $S$.
+2. Select from the product only those tuples that satisfy the condition $C$.
+
+Example: Let $C := R.B < S.B$, then the result of the expression $R \bowtie_{R.B < S.B} S$ with the relations $R$ and $S$ as in Fig. 2.14(a) and (b) is:
+
+|  A  | R.B | S.B |  C  |  D  |
+| :-: | :-: | :-: | :-: | :-: |
+|  1  |  2  |  4  |  7  |  8  |
+|  1  |  2  |  9  |  10 |  11 |
+|  3  |  4  |  9  |  10 |  11 |
+
+### 2.4.10 Combining Operations to Form Queries
+Relational algebra, like all algebras, allows us to form expressions of arbitrary complexity by applying operations to the result of other operations. One can construct expressions of relational algebra by applying operators to subexpressions, using parantheses when necessary to indicate grouping of operands.
+
+Example: Suppose we want to know, from our *Movies* relation, "What are the titles and years of movies made by Fox that are at least 100 minutes long?". One way to compute the answer to this query is:
+1. Select those *Movies* tuples that have $\text{length} \geq 100$.
+2. Select those *Movies* tuples that have $\text{studioName } = \text{ 'Fox'}$.
+3. Compute the intersection of $(1)$ and $(2)$.
+4. Project the relation from $(3)$ onto the attributes *title* and *year*.
+
+Alternatively, we could represent the same expression in a conventional, linear notation, with parantheses. The formula:
+
+$$\pi_{\text{title, year}} \Big(\sigma_{\text{length } \geq 100}(\text{Movies}) \cap \sigma_{\text{studioName } = \text{ 'Fox'}}(\text{Movies}) \Big)$$
+
+represents the same expression.
+
+### 2.4.11 Naming and Renaming
+We shall use the operator $\rho_{S(A_1, \, A_2,..., \, A_n)}(R)$ to rename a relation $R$. The resulting relation has exactly the same tuples as $R$, but the name of the relation is $S$. Moreover, the attributes of the result relation $S$ are named $A_1, \, A_2,..., \, A_n$.
+
+If we only want to change the name of the realtion to $S$ and leave the attributes as they are in $R$, we can just say $\rho_S(R)$.
+
+### 2.4.12 Relationships Among Operations
+Some of the operations that we described in Section 2.4 can be expressed in terms of other relational-algebra operations.
+
+`Intersection` can be expressed in terms of set difference:
+
+$$R \cap S = R - (R - S)$$
+
+`Theta-join` can be expressed by product and selection:
+
+$$R \bowtie_C S = \sigma_C (R \times S)$$
+
+Let $C$ be of the form $R.A_1 = S.A_1 \text{ AND } R.A_2 = S.A_2 \text{ AND } ...$, where $A_1, \, A_2,..., \, A_n$ are all the attributes appearing in the schemas of both $R$ and $S$. Let $L$ bet the list of attributes in the schema of $R$ followed by those attributes in the schema of $S$ that are not also in the schema of $R$. Then we can represent `natural join` by:
+
+$$R \bowtie S = \pi_L \Big(\sigma_C (R \times S) \Big)$$
