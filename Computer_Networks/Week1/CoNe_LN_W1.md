@@ -98,7 +98,7 @@ To send a message from a source end system to a destination end system, the sour
 Most packet switches use `store-and-forward transmission` at the inputs to the links. Store-and-forward transmission means that the packet switch must receive the entire packet before it can begin to transmit the first bit of the packet onto the outbound link.
 
 If we consider the general case of sending one packet of length $L$ bits from source to destination over a path consisting of $N$ links each of rate $R$ (thus, there are $N-1$ routers between source and destination). Then the `end-to-end delay` is given by:
-$$d_{end-to-end} = NLR$$
+$$d_{end-to-end} = \frac{NL}{R}$$
 
 #### Queuing Delays and Packet Loss
 Each packet switch has multiple links attached to it. For each attached link, the packet switch has an `output buffer` (also called `output queue`), which stores packets that the router is about to send into that link. Thus, in addition to the store-and-forward delays, packets suffer output buffer `queuing delays`.
