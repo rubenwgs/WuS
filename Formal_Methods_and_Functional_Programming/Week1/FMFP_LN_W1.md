@@ -207,3 +207,34 @@ The formal definition is given by:
   - $A \land B \in \mathcal{L}_P$ if $A \in \mathcal{L}_P$ and $B \in \mathcal{L}_P$.
   - $A \lor B \in \mathcal{L}_P$ if $A \in \mathcal{L}_P$ and $B \in \mathcal{L}_P$.
   - $A \to B \in \mathcal{L}_P$ if $A \in \mathcal{L}_P$ and $B \in \mathcal{L}_P$.
+
+### Semantics
+A `valuation` $\sigma : \mathcal{V} \to \{\text{True, False} \}$ is a function mapping variables to truth values. We furthermore let `Valuations` be the set of valuations.
+
+`Satisfiability` describes the smalles relation $\vDash \,\subseteq Valuations \times \mathcal{L}_P$ such that:
+- $\sigma \vDash X$ if $\sigma(X) = \text{True}$
+- $\sigma \vDash A \land B$ if $\sigma \vDash A$ and $\sigma \vDash B$
+- $\sigma \vDash A \lor B$ if $\sigma \vDash A$ or $\sigma \vDash B$
+- $\sigma \vDash A \to B$ if whenerver $\sigma \vDash A$ then $\sigma \vDash B$
+
+We note here that $\sigma \nvDash \bot$, for every $\sigma \in Valuations$.
+
+> A formula $A \in \mathcal{L}_P$ is `satisfiable` if 
+> $$\sigma \vDash A, \text{ for some valuation } \sigma$$
+
+> A formula $A \in \mathcal{L}_P$ is `valid` (a `tautology`) if
+> $$\sigma \vDash A, \text{ for all valuations } \sigma$$
+
+We furthermore respect `semantic entailment`, that is, $A_1,..., \, A_n \vDash A$ if for all $\sigma$, if $\sigma \vdash A_1,..., \, \sigma \vDash A_n$, then $\sigma \vDash A$.
+
+### Requirement for a deductive system
+For a deductive system we require that *syntactic entailment* $\vdash$ (derivation rules) and *semantic entailment* $\vDash$ (truth tables) agree. This requirement has two parts. For $H \equiv A_1,..., \, A_n$ some collection of formulae:
+1. `Soundness`: If $H \vdash A$ can be derived, then $H \vDash A$
+2. `Completeness`: If $H \vDash A$, then $H \vdash A$ can be derived
+
+### Natural deduction for propositional formulae
+We define three keywords for natural deduction:
+- `Sequent`: An assertion of the form $A_1,..., \, A_n \vdash A$ where all $A, \, A_1, \, A_2,..., \, A_n$ are propositional formulae
+- `Axiom`: A starting point for building derivation trees of the form
+  $$\frac{}{..., \, A,... \vdash A} \, \, axiom$$
+- `Proof` (of $A$):  A derivation tree with root $\vdash A$
