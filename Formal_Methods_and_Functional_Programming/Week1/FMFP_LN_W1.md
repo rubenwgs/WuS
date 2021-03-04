@@ -141,3 +141,69 @@ The keyword `where` comes directly after a function definition and is used to de
             v2 = r2
             ...
 ```
+
+# Natural Deduction
+To carry out `formal reasoning` about systems we need three essential parts:
+1. Language
+2. Semantics
+3. Deductive system for carrying out proofs
+
+As an introduction to this topic we look at an abstract example of a formal proof:
+- Language: $\mathcal{L} = \{\bigoplus, \, \bigotimes, \, +, \, \times \}$
+- Rules:
+  - $\alpha$ : If $+$, then $\bigotimes$.
+  - $\beta$ : If $+$, then $\times$.
+  - $\gamma$ : If $\bigotimes$ and $\times$, then $\bigoplus$.
+  - $\delta$ : $+$ holds.
+
+Given the task "*Prove $+$*" we can proceed as follows:
+1. $+$ holds by $\delta$
+2. $\bigotimes$ holds by $\alpha$ with $1$.
+3. $\times$ holds by $\beta$ with $1$.
+4. $\bigoplus$ holds by $\gamma$ with $2$ and $3$.
+
+Now, in a `deductive proof system` our rules look the following way:
+
+$$
+\frac{+}{\bigotimes} \alpha \qquad \frac{+}{\times} \beta \qquad \frac{\bigotimes \quad \times}{\bigoplus} \gamma \qquad \frac{}{+} \delta 
+$$
+
+Our prove can then be displayed as a `derivation tree` (following in *Parwitz style*):
+
+<img src="./Figures/FMFP_FIG_1-2.png" width="350px" />
+
+We now change the rules a little bit and look at another example of a formal proof:
+- Language: $\mathcal{L} = \{\bigoplus, \, \bigotimes, \, +, \, \times \}$
+- Rules:
+  - $\alpha$ : If $+$, then $\bigotimes$.
+  - $\beta$ : If $+$, then $\times$.
+  - $\gamma$ : If $\bigotimes$ and $\times$, then $\bigoplus$.
+  - $\delta$ : **We may assume $+$ when proving $\bigotimes$.**
+
+Our linear proof changes therefore to:
+1. **Assume** $+$ holds by $\delta$
+2. $\bigotimes$ holds by $\alpha$ with $1$.
+3. $\times$ holds by $\beta$ with $1$.
+4. $\bigoplus$ holds by $\gamma$ with $2$ and $3$.
+
+In our deductive proof system we now change our rules as follows:
+
+$$
+\frac{\Gamma \vdash +}{\Gamma \vdash \bigotimes} \alpha \qquad \frac{\Gamma \vdash +}{\Gamma \vdash \times} \beta \qquad \frac{\Gamma \vdash \bigotimes \quad \Gamma \vdash \times}{\Gamma \vdash \bigoplus} \gamma \qquad \frac{\Gamma, + \vdash \bigoplus}{\Gamma \vdash \bigoplus} \delta 
+$$
+
+Here, $\Gamma$ stands for some assumption. The first rule, read bottom-up, therefore reads as "*To prove $\bigotimes$ holds under some assumption $\Gamma$, it suffices to show that $+$ holds under the same assumption $\Gamma$.*"
+
+Our derivation tree, now in *Gentzen-style*, looks as follows:
+
+<img src="./Figures/FMFP_FIG_1-3.png" width="400px" />
+
+## Propositional logic
+### Syntax
+The formal definition is given by:
+- Let a set $\mathcal{V}$ of variables be given. Then $\mathcal{L}_P$, the `language of propositional logic`, is the smallest set where:
+  - $X \in \mathcal{L}_P$ if $X \in \mathcal{V}$
+  - $\bot \in \mathcal{L}_P$.
+  - $A \land B \in \mathcal{L}_P$ if $A \in \mathcal{L}_P$ and $B \in \mathcal{L}_P$.
+  - $A \lor B \in \mathcal{L}_P$ if $A \in \mathcal{L}_P$ and $B \in \mathcal{L}_P$.
+  - $A \to B \in \mathcal{L}_P$ if $A \in \mathcal{L}_P$ and $B \in \mathcal{L}_P$.
