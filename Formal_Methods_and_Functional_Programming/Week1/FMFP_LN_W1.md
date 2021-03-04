@@ -41,7 +41,7 @@ We differ between two types of `evaluation strategies`:
 - `Eager evaluation`, where we evaluate arguments first (corresponds to the *green path* in the picture below)
 - `Lazy evaluation`, which is used in Haskell, where we evaluate expression from the left and *only when needed* (corresponds to the blue path in the picture below)
 
-<img src="./Figures/FMFP_FIG_1-1.png" width="750px" />
+<img src="./Figures/FMFP_FIG_1-1.PNG" width="750px" />
 
 ### Syntax and Types
 The basic syntax of Haskell consists of the following two rules:
@@ -170,7 +170,7 @@ $$
 
 Our prove can then be displayed as a `derivation tree` (following in *Parwitz style*):
 
-<img src="./Figures/FMFP_FIG_1-2.png" width="350px" />
+<img src="./Figures/FMFP_FIG_1-2.PNG" width="350px" />
 
 We now change the rules a little bit and look at another example of a formal proof:
 - Language: $\mathcal{L} = \{\bigoplus, \, \bigotimes, \, +, \, \times \}$
@@ -196,7 +196,7 @@ Here, $\Gamma$ stands for some assumption. The first rule, read bottom-up, there
 
 Our derivation tree, now in *Gentzen-style*, looks as follows:
 
-<img src="./Figures/FMFP_FIG_1-3.png" width="400px" />
+<img src="./Figures/FMFP_FIG_1-3.PNG" width="400px" />
 
 ## Propositional logic
 ### Syntax
