@@ -302,7 +302,6 @@ We can rename *bound* variables at any time (called $\alpha$`-conversion`). Exam
 $$\forall x. \exists y. p(x, \, y) \equiv \forall y. \exists x. p(y, \, x)$$
 
 ### Omitting parantheses
-
 For binary operators we have the following binding strengths:
 - $\land$ binds stronger than $\lor$ binds stronger than $\to$
 - $\to$ associates to the right, $\land$ abd $\lor$ bind to the left
@@ -310,3 +309,29 @@ For binary operators we have the following binding strengths:
 - Quantifiers extend to the right as far as possible, that is, the end of the line or ")"
 
 ### Semantics
+A `structure` is a pair $\mathcal{S} = \langle U_{\mathcal{S}}, \, I_{\mathcal{S}} \rangle$ where $U_{\mathcal{S}}$ is a non-empty set, the `universe`, and $I_{\mathcal{S}}$ is a mapping where:
+1. $I_{\mathcal{S}}(p^n)$ is an $n$-ary relation on $U_{\mathcal{S}}$, for $p^n \in \mathcal{P}$, and
+2. $I_{\mathcal{S}}(f^n)$ is an $n$-ary (total) function on $U_{\mathcal{S}}$, for $f^n \in \mathcal{F}$
+
+As shorthand, we may also write $p^{\mathcal{S}}$ for $I_{\mathcal{S}}(p)$ and $f^{\mathcal{S}}$ for $I_{\mathcal{S}}(f)$.
+
+An `interpretation` is a pair $\mathcal{I} = \langle \mathcal{S}, \, v \rangle$, where $\mathcal{S} = \langle U_{\mathcal{S}}, \, I_{\mathcal{S}} \rangle$ is a structure and $v : \mathcal{V} \to U_{\mathcal{S}}$ a valuation.
+
+The `value` of a term $t$ under the interpretation $\mathcal{I} = \langle \mathcal{S}, \, v \rangle$ is written as $\mathcal{I}(t)$ and defined by
+1. $\mathcal{I}(x) = v(x)$, for $x \in \mathcal{V}$, and
+2. $\mathcal{I}(f(t_1,..., \, t_n)) = f^{\mathcal{S}}(\mathcal{I}(t_1),..., \, \mathcal{I}(t_n))$
+
+When $\langle \mathcal{S}, \, v \rangle \vDash A$ we say $A$ `is satisfied with respect to` $\langle \mathcal{S}, \, v \rangle$ or $\langle \mathcal{S}, \, v \rangle$ `is a model of` $A$.
+
+When every suitable interpretation is a model, we write $\vDash A$ and say $A$ is `valid`.
+
+$A$ is `satisifable` if there is at leat one model for $A$.
+
+Following an example of a suitable model for
+
+$$\forall x.p(x, \, s(x))$$
+
+- $U_{\mathcal{S}} = \mathcal{N}$
+- $p^{\mathcal{S}} = \{(m, \, n) \, | \, m,n \in U_{\mathcal{S}} \text{ and } m < n \}$
+- $s^{\mathcal{S}}(x) = x + 1$
+
