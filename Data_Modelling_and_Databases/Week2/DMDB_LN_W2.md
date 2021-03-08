@@ -79,3 +79,31 @@ in which $L$ is a list of epxression, $R$ is a relation, and $C$ is a condition.
 $$\pi_L(\sigma_C(R))$$
 
 ### 6.1.3 Comparison of Strings
+Two strings are equal if they are the same sequence of characters. When comparing strings with differen declarations (`CHAR`, `VARCHAR`, etc.), only the actual strings are compared. SQL ignores any "pad" characters.
+
+When we compare strings by on of the "less than" operators, such as `<` or `>=`, we are asking whether one precedes the other in lexicographic order.
+
+### 6.1.4 Pattern Matching in SQL
+SQL also provides the capability to compare strings on the basis of a simple pattern match. An alternative from of comparison expression is
+
+```sql
+    /* Code 6.6: Pattern Matching in SQL. */
+    s LIKE p
+```
+
+where $s$ is a string and $p$ is a `pattern`, that is, a string with the optional use of the two special characters `%` and `_`. Ordinary characters ion $p$ match only themselves in $s$. But `%` in $p$ can match any sequence of 0 or more characters in $s$, and `_` in $p$ matches any one character in $s$.
+
+Similary, `s NOT LIKE p` is true if and only if string $s$ does not match pattern $p$.
+
+Example: We remember a movie "Star *something*", and we remember that the something has four letters. What could this movie be? We can retrieve all such names with the query:
+
+```sql
+    /* Code 6.7: Patter matching. */
+    SELECT title
+    FROM Movies
+    WHERE title LIKE 'Star ____';
+```
+
+Remark: The convention taken by SQL is that wto consecutive apostrophes in a string represent a single apostrophe and do not end the string. Thus, `''s` in a pattern is matched by a single apostrophe followed by an `s`.
+
+### 6.1.5 Dates and Times
