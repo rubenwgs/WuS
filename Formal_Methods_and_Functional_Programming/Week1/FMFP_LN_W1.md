@@ -238,3 +238,75 @@ We define three keywords for natural deduction:
 - `Axiom`: A starting point for building derivation trees of the form
   $$\frac{}{..., \, A,... \vdash A} \, \, axiom$$
 - `Proof` (of $A$):  A derivation tree with root $\vdash A$
+
+### Conjunction rules
+
+We distinguish betwee ntwo kinds of `rules`:
+- `introduce`, denoted with $-I$, which introduce a connective
+- `eliminate`, denoted by $-EL$ or $-ER$, which eliminate connectives
+
+Example:
+
+$$ \frac{\Gamma \vdash A \quad \Gamma \vdash B}{\Gamma \vdash A \land B} \, \land - I, \qquad \frac{\Gamma \vdash A \land B}{\Gamma \vdash A} \, \land - EL, \qquad \frac{\Gamma \vdash A \land B}{\Gamma \vdash B} \, \land - ER$$
+
+Example derivation:
+
+<img src="./Figures/FMFP_FIG_1-4.PNG" width="500px" />
+
+### Implication rules
+
+We have the following two `implication rules`:
+
+$$\frac{\Gamma, \, A \vdash B}{\Gamma \vdash A \to B} \,  \to - I, \qquad \frac{\Gamma \vdash A \to B \quad \Gamma \vdash A}{\Gamma \vdash B} \, \to - E$$
+
+### Disjunction rules
+
+We have the following three `disjunction rules`:
+
+$$\frac{\Gamma \vdash A}{\gamma \vdash A \lor B} \, \lor - IL, \qquad \frac{\Gamma \vdash B}{\Gamma \vdash A \lor B} \, \lor - IR$$
+
+$$\frac{\Gamma \vdash A \lor B \quad \Gamma, \, A \vdash C \quad \Gamma, \, B \vdash C}{\Gamma \vdash C} \, \lor - E$$
+
+### Falsity and negation rules
+
+We have the following `falsity rule`:
+
+$$\frac{\Gamma \vdash \bot}{\Gamma \vdash A} \, \bot - E$$
+
+and the following `negation rules` (we define $\neg A$ as $A \to \bot$):
+
+$$\frac{\Gamma \vdash \neg A \quad \Gamma \vdash A}{\Gamma \vdash B} \, \neg - E$$
+
+##  First-order logic
+### Syntax
+There are two syntactic categories: `terms` and `formulae`.
+
+Furthermore, a `signature` consists of a set of function symbols $\mathcal{F}$ and a aset of predicate symbols $\mathcal{P}$ and we also denote the set of variables as $\mathcal{V}$.
+
+Then *Term*, the `terms of first-order logic`, is the smalles set where
+1. $x \in Term$ if $x \in \mathcal{V}$, and
+2. $f^n(t_1,..., \, t_n) \in Term$ if $f^n \in \mathcal{F}$ and $t_j \in Term$ for all $1 \leq j \leq n$
+
+*Form*, the `formulae of first-order logic`, is the smallest set where
+1. $\bot \in Form$
+2. $p^n (t_1,..., \, t_n) \in Form$ if $p^n \in \mathcal{P}$ and $t_j \in Term$, for all $1 \leq j \leq n$
+3. $A \circ B \in Form$ if $A \in Form$, $B \in Form$, and $\circ \in \{\land, \, \lor, \, \to \}$
+4. $Qx.A \in Form$ if $A \in Form$, $x \in \mathcal{V}$, and $Q \in \{\forall, \, \exists \}$
+
+Each occurrence of each variable in a formula is either `bound` or `free`.
+
+A variable occurrence $x$ in a formula $A$ is `bound` if $x$ occurs within a subformula $B$ of $A$ of the form $\exists x.B$ or $\forall x.B$ and is said to be `free` otherwise.
+
+### $\alpha$ - conversion
+We can rename *bound* variables at any time (called $\alpha$`-conversion`). Example:
+$$\forall x. \exists y. p(x, \, y) \equiv \forall y. \exists x. p(y, \, x)$$
+
+### Omitting parantheses
+
+For binary operators we have the following binding strengths:
+- $\land$ binds stronger than $\lor$ binds stronger than $\to$
+- $\to$ associates to the right, $\land$ abd $\lor$ bind to the left
+- $\neg$ binds stronger than any binary operator
+- Quantifiers extend to the right as far as possible, that is, the end of the line or ")"
+
+### Semantics
