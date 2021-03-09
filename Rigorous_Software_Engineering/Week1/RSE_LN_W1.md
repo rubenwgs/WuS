@@ -19,3 +19,43 @@ This course is split up into four parts:
 - Part III, Software Analysis at Scale: Math, heap, numerical, symbolic execution, concolic execution, fuzzing
 - Part IV, Modeling: Model finding, Alloy, applications to memory models
 
+# 2. Documentation
+## 2.1 Why should we document?
+### 2.1.1 Essential vs Incidental Properties
+Source code does not exspress *which properties are stable* during software evolution, moreso, which properties are `essential` and which are `incidental`.
+
+Example: In the following code, is it *essential* that it finds some index $i$ such that $\text{array}[i] = v$ or the *first* index $i$ ?
+
+```java
+    int find(int[] array, int v) {
+        for(int i = 0; i < array.length; i++) {
+            if(array[i] == v) {
+                return i;
+            } else {
+                return -1;
+            }
+        }
+    }
+```
+
+If a developer at a later point decides to parallelize this function, it is essential to know whether or not it is important to return the first matching index or just some matching index.
+
+### 2.1.2 Invariants
+We look at a simple example code:
+
+```java
+    HashMap<String, String> m;
+    m = SomeLibrary.foo();
+    String s = m.get("key");
+```
+
+Now, one might ask whether or not $s$ can be `NULL`.
+- What happens if the key is not found in the map? -> The function `.get()` returns `NULL`.
+- What if the key is matched? Can the value still be `NULL`?
+
+### 2.1.3 Invariants
+
+
+## 2.2 What to document?
+
+## 2.3 How to document?
