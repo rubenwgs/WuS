@@ -134,3 +134,50 @@ For a TDM link, time is divided into frames of fixed duration, and each frame is
 	title="Figure 1.14 illustrates FDM and TDM for a specific network link supporting up to four circuits." width="750px"/><br>
 
 Proponents of packet switching have always argued that circuit switching is wasteful because the dedicated circuits are idle during `silent periods`. For example, when one person in a telephone call stops talking, the idle network resources cannot be used by other ongoing connections.
+
+## 1.4 Delay, Loss, and Throughput in Packet-Switched Networks
+### 1.4.1 Overview of Delay in Packet-Switched Networks
+
+Recall that a packet starts in a host, passes through a series of routers, and ends its journey in another host. As a packet travels from one node to the subsequent node along this path, the packet suffers from several types of delays at each node along the path. The most important of these delays are the `nodal processing delay`, `queuing delay`, `transmission delay`, and `propagation delay`. Together, these delays accumulate to give a `total nodaly delay`.
+
+<img src="./Figures/CoNe_Fig1-16.jpeg" alt="Nodaly Delay"
+	title="Figure 1.16: The nodal delay at router A." width="750px"/><br>
+
+#### Processing Delay
+The time required to examine the packet's header and determine where to direct the packet is part of the `processing delay`. The processing delay may also include other factors, such as the time needed to check for bit-level errors in a packet.
+
+#### Queuing Delay
+At the queue, the packet experiences a `queuing delay` as it waits to be transmitted onto the link. The length of the queuing delay of a specific packet will depend on the number of earlier-arriving packets that are queued and waiting for transmission onto the link.
+
+#### Transmission Delay
+Denote the length of the packet by $L$ bits, and denote the transmission rate of the link from router A to router B by $R$ bits/second. The `transmission delay` is therefore given by $L / R$. This is the amount of time required to push (that is, transmit) all of the packet's bits into the link.
+
+#### Propagation Delay
+The time required to propagate from the beginning of the link to router B is the `propagation delay`. The bit propagates at the propagation speed of the link. The propagation delay is the distance between two routers divided by the propagation speed, that is $d / s$.
+
+#### Nodal Delay
+If we let $d_{proc}, \, d_{queue}, \, d_{trans}$ and $d_{prop}$ denote the processing, queuing, transmission, and propagation delays, then the `total nodal delay` is given by:
+
+$$d_{nodal} = d_{proc} + d_{queue} + d_{trans} + d_{prop}$$
+
+### 1.4.2 Queuing Delay and Packet Loss
+Unlike the processing, transmission, and propagation delay, the queuing delay can vary from packet to packet. For example, if 10 packets arrive at an empty queue at the same time, the first packet transmitted will suffer no queuing delay, while the last packet transmitted will suffer relatively large queuing delay.
+
+Let $a$ (in packets/second) denote the average rate at which packets arrive at the queue. Recall that $R$ is the transmission rate in bits/second. Also, we assume for simplicity, that all packets consist of $L$ bits. Then the `average rate` at which bits arrive at the queue is $La$ bits/second.
+
+The ration $La/R$, called the `traffic intensity`, often plays an important role in estimating the extent of the queuing delay. If $La/R > 1$, then the average rate at which bits arrive at the queue exceeds the rate at which the bits can be transmitted from the queue and the queuing delay (without bond) will reach infinity.
+
+#### Packet Loss
+In reality a queue preceding link has finite capacity, although the queuing capacity greatly depends on the router design and cost. With no place to store such a packet, a router will `drop` that packet. That is, the packet will be `lost`.
+
+### 1.4.3 End-to-End Delay
+Suppose there are $N-1$ routers between the source host and the destination host. Let's also suppose the queuing delays are negligible, the processing delay at each router and at the source host is $d_{proc}$, the transmission rate out of each router and out of the source host is $d_{trans}$, and the propagation on each link is $d_{prop}$. The nodaly delays accumulate and give an `end-to-end delay`:
+
+$$d_{end-end} = N(d_{proc} + d_{trans} + d_{prop})$$
+
+### 1.4.4 Throughput in Computer Networks
+To define throughput, consider transferring a large file from Host A to Host B across a computer network. The `instantaneous throughput` at any instant of time is the rate, in bits/second, at which Host B is receiving the file. <br>
+If the file consists of $F$ bits and the transfer takes $T$ seconds for Host B to receive all $F$ bits, then the `average throughput` of the file transfer is $F/T$ bits/second.
+
+Consider the throughput for a file transfer from the server to the client. Let $R_s$ denote the rate of the link between the server and the router, and $R_c$ denote the rate of the link between the router and the client. For a simple two-link network, the throughput is $\min\{R_c, \, R_s\}$, that is, the transmission rate of the `bottleneck link`. Having determined the throughput, we can now approximate the time it takes to transfer a large file of $F$ bits from server to client as $F/ \min \{R_s, \, R_c \}$.
+
