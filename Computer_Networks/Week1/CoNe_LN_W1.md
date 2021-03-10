@@ -181,3 +181,17 @@ If the file consists of $F$ bits and the transfer takes $T$ seconds for Host B t
 
 Consider the throughput for a file transfer from the server to the client. Let $R_s$ denote the rate of the link between the server and the router, and $R_c$ denote the rate of the link between the router and the client. For a simple two-link network, the throughput is $\min\{R_c, \, R_s\}$, that is, the transmission rate of the `bottleneck link`. Having determined the throughput, we can now approximate the time it takes to transfer a large file of $F$ bits from server to client as $F/ \min \{R_s, \, R_c \}$.
 
+## 1.5 Protocol Layers and Their Service Models
+
+### 1.5.1 Layered Architecture
+A layered architecture allows us to discuss a well-defined, specific part of a large and complex system. As long as the layer provides the same service to the layer above it, and uses the same services from the layer below it, the remainder of the system remains unchanged when a layer's implementation is changed.
+
+#### Protocol Layering
+To provide structure to the design of network protocols, network designers organize protocols - and the network hardware and software that implement the protocols - in `layers`. <br>
+We are again inerested in the `services` that a layer offers to the layer above - the so called `service model` of a layer.
+
+A protocl layer can be implemented in software, in hardware, or in a combination of the two. Application-layer protocols - such as HTTP and SMTP - are almost always implemented in software in the end systems, and so are transport-layer protocols. Because the physical layer and data link layers are responsible fro handling communication over a specific link, they are typically implemented in a network interface card associated with a given link. The network layer is often a mixed implementation of hardware and software.
+
+When taken together, the protocols of the various layers are called the `protocol stack`.
+
+#### Application Layer
