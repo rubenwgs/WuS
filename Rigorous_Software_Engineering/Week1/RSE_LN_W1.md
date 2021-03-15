@@ -179,3 +179,117 @@ We might add the following information which could be helpful in the documentati
 - ...
 
 ## 2.3 How to document?
+There are multiple different ways to document code:
+
+### Comments
+Comments are a simple, flexible and effective way of documenting interfaces and implementations. One might comment the `V get(Object key)` as follows:
+
+```java
+    /**
+    * Returns the value to which the specified key is mapped, or
+    * {@code null} if this map contains no mapping for the key.
+    *
+    * @param key the key whose associated value is to be returned
+    *
+    * @return the value to which the specified key is mapped,
+    * or {@code null} if this map contains no mapping for the key
+    *
+    * @throws NullPointerException if the specified key is null
+    * and this map does not permit null keys
+    */
+    V get(Object key);
+```
+
+### Types and Modifiers
+Types are a powerful documentation tool and modifiers can express some specific semantic properties.
+
+Example:
+
+```java
+    /* Types as documentation tool. */
+    HashMap<String, String> m;
+    m = SomeLibrary.foo();
+    String s = m.get("key");
+```
+
+```java
+    /* Modifiers as documentation tool. */
+    class HashMap<K, V> ... {
+        final float loadFactor;
+    }
+```
+
+### Effect Systems
+Effect systems are extensions of type systems that describe computational effects:
+- Read and write effects
+- Allocation and de-allocation
+- Locking
+- Exceptions
+
+Example:
+
+```java
+    try {
+        int i = isr.read();
+    } catch(IOException e) {
+        ...
+    }
+```
+
+### Metadata
+Annotations allow one to attach additional syntactic and semantic information to declarations.
+
+Example:
+
+```java
+    @NonNull Image getImage() {
+        if(image == null) {
+            // load image
+        }
+        return image;
+    }
+```
+
+### Assertions
+Assertions specify semantic properties of implementations, i.e. boolean conditions that need to hold.
+
+Example:
+
+```java
+    void shrink() {
+        ...
+        if(rep.shared) {
+            rep = new ListRep<E>();
+        }
+        assert !rep.shared;
+        ...
+    }
+```
+
+### Contracts
+Contracts are stylized assertions for the documentation of interfaces and implementations. This includes:
+- Method pre- and postconditions
+- Invariants
+
+Example:
+
+```java
+    class ImageFile {
+        String file;
+        invariant file != null;
+
+        Image image;
+        invariant old(image) != null ==> old(image) == image;
+
+        ImageFile(String f) requires f != null; {
+            file = f;
+        }
+
+        Image getImage() ensures result != null; {
+            if(image == null) {
+                // load image
+            }
+            return image;
+        }
+    }
+```
