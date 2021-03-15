@@ -181,7 +181,7 @@ We might add the following information which could be helpful in the documentati
 ## 2.3 How to document?
 There are multiple different ways to document code:
 
-### Comments
+### 2.3.1 Comments
 Comments are a simple, flexible and effective way of documenting interfaces and implementations. One might comment the `V get(Object key)` as follows:
 
 ```java
@@ -200,7 +200,7 @@ Comments are a simple, flexible and effective way of documenting interfaces and 
     V get(Object key);
 ```
 
-### Types and Modifiers
+### 2.3.2 Types and Modifiers
 Types are a powerful documentation tool and modifiers can express some specific semantic properties.
 
 Example:
@@ -219,7 +219,7 @@ Example:
     }
 ```
 
-### Effect Systems
+### 2.3.3 Effect Systems
 Effect systems are extensions of type systems that describe computational effects:
 - Read and write effects
 - Allocation and de-allocation
@@ -236,7 +236,7 @@ Example:
     }
 ```
 
-### Metadata
+### 2.3.4 Metadata
 Annotations allow one to attach additional syntactic and semantic information to declarations.
 
 Example:
@@ -250,7 +250,7 @@ Example:
     }
 ```
 
-### Assertions
+### 2.3.5 Assertions
 Assertions specify semantic properties of implementations, i.e. boolean conditions that need to hold.
 
 Example:
@@ -266,7 +266,7 @@ Example:
     }
 ```
 
-### Contracts
+### 2.3.6 Contracts
 Contracts are stylized assertions for the documentation of interfaces and implementations. This includes:
 - Method pre- and postconditions
 - Invariants
