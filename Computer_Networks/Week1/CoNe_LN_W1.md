@@ -195,3 +195,22 @@ A protocl layer can be implemented in software, in hardware, or in a combination
 When taken together, the protocols of the various layers are called the `protocol stack`.
 
 #### Application Layer
+The application layer is where network applications and their application-layer protocols reside. The Internet's application layer includes many protocols, such as the HTTP protocol, SMTP, and FTP. <br>
+An application-layer protocol is distributed over multiple end systems. We refer to a packet of information exchanged using such a protocl as a `message`.
+
+#### Transport Layer
+The Internet's transport layer transports application-layer messages between application endpoints. In the Internet there are two transport protocols, TCP and UDP, either of which can transport application-layer messages. <br>
+We'll refer to a transport-layer packet as a `segment`.
+
+#### Network Layer
+The Internet's network layer is responsible for moving network-layer packets known as `datagrams` from one host to another. The network layer provides the service of delivering the segment to the transport layer in the destination host.
+
+#### Link Layer
+The Internet's network layer routes a datagram through a series of routers  between the source and destination. At each node, the network layer passes the datagram down to the link layer, which delivers the datagram to the next node along the route. <br>
+We'll refer to the link-layer packets as `frames`.
+
+#### Physical Layer
+The job of the physical layer is to move the individual bits within the frame from one node to the next. The protocols in this layer are again link dependent and further depend on the actual transmission medium of the link.
+
+<img src="./Figures/CoNe_Fig1-24.png" alt="Protocl Stacks"
+	title="Figure 1.24: Hosts, routers, and link-layer switches; each contains a different set of layers, refelcting their differences in functionality." width="750px"/><br>
