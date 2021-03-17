@@ -4,9 +4,10 @@
 - Contact: ruben.schenk@inf.ethz.ch
 
 # 2. Application Layer
-## 2.2 The Web and HTTP
-### 2.2.1 Overview of HTTP
 
+## 2.2 The Web and HTTP
+
+### 2.2.1 Overview of HTTP
 The `HyperText Transfer Protocol (HTTP)`, the Web's application-layer protocol, is at the heart of the Web. The client program and server program, which both implement HTTP, talk to each other by exchanging HTTP messages. HTTP defines the structure of these messages and how the client and server exchange the messages.
 
 A `Web page` consists of objects. An `object` is simply a file - such as an HTML file, a JPEG image, or a video clip - that is addressable by a single URL.
@@ -31,7 +32,6 @@ To this end, we define the `round-trip time (RTT)`, which is the time it takes f
 Thus, roughly, the `total response time` is two RTTs plus the transmission time at the server of the HTML file.
 
 #### HTTP with Persistent Connections
-
 Non-persistent connections have some shortcomings:
 
 1. For each connection (aka for each object), TCP buffers must be allocated and TCP variables must be kept in both the client and server. This can place a significant burden on the Web server.
@@ -42,11 +42,9 @@ With HTTP 1.1 persistent connections, the server leaves the TCP connection open 
 The default mode of HTTP uses persistent connections with pipelining.
 
 ### 2.2.3 HTTP Message Format
-
 The HTTP specifications include the definitions of the HTTP message formats. There are two types of HTTP messages, request messages and response messages.
 
 #### HTTP Request Message
-
 Below we provide a typical HTTP request message:
 
 ```http
@@ -114,7 +112,6 @@ Some common status codes and associated phrases include:
 - `505 HTTP Version Not Supported`: The requested HTTP protocol version is not supported by the server.
 
 ### 2.2.4 User-Server Interaction: Cookies
-
 We mentioned above that an HTTP server is stateless. However, it is often desireable for a Web site to identify users, either because the server wishes to restrict user access or beause it wants to serve content as a function of the user identity. For these purposes, HTTP uses `cookies`.
 
 Cookie technology has four components: (1) a cookie header line in the HTTP response message, (2) a cookie header line in the HTTP request message, (3) a cookie file kept on the user's end system and managed by the user's browser, and (4) a back-end database at the Web site.
@@ -194,9 +191,59 @@ Suppose the object has not been modified since 9 Sep 2015 09:23:24. Then, fourth
 	Server: Apache/1.3.0 (Unix)
 
 	(empty entity body)
-	
+
 ```
 
 ## 2.4 DNS - The Internet's Directory Service
+Just as humans can be identified in many ways, so too can Internet hosts. One identifier for a host is its `hostname`. But because those consist of variable-length alphanumeric characters, they would be difficult to process by routers. For these reasons, hosts are also identified by so-called `IP addresses`.
+
+An IP address consists of four bytes in a hierarchical structure. An IP address looks like `121.7.106.83`, where each period separates one of the bytes expressed in decimal notation from `0` to `255`.
+
+### 2.4.1 Services Provided by DNS
+We have just seen that there are two ways to identify a host - by a hostname and by an IP address. This fact results in a need of a directory service that translates hostnames to IP addresses. This is the main task of the Internet's `domain name system (DNS)`.
+
+The DNS is (1) a distributed database implemented in a hierarchy of `DNS servers`, and (2) an application-layer protocol that allows hosts to query the distributed database. The DNS protocol runs over UDP and uses port 53.
+
+DNS provides a few other important services in addition to translating hostnames to IP addresses:
+- `Host aliasing`: A host with a complicated hostname can have one or more alias names. For example, `relay1.west-coast.enterprise.com` could have an alias such as `enterprise.com`. In this case, the first hostname is called the `canonical hostname`.
+- `Mail server aliasing`: DNS can be invoked by a mail application to obtain the canonical hostname for a supplied alias hostname as well as the IP address of the host.
+- `Load distribution`: DNS is also used to perform load distribution among replicated servers, such as replicated Web servers. For replicated Web servers, a set of IP addresses is thus associated with one canonical hostname.
+
+### 2.4.2 Overview of How DNS Works
+Suppose some application needs to translate a hostname that needs to be translated. The application will invoke the client side of DNS, specifying the hostname that needs to be translated. DNS in the user's host then takes over, sending a query message into the network. After a delay, DNS in the user's host receives a DNS reply message that provides the desired mapping.
+
+A simple design for DNS would have one DNS server that contains all the mappings. The problem with this `centralized design` include:
+- *Single point of failure*: If the DNS server crashes, so does the Internet.
+- *Traffic volume*: A single DNS would have to handle all DNS queries.
+- *Distant centralized database*: A single DNS server cannot be "close" to all the querying clients.
+- *Maintenance*: The single DNS server would have to keep records for all Internet hosts.
+
+#### A Distributed, Hierarchical Database
+In order to deal with the issue of scale, the DNS uses a large number of servers, organized in a hierarchical fashion distributed around the world. To a first approximation, there are three classes of DNS servers - root DNS servers, top-level domain (TLD) DNS servers, and authoritative DNS servers - organized in a hierarchy as show in the figure below:
+
+<img src="./Figures/CoNe_Fig2-17.png" alt="DNS servers"
+	title="Figure 2.17: Portion of the hierarchy of DNS servers." width="500px"/><br>
+
+Let's take a closer look at these three classes of DNS servers:
+- `Root DNS servers`: There are over 400 root name servers scattered all over the world. These root name servers are managed by 13 different organizations.
+- `Top-level domain (TLD) servers`: For each of the top-level domains - such as `.com`, `.org`, or `.edu` - there is a TLD server (or server cluster).
+- `Authoritative DNS servers`: Every organization with publicly accessible hosts on the Internet must provide publicly accessible DNS records that map the names of those hosts to IP addresses.
+
+There is also another important type of DNS server called the `local DNS server`. A local DNS server does not strictly belong to the hierarchy of servers but is nevertheless central to the DNS architecture. Each ISP - such as a residential ISP or an institutional ISP - has a local DNS server.
+
+Let's look at an example where the host `cse.nyu.edu` desires the IP address of `gaia.cs.umass.edu`. Then the sent queries are shown in the picture below:
+
+<img src="./Figures/CoNe_Fig2-19.png" alt="DNS interaction"
+	title="Figure 2.19: Interaction of the various DNS servers." height="650px"/><br>
+
+The example above makes use of both `recursive queries` and `iterative queries`. The query *(1)* is a recursive query, since it asks `dns.nyu.edu` to obtain the mapping on its behalf. The subsequent queries are all iterative since all of the replies are directly returned to `dns.nyu.edu`.
+
+#### DNS Caching
+The idea behind `DNS caching` is very simple. In a query chain, when a DNS server receives a DNS reply, it can cache the mapping in its local memory. If a hostname/IP address pair is cached in a DNS server and another query arrives to the DNS server for the same hostname, the DNS server can provide the desired IP address, even if it is not authoritative for the hostname.
+
+A local DNS server can also cache the IP address of TLD servers, thereby allowing the local DNS server to bypass the root DNS servers in a query chain.
+
+### 2.4.3 DNS Records and Messages
+
 
 ## 2.6 Video Streaming and Content Distribution Networks
