@@ -103,6 +103,9 @@ Let's look closer at the header lines of our example:
 - `Content-Length`: indicates the number og bytes in the object being sent
 - `Content-Type`: indicates that the object in the entity body is HTML text
 
+<img src="./Figures/CoNe_Fig2-9.png" alt="HTTP Response Message"
+	title="Figure 2.9: General format of an HTTP response message." width="750px"/><br>
+
 Some common status codes and associated phrases include:
 - `200 OK`: Request succeeded and the information is returned in the response.
 - `301 Moved Permanently`: Requested object has been permanently moved, the new URL is specified in `Location` header of the response message.
@@ -112,7 +115,12 @@ Some common status codes and associated phrases include:
 
 ### 2.2.4 User-Server Interaction: Cookies
 
+We mentioned above that an HTTP server is stateless. However, it is often desireable for a Web site to identify users, either because the server wishes to restrict user access or beause it wants to serve content as a function of the user identity. For these purposes, HTTP uses `cookies`.
 
+Cookie technology has four components: (1) a cookie header line in the HTTP response message, (2) a cookie header line in the HTTP request message, (3) a cookie file kept on the user's end system and managed by the user's browser, and (4) a back-end database at the Web site.
+
+<img src="./Figures/CoNe_Fig2-10.png" alt="Cookies"
+	title="Figure 2.10: Keeping user state with cookies." width="750px"/><br>
 
 ## 2.4 DNS - The Internet's Directory Service
 
