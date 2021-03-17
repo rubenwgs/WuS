@@ -122,6 +122,81 @@ Cookie technology has four components: (1) a cookie header line in the HTTP resp
 <img src="./Figures/CoNe_Fig2-10.png" alt="Cookies"
 	title="Figure 2.10: Keeping user state with cookies." width="750px"/><br>
 
+Suppose Susan contacts `Amazon.com` for the first time. When the request comes in, the Amazon Web server creates a unique identification number for Susan and stores it in its back-end database. The Amazon Web server then responds to Susan's browser, including in the HTTP response a `Set-cookie` header, which contains the id number. The header might be:
+
+```http
+
+	Set-cookie: 1678
+
+```
+
+As Susan continues to browse the Amazon site, each time she requests a Web page, her browser consults her cookie file, extracts her id number for this site, and puts a cookie header linea in the HTTP request as follows:
+
+```http
+
+	Cookie: 1678
+
+```
+
+Although the Amazon Web site does not encessarily know Susan's name, it knows exactly which pages user 1678 visited, in which order, and at what times!
+
+### 2.2.5 Web Caching
+A `Web cache` - also called a `proxy server` - is a network that satisfies HTTP requests on the behalf of an origin Web server. The Web cache has its own disk storage and keeps copies of recently requested objects in this storage.
+
+Typically a Web cache is purchased and installed by an ISP. For example, a university might install a cache on its campus network and configure all of the campus browsers to point to the cache.
+
+There are two main reasons to deploy Web caching in the Internet:
+1. A Web cache can substantially reduce the response time for a client request.
+2. Web caches can substantially reduce traffic on an institution's access link to the Internet.
+
+#### The Conditional GET
+HTTP has a mechanism that allows a cache to verify that its objects are up to date. This mechanism is called the `conditional GET`. An HTTP request message is a so-called conditional GET message if (1) the request message uses the `GET` method and (2) the request message includes an `If-Modified-Since` header line.
+
+Let's walk through an example: First, on behalf of a requesting browser, a proxy cache sends a request message to a web server:
+
+```http
+
+	GET /fruit/kiwi.gif HTTP/1.1
+	Host: www.exotiquecuisine.com
+
+```
+
+Second, the Web server sends a response message with the requested object to the cache:
+
+```http
+
+	HTTP/1.1 200 OK
+	Date: Sat, 3 Oct 2015 15:39:29
+	Server: Apache/1.3.0 (Unix)
+	Last-Modified: Wed, 9 Sep 2015 09:23:24
+	Content-Type: image/gif
+
+	(data data data data data ...)
+
+```
+
+Third, one week later, another browser requests the same object via the cache. The cache performs an up-to-date check by issuing a conditional GET. Specifically, the cache sends:
+
+```http
+
+	GET /fruit/kiwi.gif HTTP/1.1
+	Host: www.exotiquecuisine.com
+	If-modified-since: Wed, 9 Sep 2015 09:23:24
+
+```
+
+Suppose the object has not been modified since 9 Sep 2015 09:23:24. Then, fourth, the Web server sends a response message to the cache:
+
+```http
+	
+	HTTP/1.1 304 Not Modified
+	Date: Sat, 10 Oct 2015 15:39:29
+	Server: Apache/1.3.0 (Unix)
+
+	(empty entity body)
+	
+```
+
 ## 2.4 DNS - The Internet's Directory Service
 
 ## 2.6 Video Streaming and Content Distribution Networks
