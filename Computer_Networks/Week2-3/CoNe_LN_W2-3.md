@@ -244,6 +244,20 @@ The idea behind `DNS caching` is very simple. In a query chain, when a DNS serve
 A local DNS server can also cache the IP address of TLD servers, thereby allowing the local DNS server to bypass the root DNS servers in a query chain.
 
 ### 2.4.3 DNS Records and Messages
+The DNS servers that together implement the DNS distributed database store `resource records (RRs)`, including RRs that provide hostname-to-IP address mappings.
 
+A resource record is a four-tuple that contains the following fields:
+
+```http
+(Name, Value, Type, TTL)
+```
+
+`TTL` is the time to live of the resource record. It determines when a resource should be removed from a cache. The meaning of `Name` and `Value` depend on `Type`:
+- `Type = A`: Then `Name` is a hostname and `Value` is the IP address for the hostname. Thus, a Type A record provides the standard hostname-to-IP address mapping. Example: `(relay1.bar.foo.com, 145.37.93.126, A)`
+- `Type = NS`: Then `Name` is a domain and `Value` is the hostname of an authoritative DNS server that knows how to obtain the IP addresses for hosts in the domain. Example: `(foo.com, dns.foo.com, NS)`
+- `Type = CNAME`: Then `Value` is the canonical hostname for the alias hostname `Name`. Example: `(foo.com, realy1.bar.foo.com, CNAME)`
+- `Type = MX`: Then `Value` is a canonical hostname for the alias hostname `Name`. Note that by using the MX record, a company can have the same aliased name for its mail server and for one of its other servers.
+
+If a DNS server is authoritative for a particular hostname, then the DNS server will contain the Type A record for the hostname. If a server is not authoritative for a hostname, then the server will contain a Type NS record for the domain that includes the hostname. It will also contain a Type A record that provides the IP address of the DNS server in the `Value` field of the NS record.
 
 ## 2.6 Video Streaming and Content Distribution Networks
