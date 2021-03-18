@@ -288,3 +288,17 @@ When you register, let's say, the domain name `networkutopia.com` with some regi
 ```
 
 ## 2.6 Video Streaming and Content Distribution Networks
+
+### 2.6.1 Internet Video
+A `video` is a sequence of images, typically being displayed at a constant rate, for example, at 24 or 30 images per second. An uncompressed, digitally encoded image consists of an array of pixels, with each pixel encoded into a number of bits to represent luminance and color.
+
+Today's off-the-shelf compression algorithms can compress a video to essentially any bit rate desired. Of course, the higher the bit rate, the better the image quality and the better the overall user viewing experience.
+
+### 2.6.2 HTTP Streaming and DASH
+In `HTTP streaming`, the video is simply stored at an HTTP server as an ordinary file with a specific URL. When the user wants to see the video, the client establishes a TCP connection with the server and issues an HTTP `GET` request for that URL. On the client side, the bytes are collected in a client application buffer. Once the number of bytes in this buffer exceeds a predetermined threshold, the client application begins playback.
+
+This approach has a major shortcoming: All clients receive the same encoding of the video, despite the large variations in the amount of bandwith available to a client.
+
+This lead to the developement of a new type of HTTP-based streaming, often referred to as `Dynamic Adaptive Streaming over HTTP (DASH)`. In DASH, the video is encoded into several different versions, with each version having a different bit rate. The client dynamically requests chunks of video segments of a few seconds in length. DASH also allows a client to adapt to the available bandwidth if the available end-to-end bandwidth changes during the session. With DASH, each video is stored on the HTTP server, each with different URL. The HTTP server also has a `manifest file`, which provides a URL for each version along with its bit rate.
+
+### 2.6.3 Content Distributed Networks
