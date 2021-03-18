@@ -34,6 +34,32 @@ TCP, on the other hand, offers several additional services to applications:
 - It provides `congestion control`. Loosely speaking, TCP congestion control prevents any one TCP connection from swamping the links and routers between communicating hosts with an excessive amount of traffic.
 
 ## 3.2 Multiplexing and Demultiplexing
+At the destination host, the transport layer receives segments from the network layer just below. The transport layer has the responsibility of delivering the data in these segments to the appropriate application process running in the host. Let's examine how this is done:
+
+First recall that a process can have one or more `sockets`, doors through which data passes from the network to the process and vice versa. The transport layer in the receiving host does not actually deliver data directly to a process, but instead to an intermediary socket. To identify a socket, each socket has a unique identifier.
+
+Each transport-layer segment has a set of fields in the segment for the purpose of socket identification. At the receiving end, the transport layer examines these fields to identify the receiving socket and then directs the segment to that socket. This job of delivering the data to the correct socket is called `demultiplexing`. The job of gathering data chunks from different sockets, encapsulating them with header information and passing the resulting segments to the network layer is called `multiplexing`.
+
+Let us examine how multiplexing and demultiplexing is actually done:<br>
+We know that transport-layer multiplexing requires (1) that sockets have unique identifiers, and (2) that each segment has special fields that indicate the socket to which the segment is to be delivered. These special fields are the `source port number field` and the `destination port number field`.
+
+<img src="./Figures/CoNe_Fig3-3.png" alt="Port-Number Fields"
+	title="Figure 3.3: Source and destination port-number fields in a transport-layer segment." width="350px"/><br>
+
+Each port number is a 16-bit number, ranging from 0 to 65'535. The port numbers ranging from 0 to 1023 are called `well-known port numbers` and are restricted, which means that they are reserved for use by well-known application protocols such as HTTP (port number 80) and FTP (port number 21).
+
+#### Connectionless Multiplexing and Demultiplexing
+We can describe UDP multiplexing/demultiplexing as follows. Suppose a process in Host A, with UDP port 19157, wants to send a chunk of application data to process with UDP port 42069 in Host B:
+1. The transport layer in Host A creates a transport-layer segment that includes the applciation data, the source port number (19157), the destination port number (42069).
+2. The transport layer passes the resulting segment to the network layer.
+3. The network layer encapsulates the segment in an IP datagram and tries to deliver the segment to the receiving host.
+4. If the segment arrives at the receiving Host B, the transport layer examines the destination port number (42069).
+5. Finally, the transport layer at the receiving Host B delivers the segment to its socket identified by port 42069.
+
+It is important to note that a UPD socket is fully identified by a two-tuple consisting of a destination IP address and a destiantion port number.
+
+#### Connection-Oriented Multiplexing and Demultiplexing
+
 
 ## 3.3 Connectionless Transport: UDP
 
