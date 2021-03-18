@@ -260,4 +260,31 @@ A resource record is a four-tuple that contains the following fields:
 
 If a DNS server is authoritative for a particular hostname, then the DNS server will contain the Type A record for the hostname. If a server is not authoritative for a hostname, then the server will contain a Type NS record for the domain that includes the hostname. It will also contain a Type A record that provides the IP address of the DNS server in the `Value` field of the NS record.
 
+#### DNS Messages
+Earlier in this section, we referred to DNS query and reply messages. These are the only two kinds of DNS messages.
+- The first 12 bytes is the `header section`, which has a number of fields. The first field is a 16-bit number that identifies the query. 
+- Furthermore there are a number of flags in the `flag field`:
+	- 1-bit query/reply flag indicates whether the message is a query (0) or a reply (1)
+	- 1-bit authoritative flag is set in a reply message when a DNS server is authoritative for the queried name
+	- 1-bit recursion-desired flag, set when a client desires that the DNS server performs recursion when it doesn't have the record.
+	- 1-bit recursion-available field, set in a reply if the DNS server supports recursion.
+- In the header, there are also four `number-of fields`. These fields indicate the number of occurences of the four types of data sections that follow the header.
+- The `question section` contains information about the query that is being made. This section includes (1) a name field that contains the name that is being queried, and (2) a type field that indicates the type of question being asked about the name.
+- In a reply from a DNS server, the `answer section` contains the resource records for the name that was originally queried. A reply can return multiple RRs in the answer, since a hostname can have multiple IP addresses.
+- The `authority section` contains records of other authoritative servers.
+- The `additional section` contains other helpful records.
+
+<img src="./Figures/CoNe_Fig2-21.png" alt="DNS Message"
+	title="Figure 2.21: DNS message format." width="750px"/><br>
+
+#### Inserting Records into the DNS Database
+A `registrar` is a commercial entity that verifies the uniqueness of the domain name, enters the domain name into the DNS database.
+
+When you register, let's say, the domain name `networkutopia.com` with some registrar, you also need to provide the registrar with the names and IP addresses of your primary and secondary authoritative DNS servers. For each of these two authoritative DNS servers, the registrar would then make sure that a Type NS and a Type A record are entered into the TLD com servers:
+
+```http
+	(networkutopia.com, dns1.networkutopia.com, NS)
+	(dns1.networkutopia.com, 212.212.212.1, A)
+```
+
 ## 2.6 Video Streaming and Content Distribution Networks
