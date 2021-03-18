@@ -302,3 +302,69 @@ This approach has a major shortcoming: All clients receive the same encoding of 
 This lead to the developement of a new type of HTTP-based streaming, often referred to as `Dynamic Adaptive Streaming over HTTP (DASH)`. In DASH, the video is encoded into several different versions, with each version having a different bit rate. The client dynamically requests chunks of video segments of a few seconds in length. DASH also allows a client to adapt to the available bandwidth if the available end-to-end bandwidth changes during the session. With DASH, each video is stored on the HTTP server, each with different URL. The HTTP server also has a `manifest file`, which provides a URL for each version along with its bit rate.
 
 ### 2.6.3 Content Distributed Networks
+For an Internet video company, perhaps the most straightforward approach to providing streaming video service is to build a single massive data center and stream the videos directly from the data center to clients worldwide. This approach has three major probles though:
+1. If the client is far from the data center, packets will cross many communication links. If one of these links provides a throughput that is less than the  video consumption rate, then so will the end-to-end throughput be.
+2. Popular videos will likely be sent many times over the same communication links. Not only will this waste network bandwidth, but the Internet video company will be paying its provider ISP for sending the same bytes into the Internet over again.
+3. A single data center represents a single point of failure - if the data center goes down, it would not be able to distribute any video streams.
+
+Therefore, almost all major video-streaming companies make use of `Content Distribution Networks (CDNs)`. A CDN manages servers in multiple geographically distributed locations and attempts to direct user requests to a CDN location that will provide the best user experience.
+
+The CDN may be a `private CDN`, that is, owned by the content provider itself, or a `third-party CDN` that distributes content on behalf of multiple content providers.
+
+CDNs typically adopt one of two different server placement philosophies:
+- `Enter Deep`: One philosophy is to *enter deep* into the access networks of Internet Service Providers, by deploying server clusters in access ISPs all over the world. The goal is to get close to end users, thereby improving user-perceived delay at the cost of higher maintenance.
+- `Bring Home`: A second philosophy is to *bring the ISPs home* by building large clusters at a smaller number of sites. Instead of getting inside the access ISPs, these CDNs typically place their clusters in Internet Exchange Points (IXPs). This results in lower maintenance and management overhead, possibly at the expense of higher delay and lower throughput to end users.
+
+#### CDN Operation
+When a browser in a user's host is instructed to retreive a specific video, the CDN must intercept the request so that it can (1) determine a suitable CDN server cluster for that client at the time, and (2) redirect the client's request to a server in that cluster.
+
+Most CDNs take advantage of DNS to intercept and redirect requests. We illustrate the involvement of DNS in the following example:
+
+Suppose a content provider, NetCinema, employs a third-party CDN company, KingCDN, to distribute its videos to its customers. The movie "Transformers 7" might be assigned `http://video.netcinema.com/6Y7B23V`. Six steps the occurs, also shown in the figure below:
+1. User vists the Web page at NetCinema.
+2. User clicks on the link of "Transformers 7" and the user's host sends a DNS query for `video.netcinema.com`.
+3. The user's Local DNS Server (LDNS) realys the query to an authoritative DNS server for NetCinema. Instead of returning the IP address, the DNS server returns to the LDNS a hostname in the KingCDN's domain, for example `a1105.kingcdn.com`.
+4. From this point on, the DNS query enters into KingCDN's private DNS infrastructure. The user's LDNS sends a second query and KingCDN's DNS system will eventually return the IP addresses of a KingCDN content server to the LDNS.
+5. The LDNS forwards the IP address of the content-serving CDN node to the user's host.
+6. Once the client receives the IP address for a KingCDN content server, it establishes a direct TCP connection with the server at that IP address and issues an HTTP GET request for the video.
+
+<img src="./Figures/CoNe_Fig2-25.png" alt="CDN Server"
+	title="Figure 2.25: DNS redirects a user's request to a CDN server." width="650px"/><br>
+
+#### Cluster Selection Strategies
+At the core of any CDN deployment is a `cluster selection strategy`, that is, a mechanism for dynamically directing clients to a server cluster or a data center within the CDN. CDNs generally employ proprietary cluster selection strategies:
+1. One simple strategy is to assign the client to the cluster that is `geographically closest`. Such a solution can reasonably well for a large fraction of the clients. However, for some clients, the solution may perform poorly, since the geographically closest cluster may not be the closest cluster in terms of length or number of hops of the network path.
+2. CDNs can instead perform periodic `real-time measurements` of delay and loss performance between their clusters and clients. For instance, a CDN can have each of its clusters periodically send propbes to all the LDNSs around the world. One drawback of this approach is tha many LDNSs are configured to not respond to such probes.
+
+### 2.6.4 Case Studies: Netflix, YouTube, and Kankan
+
+#### Netflix
+Generating 37% of the downstream traffic in residential ISPs in North America in 2015, Netflix has become the leading service provider for online movies and TV series in the United States.
+
+As shown in the figure below, Netflix's Web site runs entirely on Amazon servers in the Amazon cloud. Additionally, the Amazon cloud handles the following critical functions:
+- *Content ingestion*: Before Netflix can distribute a movie to its customers, it must first ingest and process the movie.
+- *Content processing*: The machines in the Amazon cloud create many different formats for each movie, suitable for a diverse array of client video players.
+- *Uploading versions to its CDN*: Once all of the versions of a movie have been created, the hosts in the Amazon cloud upload the versions to its CDN.
+
+<img src="./Figures/CoNe_Fig2-26.png" alt="Netflix"
+	title="Figure 2.26: Netflix video streaming platform." width="650px"/><br>
+
+Netflix has since created its own private CDN, from which it now streams all of its videos. To create its own CDN, Netflix has installed server racks both in IXPs and within residential ISPs themselves. Netflix does not use pull-caching to populate its CDN servers in the IXPs and ISPs. Instead, Netflix distributes by pushing the videos to its CDN servers during off-peak hours. For those locations that cannot hold the entire library, Netflix pushes only the most popular videos, which are determined on a day-to-day basis.
+
+When a user selects a movie to play, Netflix software, running in the Amazon cloud, first determines which of its CDN servers have copies of the movies. Among those servers, the software then determines the "best" server for the client request.
+
+The client and the determines CDN server then directly interact using a proprietary version of DASH. Specifically, the client uses the byte-range header in HTTP GET request messages, to request chunks from the different versions of the movie. Netflix uses chunks that are approximately four-seconds long.
+
+#### YouTube
+As with Netflix, YouTube makes extensive use of CDN technology to distribute its videos. Similar to Netflix, Google uses its own private CDN and has installed server clusters in many hundreds of different IXP and ISP locations.
+
+Unlike Netflix, however, Google uses pull caching and DNS redirect. Most of the time, Google's cluster-selection strategy directs the client to the cluster for which the RTT between client and cluster is the lowest.
+
+YouTube employs HTTP streaming, often making a small number of different versions available for a video, each with a different bit rate and corresponding quality level. YouTube does not employ adaptive streaming (such as DASH), but instead requires the user to manually select a version.
+
+#### Kankan
+Since 2011, Kankan has been deploying P2P video delivery with great success, with tens of millions of users every month.
+
+When a peer wants to see a video, it contacts a tracker to discover other peers in the system that have a copy of that video. This requesting peer then requests chunks of the video parallel from the other peers that have the video.
+
+Specifically, Kankan now deploys a few hundred servers within China and pushes video content to the servers. In most cases, the client requests the beginning of the content from CDN servers, and in parallel requests content from peers. When the total P2P traffic is sufficient for video playback, the client will cease streaming from the CDN and only stream from peers.
