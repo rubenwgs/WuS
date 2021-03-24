@@ -196,6 +196,95 @@ We still have the problem of `instantiation`, since allocations couple clients t
     }
 ```
 
-min. 46:29 w2-1_result
+#### Design Pattern
+**Abstract Factory Pattern**
+
+<img src="./Figures/RSE_Fig2-7.PNG" width="650px"/><br>
+
+We can show the above pattern with the following code example:
+
+```java
+    interface MapFactory<K, V> {
+        Map<K, V> make();
+    }
+
+    class TreeMapFactory implements MapFactory<K, V> {
+        Map<K, V> make() {
+            return new TreeMap<K, V>();
+        }
+    }
+
+    class SymbolTable {
+        MapFactory<Ident, Type> factory;
+        Map<Ident, type> types;
+
+        SymbolTable(MapFactory<Ident, Type> f) {
+            factory = f;
+            types = factory.make();
+        }
+    }
+```
 
 ## 3.2 Adaptation
+Since software is easy to change, software systems often deviate from their initial design. Typical changes are:
+- New features
+- New interfaces
+- Bug fixing, performance tuning
+
+Through `parametrization`, modules can be prepared for change by allowing clients to influence their behavior. One might make modules parametric in:
+- the values they manipualte
+- The data structures they operate on
+- The types they operate on
+- The algorithms they apply
+
+We show as an example a class which is not parametrized:
+
+```java
+    class Merger {
+        
+        // Source of data and numbers of sources is fixed;
+        StringStream f1, f2;
+        boolean toggle;
+
+        // Type of data is fixed
+        String getNext() {
+            String res = null;
+            do {
+                res = (toggle ? f1.getNext() : f2.getNext());
+            
+            // Filter criterion is fixed
+            } while (res == null);
+
+            // Alternation between sources is fixed
+            toggle = !toggle;
+            return res;
+        }
+    }
+```
+
+We can parametrize this class by using interfaces and factories instead of concrete classes:
+
+```java
+    class Merger {
+        Filter[] filters;
+        int next;
+
+        String getNext() {
+            String res = null;
+            do {
+                res = filters[next].getNext();
+            } while(res == null);
+        }
+        next = (next + 1) % filters.length;
+        return res;
+    }
+```
+
+#### Design Pattern
+**Strategy Pattern**
+
+<img src="./Figures/RSE_Fig2-8.PNG" width="650px"/><br>
+
+**Visitor Pattern**
+
+<img src="./Figures/RSE_Fig2-9.PNG" width="650px"/><br>
