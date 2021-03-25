@@ -386,6 +386,32 @@ Structural testing focuses on thoroughness, i.e. covering all of the code. It is
 - Requires design knowledge, which testers and clients do not have and do not care about
 - Thoroughness would lead to highly-reduntant tests
 
+In summary we looked at three different strategies, each with a different goal:
+- `Functional testing`: Cover all the requirements, black-box
+- `Structural testing`: Cover all the code, white-box
+- `Reandom testing`: Cover corner cases, black-box
 ## 5.3 Functional Testing
 
-min. 41:01 w2-2
+### 5.3.1 Partition Testing
+The idea is to divide test inputs into `equivalence classes`, where each possible input belongs to one equivalence class. The goal is to find classes which have a higher density of failures than other classes.
+
+Example: Given a month and a year, compute the number of days in the given month in the given year. We might partition the inputs as follows:
+- Months
+  - Months with 28 or 29 days
+  - Months with 30 days
+  - Months with 31 days
+  - Invalid inputs
+- Years
+  - Standard leap years (year mod 4 = 0)
+  - Standard non-leap years (year mod 4 != 0)
+  - Special leap years (year mod 400 = 0)
+  - Special non-leap years (year mod 100 = 0 and year mod 400 != 0)
+
+### 5.3.2 Selecting Representative Values
+Once we have partitioned the input values, we need to select concrete values for the test cases for each equivalence class.
+
+#### Boundary Testing
+A large number of errors tent to occur at boundaries of the input domain. One should therefore always check the boundaries of the domain!
+
+### 5.3.3 Combinatorial Testing
+
