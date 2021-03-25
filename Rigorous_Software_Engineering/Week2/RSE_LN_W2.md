@@ -288,3 +288,37 @@ We can parametrize this class by using interfaces and factories instead of concr
 **Visitor Pattern**
 
 <img src="./Figures/RSE_Fig2-9.PNG" width="650px"/><br>
+
+# 5. Testing
+
+## 5.1 Test Stages
+
+### Unit Testing
+Unit testing describes testing individual subsystems (collection of classes or a single class). The goal is to confirm that a subsystem is correctly coded and has  the intended functionality.
+
+following a unit test example with JUnit:
+
+```java
+    // To test
+    class SavingsAccount {
+        ...
+        public void deposit(int amount) {...}
+        public void withdraw(int amount) {...}
+        public int getBalance() {...}
+    }
+
+    // Unit test
+    public void withdrawTest() {                        // Test driver
+        SavingsAccount target = new SavingsAccount();   // Create test data
+        target.deposit(300);
+        int amount = 100;
+        target.withdraw(amount);
+        Assert.assertTrue(target.getbalance() == 200);  // Test oracle
+    }
+```
+
+One might also use `parametrized unit tests`, where test methods take arguments for test data. This results in a decoupling of the test driver from the test data.
+
+## 5.2 Test Strategies
+
+## 5.3 Functional Testing
