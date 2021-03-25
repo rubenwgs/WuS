@@ -320,5 +320,72 @@ following a unit test example with JUnit:
 One might also use `parametrized unit tests`, where test methods take arguments for test data. This results in a decoupling of the test driver from the test data.
 
 ## 5.2 Test Strategies
+We first look  at the several testing steps:
+1. Select what will be tested (What parts of the system? What aspects of the system?)
+2. Select test strategy (How is the test data determined?)
+3. Define test cases (What is the test data? How is the test carried out?)
+4. Create test oracle (What are the expected results? Defined before executing tests)
+
+We will explore different `testing strategies` with the following example in mind:
+
+```java
+    // Solving the quadratic equation
+    void roots(double a, double b, double c) {
+        double q = b*b-4*a*c;
+        if(q > 0 && a != 0) {
+            int numRoots = 2;
+            double r = Math.sqrt(q);
+            double x1 = (-b + r) / (2*a);
+            double x2 = (-b i-r) / (2*a);
+        } else if(q == 0) {
+            int numRoots = 1;
+            double x1 = -b / (2*a);
+        } else {
+            int numRoots = 0;
+        }
+    }
+```
+
+#### Strategy 1: Exhaustive Testing
+In `exhaustive testing` we check the UUT for all possible inputs. This is usually not feasible, even for trivial programms.
+
+Example: Assume that `double` represents a 64-bit number, then we'd get $(2^{64})^{3} \simeq 10^{58}$ possible values for $a, \, b,$ and $c$.
+
+#### Strategy 2: Random Testing
+`Random testing` focuses on selecting test data uniformly. In the example code above we see that the methods fails if $a = 0$ and $b = 0$, however, the likelihood of selecting $a = 0$ and $b = 0$ randomly is $1 / 10^{38}$.
+
+Random testing mainly focuses on generating test data fully automatic. We make the following observations with random testing:
+- Advantages:
+  - Avoids designer and tester bias
+  - Tests robustness, especially handling of invalid inputs and unusual actions
+- Disadvantages:
+  - Treats all inputs as equally valuable
+
+#### Strategy 3: Functional Testing
+`Functional testing` focuses on using requirements knowledge to determine the test cases. 
+
+For example, the task of our previous code is given by: "Given three values $a, \, b, \, c,$ compute all solutions of the equation $ax^2 + bx + c$. We furthermore know:
+
+| Two solutions                       | One solution | No solution |
+| :---------------------------------: | :----------: | :---------: |
+| $a \neq 0$ and <br> $b^2 - 4ac > 0$ | $a = 0$ and $b \neq 0$ <br> or $a \neq 0$ and <br> $b^2 - 4ac = 0$ | $a = 0, \, b = 0,$ and $c \neq 0$ <br> or $a \neq 0$ and <br> $b^2 - 4ac < 0$ |
+
+The idea with functional testing is to test each one of the three specified cases.
+
+Functional testing focuses on input/output behavior, i.e. to cover all the requirements. It attempts to find incorrect or missing functions, interface errors, and performance errors.
+
+Limititations of this strategy are:
+- It does not effetctively detect design and coding errors (e.g. buffer overflow, memory management, etc.)
+- It does not reveal errors in the specification (e.g. mising cases)
+
+#### Strategy 4: Structural Testing
+The idea of `structural teesting` is to use design knowledge about system structure, algorithms, and data strctures to determine test cases that exercise a large portion of the code.
+
+Structural testing focuses on thoroughness, i.e. covering all of the code. It is, however, not well suited for system tests:
+- Focuses on code rather than on requirements, for instance, does not detect missing logic
+- Requires design knowledge, which testers and clients do not have and do not care about
+- Thoroughness would lead to highly-reduntant tests
 
 ## 5.3 Functional Testing
+
+min. 41:01 w2-2
