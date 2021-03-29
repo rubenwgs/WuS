@@ -68,4 +68,20 @@ An `intraprocedural control flow graph`(CFG) of a procedure $p$ is a graph $G = 
     - and edge $(entry, \, a, \, true)$ if $a$ is the first basic block of $p$
     - edges $(b, \, exit, \, true)$ for each basic block $b$ that ends with a return statement
 
-32:18 RSE W3-1
+The CFG can serve as an adequacy criterion for test cases. The more parts are executed, the higher the chance to uncover a bug.
+
+#### Statement Coverage
+We can asses the quality of a test suite by measuring how much of the CFG it executes, i.e. number of executed statements over the total number of statements gives you the `statement coverage`.
+
+#### Branch Coverage
+The idea is to test all possible branches in the control flow. An edge $(m, \, n, \, c)$ in a CFG is a `branch` iff. there is another edge $(m, \, n', \, c')$ in the CFG with $n \neq n'$. We define the `branch coverage` as the number of executed branches over the total number of branches.
+
+Complete branch coverage implies complete statement coverage. It is the most widely used adequacy criterion in the industry.
+
+#### Path Coverage
+The idea is to test all possible paths thorugh the CFG. A `path` is a sequence of nodes $n_1,..., \, n_k$ such that $n_1$ is an entry and $n_k$ is an exit. We define the `path coverage` as the number of executed paths over the total number of paths.
+
+Complete path coverage implies complete statement coverage and complete branch coverage. However, complete path coverage is not feasible for loops.
+
+#### Loop Coverage
+The idea is to test for each loop zero, one, and more that one consecutive iterations. The the `loop coverage` is given by the number of executed loops with 0, 1, and more that 2 iteration divided by the total number of loops * 3.
