@@ -69,3 +69,32 @@ $\Rightarrow$ `y := y + 1;` $\Rightarrow$
 | pc | x | y | i |
 |:--:|:-:|:-:|:-:|
 | 5  | $\top$ | $\top$ | $\top$ |
+
+It is easy to be `sound` and `imprecise`, simply output $\top$. It is desirable though to be both `sound` and `precise`.
+
+### Step 3: Iterate to a fixed point
+To start the analysis we start to iterate with the least abstract element. This means that initially, all 7 states in our code example from above look like:
+
+| pc | x | y | i |
+|:--:|:-:|:-:|:-:|
+| 1-7  | $\bot$ | $\bot$ | $\bot$ |
+
+After executing some iterations we will see that we get a state which doesn't change anymore, a so called `fixed point`:
+
+<img src="./Figures/RSE_FIG_4-2.png" width="550px"/><br>
+
+### Step 4: Check property
+As we can see, our property we're trying to prove is $(0 \leq x + y)$. As both $x$ and $y$ are positive in pc $7$, we have shown via abstract interpolation, that our assertion holds.
+
+## 6.3 More on Abstract Interpolation
+### Joins
+When we have two abstract elements $A$ and $B$, we can `join` them to produce their least upper bound, denoted by $A \sqcup B$.
+
+We then have that $A \sqsubseteq A \sqcup B$ and $B \sqsubseteq A \sqcup B$, where $D \sqsubseteq E$ means that $E$ is `more abstract` than $D$.
+
+### Widening
+With the interval abstraction we might not reach a fixed point. We therefore introduce a special operator called `widening operator`. It ensures termination at the expense of precision.
+
+Whenever we want to join two states and we see that one variable is increasing, we directly go to infinity. 
+
+Example: Instead of joining $[7, \, 7]$ with $[8, \, 8]$ to $[7, \, 8]$, we widen it to $[7, \, \infty]$.
