@@ -1,4 +1,4 @@
-# Rigorous Software Engineering- Week 4 (Lectures)
+# Rigorous Software Engineering - Week 4 (Lectures)
 - Author: Ruben Schenk
 - Date: 30.03.2021
 - Contact: ruben.schenk@inf.ethz.ch
