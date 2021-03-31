@@ -31,4 +31,41 @@ Lets prove an assertion to see how abstract interpolation works. Consider the fo
     }
 ```
 
-Finished RSE VID W4-1
+### Step 1: Select abstraction
+Lets pick the `sign` abstraction, given as follows:
+
+<img src="./Figures/RSE_FIG_4-1.png" height="350px"/><br>
+
+- $\top$: stands for all possible values
+- $-$: stands for the negative values ($\leq 0$)
+- $+$: stands for the positive values ($\geq 0$)
+- $0$: stands for zero
+- $\bot$: unreachable numbers (for now)
+
+An `abstract` program state is a map from variables to elements in the domain. Example:
+
+| pc | x | y | i |
+|:--:|:-:|:-:|:-:|
+| 2  | + | $\bot$ | $\top$ |
+
+We see that at pc (program counter) 2, i.e. right before the execution of the second line, $x$ is positive, $y$ is bottom, i.e. not yet defined, and $i$ is either positive or negative.
+
+### Step 2: Define Transformers
+An `abstract transformer` describes the effect of statement and expression evaluation on an abstract state.
+
+It is important to remember that abstract transformers are defined per `programming language` once and for all, and not per-program! <br>
+This means thath any program in the programming language can use the same transformers.
+
+A `correct abstract transformer` should always produce results that are superset of what a concrete transformer would produce.
+
+Example of a sound transformer:
+
+| pc | x | y | i |
+|:--:|:-:|:-:|:-:|
+| 4  | $\top$ | - | $\top$ |
+
+$\Rightarrow$ `y := y + 1;` $\Rightarrow$
+
+| pc | x | y | i |
+|:--:|:-:|:-:|:-:|
+| 5  | $\top$ | $\top$ | $\top$ |
