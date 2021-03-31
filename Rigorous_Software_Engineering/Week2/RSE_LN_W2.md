@@ -412,6 +412,3 @@ Once we have partitioned the input values, we need to select concrete values for
 
 #### Boundary Testing
 A large number of errors tent to occur at boundaries of the input domain. One should therefore always check the boundaries of the domain!
-
-### 5.3.3 Combinatorial Testing
-
