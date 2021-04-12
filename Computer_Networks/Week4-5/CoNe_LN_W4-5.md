@@ -59,7 +59,22 @@ We can describe UDP multiplexing/demultiplexing as follows. Suppose a process in
 It is important to note that a UPD socket is fully identified by a two-tuple consisting of a destination IP address and a destiantion port number.
 
 #### Connection-Oriented Multiplexing and Demultiplexing
+One subtle difference between a TCP socket and a UDP socket is that a TCP socket is identified by a four-tuple: source IP address, source port number, destination IP address, and destination port number. And therefore, in contrast with UDP, two arriving TCP segments with different source IP addresses or source port numbers will be directed to two different sockets.
 
+Establishing a TCP connection looks something like this:
+1. The TCP server application has a "welcoming socket", that waits for connection establishment requests from TCP clients on port number 12000.
+2. The TCP client creates a socket and sends a connection establishment request segment, which is nothing more than a TCP segment with destination port number 12000 and a special connection establishment bit set in the TCP header.
+3. When the host receives the incoming connection request segment, it locates the server process that is waiting to accept a connection and then creates a new socket.
+4. The transport layer at the server also notes the following four values: (1) the source port number in the segment, (2) the IP address of the source host, (3) the destination port number in the segment, and (4) its own IP address. The newly created connection socket is identified by these four values.
+
+In summary, when a TCP segment arrives at the host, all four fields, as described above, are used to direct (`demultiplex`) the segment to the appropriate socket.
+
+<img src="./Figures/CoNe_Fig3-5.png" alt="Web communication"
+	title="Figure 3.5: Two clients, using the same destination port number (80) to communicate with the same Web server application." width="500px"/><br>
+
+#### Web Servers and TCP
+Consider a host running a Web server, such as an Apache Web server, on port 80. When clients send segments to the server, _all_ segments will have destination port 80.
+Furthermore, if the client and server are using persistent HTTP, then throughout the duration of the connection the client and server exchange HTTP messages via the same server socket. However, if the client and server use non-persistent HTTP, then a new TCP connection is created and closed for every request/response, and hence, a new socket is created and later closed for every request/response.
 
 ## 3.3 Connectionless Transport: UDP
 
