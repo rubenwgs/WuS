@@ -77,11 +77,37 @@ Consider a host running a Web server, such as an Apache Web server, on port 80. 
 Furthermore, if the client and server are using persistent HTTP, then throughout the duration of the connection the client and server exchange HTTP messages via the same server socket. However, if the client and server use non-persistent HTTP, then a new TCP connection is created and closed for every request/response, and hence, a new socket is created and later closed for every request/response.
 
 ## 3.3 Connectionless Transport: UDP
+`UDP` does just as little as a transport protocol can do. Aside from the multiplexing/demultiplexing function and some light error checking, it adds nothing to IP.
+
+UDP takes messages from the application process, attaches source and destination port number fields for the multiplexing/demultiplexing service, and passes the resulting segment onto the network layer. The network layer encapsulates the transport-layer segment into an IP datagram and then makes a best-effort attempt to deliver the segment to the receiving host. <br>
+Note that with UDP there is no handshaking between sending and receiving transport-layer entities before sending a segment. For this reason, UDP is said to be `connectionless`.
+
+Following some reasons why an application developer would ever choose UDP rather than TCP:
+- *Finer application-level control over what data is sent, and when*: Under UDP, as soon as an application process passes data to UDP, UDP will package the data inside a UDP segment and immediately pass the segment to the networky layer. TCP, on the other hand, has a congestion-control mechanism that throttles the transport-layer TCP sender.
+- *No connection establishment*: As we'll discuss later, TCP uses a three-way handshake before it starts to transfer data. UDP just blasts away without any formal preliminaries. Thus UDP does not introduce any delay to establish a connection.
+- *No connection state*: TCP maintains connection state in the end systems. This connection state includes receive and send buffers, congestion-control parameters, and sequence and acknowledgment number parameters. UDP, on the other hand, does not maintain connection state. For this reason, a server devoted to a particular application can typically support many more active clients when the applciation runs over UDP rather than TCP.
+- *Small packet header overhead*: The TCP segment has 20 bytes of header overhead, whereas UDP has only 8 bytes of overhead.
+
+### 3.3.1 UDP Segment Structure
+The UDP segment structure is shown in the figure below. The application data occupies the `data field` of the UDP segment. The `UDP header` has only four fields, each consisting of two bytes. The `port numbers` allow the destination host to pass the application data to the correct process. The `length field` specifies the number of bytes in the UDP segment (header plus data). The `checksum` is used by the receiving host to check whether errors have been introduced into the segment.
+
+<img src="./Figures/CoNe_Fig3-7.png" alt="UDP segment structure"
+	title="Figure 3.7: UDP segment structure." width="350px"/><br>
+
+### 3.3.2 UDP Checksum
+The UDP checksum provides for error detection. That is, the checksum is used to determine whether bits within the UDP segment have been altered as it moved from source to destination.
+
+UDP at the sender side performs the 1s complement of the sum of all the 16-bit words in the segment, with any overflow encountered during the sum being wrapped around. This result is put in the ckecksum field of the UDP segment. At the receiver, all four 16-bit words are added, including the checksum. If no errors are introduced into the packet, then clearly the sum at the receiver will be `1111111111111111`. If one of the bits is a `0`, then we know that errors have been introduced into the packet.
+
+Given that neither link-by-link reliability nor in-memory error detection is guaranteed, UDP must provide error detection at the transport layer, on an end-end basis. This is an example of the celebrated `end-end principle` in system design.
 
 ## 3.4 Principles of Reliable Data Transfer
 
+
 ## 3.5 Connection-Oriented Transport: TCP
 
+
 ## 3.6 Principles of Congestion Control
+
 
 ## 3.7 TCP Congestion Control
