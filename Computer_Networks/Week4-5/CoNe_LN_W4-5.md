@@ -102,7 +102,36 @@ UDP at the sender side performs the 1s complement of the sum of all the 16-bit w
 Given that neither link-by-link reliability nor in-memory error detection is guaranteed, UDP must provide error detection at the transport layer, on an end-end basis. This is an example of the celebrated `end-end principle` in system design.
 
 ## 3.4 Principles of Reliable Data Transfer
+The problem of implementing reliable data transfer occurs not only at the transport layer, but also at the link layer and the application layer as well. With a `reliable` channel, not transferred data bits are corrupted (flipped from 0 to 1, or vice versa) or lost, and all are delivered in the order in which they were sent.
 
+It is the responsibility of a `reliable data transfer protocol` to implement this service abstraction. This task is made difficult by the fact that the layer below the reliable data transfer protocol may be unreliable.
+
+In the following sections we consider only the case of unidirectional data transfer, that is, data transfer from the sending to the receiving side. The case of reliable bidirectional data transfer is conceptually no more difficult.
+
+### 3.4.1 Building a Reliable Data Transfer Protocol
+#### Reliable Data Transfer over a Perfectly Reliable Channel: rdt1.0
+We first consider the simplest case, in which the underlying channel is completely reliable. The protocol itself, which we'll call `rdt1.0`, is trivial. The `finite-state machine (FSM)` for the `rdt1.0` sender and receiver is shown in the picture below.
+
+<img src="./Figures/CoNe_Fig3-9.png" alt="rdt1.0 Protocol"
+	title="Figure 3.9: rdt1.0 - A protocol for a completely reliable channel." width="350px"/><br>
+
+##### Reliable Data Transfer over a Channel with Bit Errors: rdt2.0
+A more realistic model of the underlying channel is one in which bits in a packet may be corrupted. Such bit errors typically occur in the physical components of a network as a packet is transmitted, propagates, or is buffered.
+
+We might imagine a message-dictation protocol where the message taker might say "OK" after each understood sentence (`positive acknowledgment`) or "Please repeat that" after each not understood sentence (`negative acknowledgment`). <br>
+These control messages allow the receiver to let the sender know what has been received correctly, and what has been received in error and thus requires repeating. Data transfer protocols based on such retransmission are known  as `ARQ (Automatic Repeat reQuest) protocols`.
+
+Fundamentally, three additional protocol capabilities are required in ARQ protocols to handle the presence of bit errors:
+- `Error detection`: First, a mechanism is needed to allow the receiver to detect when bit errors have occured.
+- `Receiver feedback`: The positive (`ACK`) and negative (`NAK` acknowledgment replies are examples of such feedback.
+- `Retransmission`: A packet that is received in error at the receiver will be retransmitted by the sender.
+
+The figure below shows the FSM representation of `rdt2.0`, a data transfer protocol employing error detection, positive acknowledgments, and negative acknowledgments.
+
+<img src="./Figures/CoNe_Fig3-10.png" alt="rdt2.0 Protocol"
+	title="Figure 3.10: rdt2.0 - A protocol for a channel with bit errors." width="350px"/><br>
+
+It is important to note that when the sender is in the wait-for-ACK-or-NAK state, it cannot get more data from the upper layer. Thus, the sender will not send a new piece of data until it is sure that the receiver has correctly received the current packet. Because of this behavior, protocols such as `rdt2.0` are known as `stop-and-wait` protocols.
 
 ## 3.5 Connection-Oriented Transport: TCP
 
