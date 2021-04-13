@@ -129,7 +129,7 @@ Fundamentally, three additional protocol capabilities are required in ARQ protoc
 The figure below shows the FSM representation of `rdt2.0`, a data transfer protocol employing error detection, positive acknowledgments, and negative acknowledgments.
 
 <img src="./Figures/CoNe_Fig3-10.png" alt="rdt2.0 Protocol"
-	title="Figure 3.10: rdt2.0 - A protocol for a channel with bit errors." width="350px"/><br>
+	title="Figure 3.10: rdt2.0 - A protocol for a channel with bit errors." width="500px"/><br>
 
 It is important to note that when the sender is in the wait-for-ACK-or-NAK state, it cannot get more data from the upper layer. Thus, the sender will not send a new piece of data until it is sure that the receiver has correctly received the current packet. Because of this behavior, protocols such as `rdt2.0` are known as `stop-and-wait` protocols.
 
