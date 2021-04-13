@@ -151,6 +151,9 @@ The figure below shows the FSM description for `rdt2.1`, our fixed version of `r
 We can accomplish the same effect as a NAK if, instead of sending a NAK, we send an ACK for the last correctly received packet. A sender that receives two ACKs for the same packet knows that the receiver did not correctly receive the packet following the packet that is beeing ACKed twice.
 
 #### Reliable Data Transfer over a Lossy Channel with Bit Errors: rdt3.0
+Suppose now that in addition to corrupting bits, the underlying channel can `lose packets` as well, a not-uncommon event in today's computer networks. Two additional concerns must now be addressed by the protocol: how to detect packet loss and what to do when a packet loss occurs.
+
+Suppose that the sender transmits a data packet and either that packet, or the receiver's ACK of that packet, gets lost. In either case, no 
 
 ## 3.5 Connection-Oriented Transport: TCP
 
