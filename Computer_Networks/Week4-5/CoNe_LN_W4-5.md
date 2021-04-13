@@ -133,6 +133,25 @@ The figure below shows the FSM representation of `rdt2.0`, a data transfer proto
 
 It is important to note that when the sender is in the wait-for-ACK-or-NAK state, it cannot get more data from the upper layer. Thus, the sender will not send a new piece of data until it is sure that the receiver has correctly received the current packet. Because of this behavior, protocols such as `rdt2.0` are known as `stop-and-wait` protocols.
 
+Protocol `rdt2.0` may look as if it works but, unfortunately, it has a fatal flaw. In particular, we haven't accounted for the possibility that the ACK or NAK packet could be corrupted. We will need to add checksum bits to ACK/NAK packets in order to detect such errors. The more difficult question is how the protocol should recover from errors in ACK and NAK packets.
+
+A simple solution to this new problem is to add a new field to the data packet and have the sender number its data packets by putting a `sequence number` into this field. The receiver then need only check this sequence number to determine whether or not the received packet is a retransmission. For our simple example, a 1-bit sequence number will suffice.
+
+The figure below shows the FSM description for `rdt2.1`, our fixed version of `rdt2.0`. <br>
+**rdt2.1 sender**
+
+<img src="./Figures/CoNe_Fig3-11.png" alt="rdt2.1 sender"
+	title="Figure 3.11: rdt2.1 sender" width="600px"/><br>
+
+**rdt2.1 receiver**
+
+<img src="./Figures/CoNe_Fig3-12.png" alt="rdt2.1 receiver"
+	title="Figure 3.12: rdt2.1 receiver" width="600px"/><br>
+
+We can accomplish the same effect as a NAK if, instead of sending a NAK, we send an ACK for the last correctly received packet. A sender that receives two ACKs for the same packet knows that the receiver did not correctly receive the packet following the packet that is beeing ACKed twice.
+
+#### Reliable Data Transfer over a Lossy Channel with Bit Errors: rdt3.0
+
 ## 3.5 Connection-Oriented Transport: TCP
 
 
