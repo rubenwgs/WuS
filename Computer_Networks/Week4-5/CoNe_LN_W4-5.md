@@ -70,7 +70,7 @@ Establishing a TCP connection looks something like this:
 In summary, when a TCP segment arrives at the host, all four fields, as described above, are used to direct (`demultiplex`) the segment to the appropriate socket.
 
 <img src="./Figures/CoNe_Fig3-5.png" alt="Web communication"
-	title="Figure 3.5: Two clients, using the same destination port number (80) to communicate with the same Web server application." width="500px"/><br>
+	title="Figure 3.5: Two clients, using the same destination port number (80) to communicate with the same Web server application." width="650px"/><br>
 
 #### Web Servers and TCP
 Consider a host running a Web server, such as an Apache Web server, on port 80. When clients send segments to the server, _all_ segments will have destination port 80.
@@ -199,6 +199,11 @@ The GBN sender must respond to three types of events:
 The receiver's actions in GBN are also simple. If a apcket with the sequence number $n$ is received correctly and is in order, the receiver sends an ACK for packet $n$ and delivers the data portion of the packet to the upper layer. In all other cases, the receiver discards the packet and resends an ACK for the most recently received in-order packet.
 
 It is important to note, that in our GBN protocol, the receiver discards out-of-order packets. The advantage of this approach is the simplicity of receiver buffering - the receiver need not buffer any out-of-order packets.
+
+### 3.4.4 Selective Repeat (SR)
+There are scenarios in which GBN itsel suffers from performance problems. In particular, when the window size and bandwidth-delay product are both large, many packets can be in the pipeline. A single packet error can thus cause GBN to retransmit a large number of packets.
+
+As the name suggests, selective-repeate protocols avoid unnecessary retransmissions by having the sender retransmit only those packets that it suspects were received in error at the receiver. The SR receiver will acknowledge a correctly received packet whether or not it is in order. Out-of-order packets are buffered until any missing packets are received, at which point a batch of packets can be delivered in order to the upper layer.
 
 ## 3.5 Connection-Oriented Transport: TCP
 
