@@ -173,6 +173,32 @@ The solution to this particular performance problem is rather simple: Rather tha
 - The manner in which a protocol responds to lost, corrupted, and overly delayed packets must be adjusted. Two basic approaches toward piepelined error recovery can be identified: `Go-Back-N` and `selective repeat`.
 
 ### 3.4.3 Go-Back-N (GBN)
+In a `Go-Back-N (GBN) protocol`, the sender is allowed to transmit multiple packets without waiting for an acknowledgment, but is constrained to have no more than some maximum allowable number, `N`, of unacknowledged packets in the pipeline.
+
+The figure below shows the sender's view of the range of sequence numbers in GBN protocol.
+
+<img src="./Figures/CoNe_Fig3-19.png" alt="GBN sequence numbers"
+	title="Figure 3.19: Sender's view of sequence numbers in Go-Back-N." width="650px"/><br>
+
+If we define `base` to be the sequence number of the oldest unacknowledged packet and `nextseqnum` to be the smallest unused sequence number. Sequence numbers in the interval `[0, base-1]` correspond therefore to packets that have been transmitted and acknowledged. The interval `[base, nextseqnum-1]` corresponds to packets that have been sent but not yet acknowledged. Sequence numbers in the interval `[nextseqnum, base+N-1]` can be used for packets that can be sent immediately, should data arrive from the upper layer. Finally, sequence numbers greater than or equal to `base+N` cannot be used until an acknowledged packet currently in the pipeline has been acknowledged. <br>
+As the protocol operates, the window slides forward over the sequence number space. For this reason, $N$ is often referred to as the `window size` and the GBN protocol itself as a `sliding-window protocol`.
+
+The two figures below give an extended FSM description of the sender and receiver sides of an ACK-based, NAK-free, GBN protocol.
+
+<img src="./Figures/CoNe_Fig3-20.png" alt="GBN sender"
+	title="Figure 3.20: Extended FSM description of the GBN sender." width="650px"/><br>
+
+<img src="./Figures/CoNe_Fig3-21.png" alt="GBN receiver"
+	title="Figure 3.21: Extended FSM description of the GBN receiver." width="450px"/><br>
+
+The GBN sender must respond to three types of events:
+- *Invocation from above*: When `rdt_send()` is called from above, the sender first checks to see if the window is full. If the window is not full, a packet is created and sent, and variables are appropriately updated. If the window is full, the sender simply returns the data back to the upper layer.
+- *Receipt of an ACK*: In our GBN protocol, an acknowledgment for a packet with the sequence number $n$ will be takren to be a `cumulative acknowledgment`, indicating that all packets with sequence number up to and including $n$ have been correctly received.
+- *A timeout event*: The protocol's name is derived from the sender's behavior in the presence of lost or overly delayed packets. If a timeout occurs, the sender resends all packets that have been previously sent but that have not yet been acknowledged.
+
+The receiver's actions in GBN are also simple. If a apcket with the sequence number $n$ is received correctly and is in order, the receiver sends an ACK for packet $n$ and delivers the data portion of the packet to the upper layer. In all other cases, the receiver discards the packet and resends an ACK for the most recently received in-order packet.
+
+It is important to note, that in our GBN protocol, the receiver discards out-of-order packets. The advantage of this approach is the simplicity of receiver buffering - the receiver need not buffer any out-of-order packets.
 
 ## 3.5 Connection-Oriented Transport: TCP
 
