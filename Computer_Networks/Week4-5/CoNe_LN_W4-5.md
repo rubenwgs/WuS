@@ -153,7 +153,26 @@ We can accomplish the same effect as a NAK if, instead of sending a NAK, we send
 #### Reliable Data Transfer over a Lossy Channel with Bit Errors: rdt3.0
 Suppose now that in addition to corrupting bits, the underlying channel can `lose packets` as well, a not-uncommon event in today's computer networks. Two additional concerns must now be addressed by the protocol: how to detect packet loss and what to do when a packet loss occurs.
 
-Suppose that the sender transmits a data packet and either that packet, or the receiver's ACK of that packet, gets lost. In either case, no 
+Suppose that the sender transmits a data packet and either that packet, or the receiver's ACK of that packet, gets lost. In either case, no reply is forthcoming at the sender from the receiver. If the sender is willing to wait long enough so that it is certain that a packet has been lost, it can simply retransmit the data packet. But how long must the sender wait to be certain that something has been lost?
+
+The approach adopted in practice is for the sender to judiciously choose a time value such that packet loss is likely, although not guaranteed, to have happened.If an ACK is not received within this time, the packet is retransmitted.
+
+The figure below shows the sender FSM for `rdt3.0`, a protocol that reliably tranfers data over a channel that can corrupt or lose packets.
+
+<img src="./Figures/CoNe_Fig3-15.png" alt="rdt3.0 sender"
+	title="Figure 3.15: rdt3.0 sender" width="600px"/><br>
+
+Becuase the packet sequence numbers alternate between 0 and 1, protocol `rdt3.0` is sometimes known as the `alternating-bit protocol`.
+
+### 3.4.2 Pipelined Reliable Data Transfer Protocols
+Protocol `rdt3.0` is a functionally correct protocol. At the heart of `rdt3.0`'s performance problem is the fact that it is a stop-and-wait protocol.
+
+The solution to this particular performance problem is rather simple: Rather than operate in a stop-and-wait manner, the sender is allowed to send multiple packets without waiting for acknowledgments. Since the many in-transit sender-to-receiver packets can be visualized as filling a pipeline, this technique is known as `pipelining`. Pipelining has the following consequences for reliable data trasnfer protocols:
+- The range of sequence numbers must be increased, since each in-transit packet must have a unique sequence number.
+- The sender and receiver sides of the protocols may have to buffer more than one packet. Minimally, the sender will have to buffer packets that have been transmitted but not yet acknowledged.
+- The manner in which a protocol responds to lost, corrupted, and overly delayed packets must be adjusted. Two basic approaches toward piepelined error recovery can be identified: `Go-Back-N` and `selective repeat`.
+
+### 3.4.3 Go-Back-N (GBN)
 
 ## 3.5 Connection-Oriented Transport: TCP
 
