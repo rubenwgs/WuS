@@ -201,9 +201,22 @@ The receiver's actions in GBN are also simple. If a apcket with the sequence num
 It is important to note, that in our GBN protocol, the receiver discards out-of-order packets. The advantage of this approach is the simplicity of receiver buffering - the receiver need not buffer any out-of-order packets.
 
 ### 3.4.4 Selective Repeat (SR)
-There are scenarios in which GBN itsel suffers from performance problems. In particular, when the window size and bandwidth-delay product are both large, many packets can be in the pipeline. A single packet error can thus cause GBN to retransmit a large number of packets.
+There are scenarios in which GBN itself suffers from performance problems. In particular, when the window size and bandwidth-delay product are both large, many packets can be in the pipeline. A single packet error can thus cause GBN to retransmit a large number of packets.
 
 As the name suggests, selective-repeate protocols avoid unnecessary retransmissions by having the sender retransmit only those packets that it suspects were received in error at the receiver. The SR receiver will acknowledge a correctly received packet whether or not it is in order. Out-of-order packets are buffered until any missing packets are received, at which point a batch of packets can be delivered in order to the upper layer.
+
+<img src="./Figures/CoNe_Fig3-23.png" alt="SR sender and receiver"
+	title="Figure 3.23: selective-repeat (SR) sender and receiver views of sequence-number space." width="650px"/><br>
+
+**SR sender events and actions:**
+1. *Data received from above*: When data is received from above, the SR sender checks the next available sequence number for the packet. If the sequence number is within the sender's window, the data is packetized and sent.
+2. *Timeout*: Timers are again used to protect against lost packets. However, each pacvket must now have its own logical timer, since only a single packet will be transmitted on timeout.
+3. *ACK received*: If an ACK is received, the SR sender marks that packet as having been received, provided it is in the window.
+
+**SR receiver events and actions:**
+1. *Packet with sequence number in* `[rcv_base, rcv_base+N-1]` *is correctly received*: In this case, the received packet falls within the receiver's window and a selective ACK packet is returned to the sender.If the packet was not previously received, it is buffered. If this packet has a sequence number equal to the base of the receive window, then this packet, and any previously buffered and consecutively numbered packets are delivered to the upper layer.
+2. *Packet with sequence number in* `[rcv_base-N, rcv_base-1]` *is correctly received*: In this case, an ACK must be generated, even though this is a packet that the receiver has previously acknowledged.
+3. *Otherwise*: Ignore the packet.
 
 ## 3.5 Connection-Oriented Transport: TCP
 
