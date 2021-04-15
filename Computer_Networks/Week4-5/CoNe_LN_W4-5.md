@@ -250,11 +250,82 @@ As with UDP, the header includes `source and destination port numbers`, which ar
 <img src="./Figures/CoNe_Fig3-29.png" alt="TCP segment"
 	title="Figure 3.29: TCP segment structure." width="400px"/><br>
 
+#### Sequence Numbers and Acknowledgment Numbers
 Two of the most important fields in the TCP segment header are the sequence number field and the acknowledgment number field. These fields are critical part of TCP's reliable data transfer service. The `sequence number for a segment` is therefore the byte-stream number of the first byte in the segment. For the acknowledgment number we consider Host A and Host B sending data from one to each other. Each of the segments that arrive from Host B have a sequence number for the data flowing from B to A. The `acknowledgment number` that Host A puts in its segment is the sequence number of the next byte Host A is expencting from Host B.
 
 Because TCP only acknowledges bytes up to the first missing byte in the stream, TCP is said to provide `cumulative acknowledgments`.
 
-#### Sequence Numbers and Acknowledgment Numbers
+### 3.5.3 Round-Trip time Estimation and Timeout
+TCP, like our `rdt` protocol in the previous section, uses a timeout/retransmit mechanism to recover from lost segments. One of the most obvious questions is the `length of the timeout intervals`. Clearly, the timeout should be larger than the connection's round-trip time (RTT), that is, the time from when a segment is sent until it is acknowledged.
+
+#### Estimating the Round-Trip Time
+The sample RTT, denoted `SampleRTT`, for a segment is the amount of time between when the segment is sent and when an acknowledgment for the segment is received. Instead of measuring a `SampleRTT` for every transmitted segment, most TCP implementations take only one `SampleRTT` measurement at a time. Furthermore, TCP maintains an average, called `EstimatedRTT`, of the `SampleRTT` values. Upon obtaining a new `SampleRTT`, TCP updates `EstimatedRTT` according to the following formula:
+
+$$\text{EstimatedRTT} = (1 - \alpha) \cdot \text{EstimatedRTT} + \alpha \cdot \text{SampleRTT}$$
+
+The recommended value of $\alpha$ is $\alpha = 0.125$. <br>
+In addition to having an estimate of the RTT, it is also valuable to have a measure of the variability of the RTT. We define the RTT variation, `DevRTT`, as an estimate of how much `SampleRTT` typically deviates from `EstimatedRTT`:
+
+$$\text{DevRTT} = (1- \beta) \cdot \text{DevRTT} + \beta \cdot | \text{SampleRTT} - \text{EstimatedRTT} |$$
+
+If the `SampleRTT` values have little fluctuation, `DevRTT` will be small. On the other hand, if there is a lot of fluctuation, `DevRTT` will be large. The recommended value of $\beta$ is $0.25$.
+
+#### Setting and Managing the Retransmission Timeout Interval
+All of the above meantioned measurements are taken into account in TCP's method for determining the retransmission timeout interval:
+
+$$\text{TimeoutInterval} = \text{EstimatedRTT} + 4 \cdot \text{DevRTT}$$
+
+An initial `TimeoutInterval` value of 1 second is recommended.
+
+### 3.5.4 Reliable Data Transfer
+Recall that the Internet's network-layer service (IP service) is unreliable. IP does not guarantee datagram delivery, does not guarantee in-order delivery of datagrams, and does not guarantee the integrity of the data in the datagrams. TCP, however, creates a `reliable data transfer service` on top of IP's unreliable best-effort service. TCP's reliable data transfer service ensures that the data stream that a process reads out of its TCP receive buffer is uncorrupted, without gaps, without duplication, and in sequence.
+
+In our earlier developement of reliable data transfer techniques, it was conceptually easiest to assume that an individual timer is associated with each transmitted but not yet acknowledged segment. While this is great in theory, timer management can require considerable overhead. Thus, the recommended TCP timer management procedures use only a single retransmission timer, even if there are multiple transmitted but not yet acknowledged segments.
+
+The code below presents a highly simplified description of a TCp sender. We see that there are three major events related to data transmission and retransmissio in the TCP sender: data received from application above, timer timeout, and ACK receipt.
+
+```pseudocode
+	NextSeqNum = InitialSeqNumber;
+	SendBase = InitialSeqNumber;
+
+	loop(forever) {
+		switch(event) {
+			event: data received from application above
+				create TCP segment with sequence number NextSeqNum
+				if(timer currently not running) {
+					start timer
+				}
+				pass segment to IP
+				nextSeqNum = NextSeqNum + length(data)
+				break;
+			
+			event: timer timeout
+				retransmit not-yet-acknowledged segment with
+					smallest sequence number
+				start timer
+				break;
+			
+			event: ACK received, with ACK field value of y
+				if(y > SendBase) {
+					SendBase = y
+					if(there are currently any not-yet-acknowledged segments) {
+						start timer
+					}
+				}
+				break,
+		}
+	} /* end of forever loop */
+```
+Upon occurrence of the first major event, TCP `receives data from the application`, encapsulates the data in a segment, and passes the segment to IP.<br>
+The second major event is the `timeout`. TCP responds to the timeout event by retransmitting the segment that caused the timeout. TCP then restarts the timer.<br>
+The third major event that must be handled by the TCP sender is the arrival of an acknowledgment segment (ACK) from the receiver.
+
+TCP uses `cumulative acknowledgments`, so that $y$ acknowledges the receipt of all bytes before byte number $y$. If $y > \text{SendBase}$, then the ACK is acknowledging one or more previously unacknowledged segments. thus the sender updates its `SendBase` variable.
+
+#### Doubling the Timeout Interval
+The first modification that most TCP implementations employ concerns the length of the timout interval after a timer expiration. In this modification, whenever the timeout event occurs, TCP retransmits the not-yet-acknowledged segment with the smallest sequence number, as described above. But each time TCP retransmits, it sets the next timeout interval to twice the previous value. Thus the intervals grow exponentially after each retransmission.
+
+
 
 ## 3.6 Principles of Congestion Control
 
