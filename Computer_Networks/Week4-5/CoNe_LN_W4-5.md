@@ -325,7 +325,40 @@ TCP uses `cumulative acknowledgments`, so that $y$ acknowledges the receipt of a
 #### Doubling the Timeout Interval
 The first modification that most TCP implementations employ concerns the length of the timout interval after a timer expiration. In this modification, whenever the timeout event occurs, TCP retransmits the not-yet-acknowledged segment with the smallest sequence number, as described above. But each time TCP retransmits, it sets the next timeout interval to twice the previous value. Thus the intervals grow exponentially after each retransmission.
 
+This modification provides a limited form of `congestion control`. The timer expiration is most likely cause by congestion in the network, that is, too many packets arriving at one router queue in the path between the source and destination, causing packets to be dropped and/or long queuing delays.
 
+#### Fast Retransmit
+One of the problems with timeout-triggered retransmissions is that the timeout period can be relatively long. Fortunately, the sender can often detect apcket loss well before the timeout event occurs by noting so-called duplicate ACKs. A `duplicate ACK` is an ACK that reacknowledges a segment for which the sender has already received an earlier acknowledgment. 
+
+When a TCP receiver receives a segment with a sequence number that is larger than the next, expected, in-order sequence number, it detects a gap in the data stream - that is, a missing segment. If the TCP sender receives three duplicate ACKs for the same data, it takes this as an indication that the segment following the segment that has been ACKed three times has been lost. In the case that three duplicate ACKs are received, the TCP sender performs a `fast retransmit`, retransmitting the missing segment before that segment's timer expires.
+
+#### Go-Back-N or Selective Repeat?
+A proposed modification to TCP, the so-called `selective acknowledgment`, allows a TCP receiver to acknowledge out-of-order segments selectively rather than just cumulatively acknowledging the last correctly received, in-order segment. When combined with selective retransmission - skipping the retransmission of segments that have already been selectively acknowledged by the receiver - TCP looks a lot like our generic SR protocol. Thus, TCP's error-recovery mechanism is probably best categorized as a hybrid of GBN and SR protocols.
+
+### 3.5.5 Flow Control
+When the TCP connection receives bytes that are correct and in sequence, it places the data in the receive buffer. If the application is relatively slow at reading the data, the sender can very easily overflow the connection's receive buffer by sending too much data too quickly. TCP provides a `flow-control service` to its applications to eliminate the possibility of the sender overflowing the receiver's buffer.
+
+As noted earlier, a TCP sender can also be throttled due to congestion within the IP network, this form of sender control is referred to as `congestion control`.
+
+TCP provides flow control by having the sender maintain a variable called the `receive window`. Informally, the receive window is used to give the sender an idea of how much free buffer space is available at the receiver. Suppose that Host A is sending a large file to Host B over a TCP connection. Host B allocates a receive buffer to this connection, we denote its size by `RcvBuffer`. We define the following variables:
+- `LastByteRead`: the number of the last byte in the data stream read from the buffer by the applciation process in B
+- `LastByteRcvd`: the number of the last byte in the data stream that has arrived from the network and has been placed in the receive buffer at B
+
+Because TCP is not permitted to overflow the allocated buffer, we must have
+
+$$\text{LastByteRcvd} - \text{LastByteRead} \leq \text{rcvBuffer}$$
+
+The receive window, denoted `rwnd` is set to the amount of spare room in the buffer:
+
+$$\text{rwnd} = \text{RcvBuffer} - (\text{LastByteRcvd} - \text{LastByteRead})$$
+
+Host A in turn keeps track of two variables, `LastByteSent` and `LastByteAcked`, which have obvious meanings. By keeping the amount of unacknowledged data less than the value of `rwnd`, Host A is assured that it is not overflowing the receive buffer at Host B. Thus, Host A makes sure throughout the connection's life that
+
+$$\text{LastByteSent} - \text{LastByteAcked} \leq \text{rwnd}$$
+
+Having described TCP's flow-control service, we briefly mention here that UDP does not provide flow control and consequently, segments may be lost at the receiver due to buffer overflow.
+
+### 3.5.6 TCP Connection Management
 
 ## 3.6 Principles of Congestion Control
 
