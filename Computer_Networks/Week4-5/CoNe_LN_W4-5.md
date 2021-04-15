@@ -219,7 +219,20 @@ As the name suggests, selective-repeate protocols avoid unnecessary retransmissi
 3. *Otherwise*: Ignore the packet.
 
 ## 3.5 Connection-Oriented Transport: TCP
+Now that we have covered the underlying principles of reliable data transfer, let's turn to `TCP` - the Internet's transport-layer, connection-oriented, reliable transport protocol. In this section, we'll see that in order to provide reliable data transfer, TCP relies on many of the underlying principles discussed in the previous section.
 
+### 3.5.1 The TCP Connection
+TCP is said to be `connection-oriented` because before one application process can begin to send data to another, the two processes must first "handshake" with each other - that is, they must send some preliminary segments to each other to establish the parameters of the ensuing data transfer.
+
+A TCP connection provides a `full-duplex service`: If there is a TCP connection between Process A on one host and Process B on anothert host, then application-layer data can flow from Process A to Process B at the same time as applciation-layer data flows from Process B to Process A. A TCP connection is also alway `point-to-point`, that is, between a single sender and a single receiver.
+
+Let's now take a look at how a *TCP connection is established*. Suppose a process running in one host wants to initiate a connection with another process in another host. TCP in the client then proceeds to establish a TCP connection with TCP in the server. The client first sends a special TCP segment, the server responds with a second special TCP segment, and finally the client responds again with a third special segment. This connection-establishment procedure is often referred to as a `three-way handshake`.
+
+Let's consider the sending of data from the client process to the server process. The client process passes a stream of data through the socket. After that, the data is in the hands of TCP running in the client. TCP directs this data to the connection's `send buffer`. From time to time, TCP will grab chunks of data from the send buffer and pass the data to the network layer. The maximum amount of data that can be grabbed and placed in a segment is limited by the `maximum segment size (MSS)`. The MSS is typically set by first determining the length of the largest link-layer frame that can be sent by the local sending host (the so-called `maximum transmission unit (MTU))`, and then setting the MSS to ensure that a TCP segment plus the TCP/IP header length will fit into a single link-layer frame.
+
+TCP pairs each chunk of client data with a TCP header, thereby forming `TCP segments`. The segments are passed down to the network layer, where they are separately ecapsulated within networky-layer IP datagrams. The IP datagrams are then sent into the network. When TCP receives a segment at the other end, the segment's data is placed in the TCP connection's receive buffer. The application reads the stream of data from this buffer.
+
+### 3.5.2 TCP Segment Structure
 
 ## 3.6 Principles of Congestion Control
 
