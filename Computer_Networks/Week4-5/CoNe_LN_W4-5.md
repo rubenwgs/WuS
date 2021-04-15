@@ -233,6 +233,28 @@ Let's consider the sending of data from the client process to the server process
 TCP pairs each chunk of client data with a TCP header, thereby forming `TCP segments`. The segments are passed down to the network layer, where they are separately ecapsulated within networky-layer IP datagrams. The IP datagrams are then sent into the network. When TCP receives a segment at the other end, the segment's data is placed in the TCP connection's receive buffer. The application reads the stream of data from this buffer.
 
 ### 3.5.2 TCP Segment Structure
+The TCP segment consists of header fields and a data field. The data field contains a chunk of application data. As mentioned above, the MSS limits the maximum size of a segment's data field.
+
+As with UDP, the header includes `source and destination port numbers`, which are used for multiplexing/demultiplexing data from/to upper-layer applications. Also, as with UDP, the header incldues a `checksum field`. A TCP segment header also contains the following fields:
+- The 32-bit `sequence number field` and the 32-bit `acknowledgment number field` are used by the TCP sender and receiver in implementing a reliable data transfer service.
+- The 16-bit `receive window field` is used for flow control.
+- The 4-bit `header length field` specifies the length of the TCP header in 32-bit words.
+- The optional and variable-length `options field` is used when a sender and receiver negotiate the maximum segment size (MSS) or as a window scaling factor for use in high-speed networks.
+- The `flag field` contains 6 bits:
+	- The `ACK bit` is used to indicate that a value carried in the acknowledgment field is valid.
+	- The `RST, SYN,` and `FIN`bits are used for connection setup and teardown.
+	- The `CWR` and `ECE` bits are used in explicit congestion notification.
+	- Setting the `PSH` bit indicates that the receiver should pass the data to the upper layer immediately.
+	- The `URG` bit is used to indicate that there is data in this segment that the sending-side upper-layer entitiy has marked as "urgent".
+
+<img src="./Figures/CoNe_Fig3-29.png" alt="TCP segment"
+	title="Figure 3.29: TCP segment structure." width="400px"/><br>
+
+Two of the most important fields in the TCP segment header are the sequence number field and the acknowledgment number field. These fields are critical part of TCP's reliable data transfer service. The `sequence number for a segment` is therefore the byte-stream number of the first byte in the segment. For the acknowledgment number we consider Host A and Host B sending data from one to each other. Each of the segments that arrive from Host B have a sequence number for the data flowing from B to A. The `acknowledgment number` that Host A puts in its segment is the sequence number of the next byte Host A is expencting from Host B.
+
+Because TCP only acknowledges bytes up to the first missing byte in the stream, TCP is said to provide `cumulative acknowledgments`.
+
+#### Sequence Numbers and Acknowledgment Numbers
 
 ## 3.6 Principles of Congestion Control
 
