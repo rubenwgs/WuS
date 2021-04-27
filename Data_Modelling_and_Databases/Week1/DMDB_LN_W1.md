@@ -89,4 +89,11 @@ $$
 R_1 \bowtie_{A=B} R_2 = \sigma_{A = B}(R_1 \times R_2)
 $$
 
-## Query Language 2: Relational Algebra
+It is important to note that relational algebra uses `Bag semantics` instead of set semantics:
+- Each relation is a bag of tuples
+- You can have duplicated tuples in the same relation
+- i.e. set: $\{1, \, 2, \, 3\}$, bag: $\{1, \, 2, \, 3, \, 1, \, 2, \, 1\}$
+
+It is furthermore important to remember that `bag operator semantics` are different to set operator semantics:
+- *Bag Union:* $\{1, \ 2, \, 1\} \cup \{1, \, 2, \, 3\} = \{1. \, 1, \, 1, \, 2, \, 2, \, 3 \}$
+- *Bag Difference:* $\{1, \ 2, \, 1\} - \{1, \, 2, \, 3, \, 3\} = \{1\}$
