@@ -90,3 +90,55 @@ Example:
 ```
 
 However it is to note, that populating a real DB cannot be done manually tuple by tuple (too cumbersome, error prone, etc.).
+
+### SQL: Query Language
+Nearly all queries follow the form `SELECT ... FROM ... WHERE ...`. We can put this into relational algebra the following way: <br>
+*SQL*
+```sql
+    SELECT PersNr, Name
+    FROM Professor
+    WHERE Level = 'FP';
+```
+*Relational Algebra*
+$$
+\Pi_{PersNr, \, Name}(\sigma_{Level="FP"}Professor)
+$$
+
+Another example: <br>
+*SQL*
+```sql
+    SELECT Name
+    FROM Professor P, Lecture L
+    WHERE P.PersNr = L.ProfNr
+    AND L.Title = 'Database';
+```
+*Relational Algebra*
+$$
+\Pi_{Name}(\sigma_{PersNr=ProfNr \land Title = "Database"}(Professor \times Lecture))
+$$
+
+It is important to note, that *every RA expression can be written in SQL subset:*
+- Union $\cup$ : $R_1 \cup R_2$ = `(SQL1) UNION (SQL2)`
+- Difference $-$ : $R_1 - R_2$ = `(SQL1) EXCEPT (SQL2)`
+- Selection $\sigma$ : $\sigma_c(R)$ = `SELECT * FROM (SQL1) WHERE c;`
+- Projection $\Pi$ : $\Pi_{A_1,..., \, A_n}R$ = `SELECT A1,..., An FROM (SQL1)`
+- Cross Product $\times$ : $R_1 \times R_2$ = `SELECT * FROM (SQL1), (SQL2);`
+- Rename $\rho$ : $\rho_{a,b,c}R$ = `SELECT A as a,..., C as c FROM (SQL1);`
+
+#### Sorting
+```sql
+    SELECT PersNr, Name, Level
+    FROM Professor
+    ORDER BY Level DESC, Name DESC;
+```
+
+#### Grouping
+```sql
+    SELECT Level, COUNT(*)
+    FROM Professor
+    GROUP BY Level;
+```
+
+## Known Unknowns and Incomplete Information
+### NULL and Its Semantics
+One way to model incomplete information is to place the values that we don't know with a special state `NULL`.
