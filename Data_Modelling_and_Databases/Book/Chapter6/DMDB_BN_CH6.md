@@ -104,6 +104,25 @@ Example: We remember a movie "Star *something*", and we remember that the someth
     WHERE title LIKE 'Star ____';
 ```
 
-Remark: The convention taken by SQL is that wto consecutive apostrophes in a string represent a single apostrophe and do not end the string. Thus, `''s` in a pattern is matched by a single apostrophe followed by an `s`.
+Remark: The convention taken by SQL is that two consecutive apostrophes in a string represent a single apostrophe and do not end the string. Thus, `''s` in a pattern is matched by a single apostrophe followed by an `s`.
 
 ### 6.1.5 Dates and Times
+A `date` constant is represented by the keyword `DATE` followed by a quoted string of a special form. For example, `'1948-05-14'` follows the required form, i.e. is of the form `'YYYY-MM-DD'`. 
+
+A `time` constant is represented similarly by the keyword `TIME` and a quoted string. For example, `'15:00:02.5'` is of the required form.
+
+To combine dates and times we use a value of type `TIMESTAMP`. These values consist of the keyword TIMESTAMP, a date value, and a time value. Thus, `TIMESTAMP '1948-05-14 12:00:00'` represents noon on May 14, 1948.
+
+### 6.1.6 Null Values and Comparisons Involving NULL
+SQL allows attributes to have a special value `NULL`, which is called the *null value*. The most common interpretations for the null value are:
+- *Value unknown*
+- *Value inapplicable*
+- *Value withheld*
+
+In `WHERE` clauses, we must be prepared for the possibility that a component of some tuple we are examining may be NULL. We must remember that:
+1. When we operate on a `NULL` and any value, including another `NULL`, using an arithmetic operator like $\times$ or $+$, the result is `NULL`.
+2. When we compare a `NULL` value and any value, including another NULL, using a comparison operator like $=$ or $>$, the result is `UNKNOWN`.
+
+The correct way to ask if $x$ has the value `NULL` is with the expression `x IS NULL`. Similarly, `x IS NOT NULL` has the value `TRUE` unless the value of $x$ is `NULL`.
+
+### 6.1.7 The Truth-Value UNKNOWN
