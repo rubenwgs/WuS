@@ -17,7 +17,7 @@ The process of implementing a real-world application includes modeling a DB. Mod
 2. *Logical Modeling:* Mapping the concepts to a concrete logical representation
 3. *Physical Modeling:* Implementation in a concrete hardware
 
-## Conceptual Modeling usingg Entity-Relationship Model
+## Conceptual Modeling using Entity-Relationship Model
 ### Basic Concept
 An `Entity-Relationship Model` models an application in the following three element types:
 - `Entity sets`: A set of similar entities, where an `entity` is defined as an object in the real world that is dishtinguishable from other objects. "*Similar*" means that entities in the same entity set share the same attributes (E.g. "Professor" is an entity set, "ProfA" is an entity).
@@ -82,3 +82,5 @@ When designing ER-diagrams, one should follow the following rules:
 
 One might use https://erdplus.com/ to design simple ER-diagrams.
 
+## Logical Modeling
+### ER Diagram to Relational Model
