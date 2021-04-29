@@ -141,4 +141,15 @@ It is important to note, that *every RA expression can be written in SQL subset:
 
 ## Known Unknowns and Incomplete Information
 ### NULL and Its Semantics
-One way to model incomplete information is to place the values that we don't know with a special state `NULL`.
+One way to model incomplete information is to place the values that we don't know with a special state `NULL`. It is important to note, that NULL represents a *state*, not a value.
+
+### Operations Over NULL
+**Arithmetic:**
+- (NULL + 1) -> NULL
+- (NULL * 0) -> NULL
+
+**Comparisons:**
+- (NULL = NULL) -> Unknown
+- (NULL < 13) -> Unknown
+- (NULL > NULL) -> Unknown
+- NULL IS NULL -> True
