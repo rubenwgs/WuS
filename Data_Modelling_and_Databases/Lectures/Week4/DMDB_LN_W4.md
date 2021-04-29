@@ -83,4 +83,12 @@ When designing ER-diagrams, one should follow the following rules:
 One might use https://erdplus.com/ to design simple ER-diagrams.
 
 ## Logical Modeling
-### ER Diagram to Relational Model
+### ER-Diagram to Relational Model
+#### Principles
+- Entities become relations
+- Relationships become relations
+- Entity sets become tables
+- Attributes of entity sets become attributes of the table
+- Merge relations with the same key
+
+Note that when there is no cardinality constraints, a `relationship becomes a table`, containing the keys of all participating entity sets.
