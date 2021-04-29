@@ -126,3 +126,67 @@ In `WHERE` clauses, we must be prepared for the possibility that a component of 
 The correct way to ask if $x$ has the value `NULL` is with the expression `x IS NULL`. Similarly, `x IS NOT NULL` has the value `TRUE` unless the value of $x$ is `NULL`.
 
 ### 6.1.7 The Truth-Value UNKNOWN
+We have just seen that when NULL values occur, comparisons can yield a third truth-value: `UNKNOWN`. We must now learn how the logical operators behave on combinations of all three truth-values.
+
+The rules is easy if we think of TRUE as $1$, FALSE as $0$, and UNKNOWN as $1/2$. Then:
+- The AND of two truth-values is the minimum of those values.
+- The OR of two truth-values is the maximum of those values.
+- The negation of truth-value $v$ is $1-v$.
+
+### 6.1.8 Ordering the Output
+To get output in `sorted order`, we may add to the select-from-where statement a clause:
+
+```sql
+    ORDER BY <list of attributes>
+```
+
+The order is by default *ascending*, but we can get the output highest-first by appending the keyword `DESC` to an attribute. The `ORDER BY` clause follows the `WHERE` clause and any other clauses (i.e. the optional `GROUP BY` and `HAVING` clauses, which are introduced in Section 6.4).
+
+Example: To get the movies listed by length, shortest first, and among movies equal length, alphabetically, we can say:
+
+```sql
+    /* Code 6.11: Sorting in SQL. */
+    SELECT *
+    FROM Movies
+    WHERE studioName = 'Disney' AND year = 1990
+    ORDER BY length, title;
+```
+
+## 6.2 Queries Involving More Than One Relation
+Much of the power of relational algebra comes from its ability to combine two or more relations through joins, products, unions, intersections, and differences.
+
+### 6.2.1 Products and Joins in SQL
+SQL has a simple way to couple relations in one query: list each relation in the FROM clause. Then, the SELECT and WHERE clauses can refer to the attributes of any of the relations in the FROM clause.
+
+Example: Suppose we want to know the name of the producer of *Star Wars*. We can phrase this in one query about the pair of relations *Movies* and *MovieExec* as follows:
+
+```sql
+    /* Code 6.12: Coupling relations in SQL. */
+    SELECT name
+    FROM Movies, MovieExec
+    WHERE title = 'Star Wars' AND producerNum = certNum;
+```
+
+The interpretation of the above query is shown in the picture below:
+
+<img src="./Figures/DMDB_Fig6-1.PNG" width="600px"/><br>
+
+### 6.2.2 Disambiguating Attributes
+Sometimes we ask a query involving several relations, and among these relations are two or more attributes with the same name. If so, we need a way to indicate which of these attributes is meant by a use of their shared name. SQL solves this problem by allowing us to place a relation name and a dot in front of an attribute.
+
+Example: The two relations
+
+```sql
+    MovieStar(name, address, gender, birthdate)
+    MovieExec(name, address, certNum, netWorth)
+```
+
+each have attributes *name* and *address*. Suppose we wish to find pairs consisting of a star and an executive with the same address. The following query does the job:
+
+```sql
+    /* Code 6.13: Relations with the same attributes. */
+    SELECT MovieStar.name, MovieExec.name
+    FROM MovieStar, MovieExec
+    WHERE MovieStar.address = MovieExec.address;
+```
+
