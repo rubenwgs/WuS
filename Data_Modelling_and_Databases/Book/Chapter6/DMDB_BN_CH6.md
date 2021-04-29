@@ -190,3 +190,49 @@ each have attributes *name* and *address*. Suppose we wish to find pairs consist
     WHERE MovieStar.address = MovieExec.address;
 ```
 
+### 6.2.3 Tuple Variables
+Disambiguating attributes by prefixing the relation name works as long as the query involves combining several different relations. However, sometimes we need to ask a query that invovles two or more tuples from the same relation.
+
+We may lis a relation $R$ as many times as we need to in the FROM clause, but we need a way to refer to each occurrence of $R$. SQL allows us to define, for each occurrence of $R$ in the FROM clause, an "alias" which we shall refer to as a `tuple variable`.
+
+Example: We might want to know about two stars who share an address. The following query does exactly that:
+
+```sql
+    /* Code 6.14: Tuple variables. */
+    SELECT Star1.name, Star2.name
+    FROM MovieStar Star1, MovieStar Star2
+    WHERE Star1.address = Star2.address
+            AND Star1.name < Star2.name;
+```
+
+The second condition in the WHERE clause, *Star1.name < Star2.name*, makes sure that we do  produce each star name paired with itself and each pair of stars only once.
+
+### 6.2.4 Interpreting Multirelation Queries
+There are several ways to define the meaning of the select-from-where expressions that we have just covered.
+
+#### Nested Loops
+If there are several tuple varaibles, we may imagine nested loops, one for each tuple variable, in which the varaibles each range over the tuples of their respective relations. For each assignment of tuples to the tuple varaibles, we decide whether the WHERE clause is true.
+
+#### Parallel Assignment
+There is an equivalent definition in which we do not explicitly create nested loops ranging over the tuple variables. Rather, we consider in arbitrary order, or in parallel, all possible assignments of tuples from the appropriate relations to the tuple variables.
+
+#### Conversion to Relational Algebra
+A third approach is to relate the SQL query to relational algebra. We start with the tuple varaibles in the FROM clause and take the Cartesian product of their relations. <br>
+Having created the product, we apply a selection operator to it by converting the WHERE clause to a selection condition on the abvious way. <br>
+Finally, we create from the SELECT clause a list of expressions for a final projection operation.
+
+### 6.2.5 Union, Intersection, and Difference of Queries
+Sometimes we wish to combine relations using the `set operations` of realtional algebra: union, intersection, and difference. The keywords used are `UNION`, `INTERSECT`, and `EXCEPT` for $\cup, \, \cap,$ and $-,$ respectively. Words like UNION are used between two queries, and those queries msut be parenthesized.
+
+Example: Suppose we wanted the name and addresses of all female movie stars who are also movie executives with a networth over $ 10'000'000:
+
+```sql
+    /* Code 6.16: INTERSECT in SQL queries. */
+    (SELECT name, address
+     FROM MovieStar
+     WHERE gender = 'F')
+        INTERSECT
+    (SELECT name, address
+     FROM MovieExec
+     WHERE netWorth > 10000000);
+```
