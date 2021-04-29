@@ -1,4 +1,4 @@
-# Data Modelling and Databases - Week 2 (Book)
+# Data Modelling and Databases - Chapter 6 (Book)
 - Author: Ruben Schenk
 - Date: 08.03.2021
 - Contact: ruben.schenk@inf.ethz.ch
