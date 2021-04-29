@@ -236,3 +236,9 @@ Example: Suppose we wanted the name and addresses of all female movie stars who 
      FROM MovieExec
      WHERE netWorth > 10000000);
 ```
+
+## 6.3 Subqueries
+In SQL, one query can be used in various ways to help in the evaluation of another. A query that is part of another is called a `subquery`. There are a number of ways that subqueries can be used:
+1. Subqueries can return a single constant, and this constant can be compared with another value in a WHERE clause.
+2. Subqueries can return relations that can be used in various ways in WHERE clauses.
+3. Subqueries can appear in FROM clauses, followed by a tuple variable that represents the tuples in the reult of the subquery.
