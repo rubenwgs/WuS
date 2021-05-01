@@ -369,3 +369,38 @@ Example: Suppose we wish to take the outerjoin of the two relations *MovieStar* 
 If we want `left-` or `right-outerjoin` we add the appropriate word `LEFT` or `RIGHT` in place of `FULL`.
 
 ## 6.4 Full-Relation Operations
+In this section we shall study some operations that act on relations as a whole, rather than on tuples individually or in small numbers.
+
+### 6.4.1 Eliminating Duplicates
+SQL's notion of relations differs from the abstract notion of relations presented in Section 2.2. A relation, being a set, cannot have more than one copy of any given tuple. When a SQL query creates a new relation, the SQL system does not ordinarily eliminate duplicates.
+
+Assume we form the Cartesian product of two relations, test each tuple with the WHERE clause and then give the passing tuples to the output for projection according to the SELECT clause. This projection may cause the same tuple to result from different uples of the product, and if so, each copy of the resulting tuple is printed in its turn.
+
+If we do not wish `duplciates` in the result, then we may follow the keyword `SELECT` by the keyword `DISTINCT`. That word tells SQL to produce only once copy of any tuple.
+
+### 6.4.2 Duplicates in Unions, Intersections, and Differences
+The union, intersection, and difference operations normally elimiante duplicates. That is, bags are converted to sets, and the set versions of the operation is applied.
+
+In order to prevent the elimiantion of duplicates, we must follow the operator `UNION`. `INTERSECT`, or `EXCEPT` by the keyword `ALL`.
+
+### 6.4.3 Grouping and Aggregation in SQL
+In a previous section we introduced the grouping-and-aggregation operator $\gamma$ for our extended relational algebra. SQL provides all the capability of the $\gamma$ operator throught he use of `aggregation` operators in SELECT clauses and a special `GROUP BY` clause.
+
+### 6.4.4 Aggregation Operators
+SQL uses the five aggregation operators `SUM`, `AVG`, `MIN`, `MAX`, and `COUNT`. These operators are used by applying them to a scalar-valued expression, typically a column name, in a SELECT clause. One exception is the expression `COUNT(*)`, which counts all the tuples in the constructed relation.
+
+In addition, we have the option of eliminating duplicates from the column before applying the aggregation operator by using the keyword `DISTINCT`, e.g. `COUNT(DISTINCT)` or `SUM(DISTINCT x)`.
+
+### 6.4.5 Grouping
+To group tuples, we use a `GROUP BY` clause, following the WHERE clause. The keywords `GROUP BY` are followed by a list of *grouping attributes*. Whatever aggregation operators are used in the SELECT clause are applied only within the groups.
+
+Example: The problem of finding the sum of the lengths of all movies for each studio is expressed by:
+
+```sql
+    /* Code 6.31: Grouping in SQL. */
+    SELECT studioNAme, SUM(length)
+    FROM Movies
+    GROUP BY studioName;
+```
+
+### 6.4.6 Grouping, Aggregation, and Nulls
