@@ -324,3 +324,48 @@ Example: Let us reconsider the problem of *Code 6.20*, where we wrote a query th
                     ) Prod
     WHERE certNum = Prod.producerNum;
 ```
+
+### 6.3.6 SQL Join Expressions
+We can construct relations by a number of variations on the join operator applied to two relations. These variants include products, natural joins, theta-joins, and outerjoins.
+
+#### Cross Join
+The simplest form of join expression is a `cross join`; that term is a synonym for what we called a Cartesian product. We might write:
+
+```sql
+    Movies CROSS JOIN StarsIn;
+```
+
+#### Theta-Join
+A more conventional `theta-join` is obtained with the keyword `ON`. We put `JOIN` between two relation names $R$ and $S$ and follow them by `ON` and a condition. The meaning of `JOIN...ON` is that the product of $R \times S$ is followed by a selection of whatever condition follows `ON`.
+
+Example: Suppose we want to join the relations *Movies* and *StarsIn* with the condition that the only tuples to be joined are those that refer to the same movie. We can ask this query with:
+
+```sql
+    /* Code 6.23: Theta-Join */
+    Movies JOIN StarsIn ON
+            title = movieTitle AND year = movieYear;
+```
+
+### 6.3.7 Natural Joins
+As we recall from Section 2.4.8, a `natural join` differs from a theta-join in that:
+1. The join condition is that all pairs of attributes from the two relations having a common name are equated, and there are no other conditions.
+2. One of each pair of equated attributes is projected out.
+
+The SQL natural join behaves exactly this way. Keywords `NATURAL JOIN` appear between the realtions to express the $\bowtie$ operator. We migh write:
+
+```sql
+    MovieStar NATURAL JOIN MovieExec;
+```
+
+### 6.3.8 Outerjoins
+The `outerjoin` operator was introduced in a previous section as a way toa ugment the result of a join by the dangling tuples, padded with null values. In SQL, we can specify an outerjoin; NULL is used as the null value.
+
+Example: Suppose we wish to take the outerjoin of the two relations *MovieStar* and *MovieExec*. SQL refers to the standard outerjoin, which pads dangling tuples from both of its argument,a s a *full outerjoin*. The syntax is as follows:
+
+```sql
+    MovieStar NATURAL FULL OUTER JOIN MovieExec;
+```
+
+If we want `left-` or `right-outerjoin` we add the appropriate word `LEFT` or `RIGHT` in place of `FULL`.
+
+## 6.4 Full-Relation Operations
