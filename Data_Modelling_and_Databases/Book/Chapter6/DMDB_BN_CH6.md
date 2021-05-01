@@ -386,6 +386,7 @@ In order to prevent the elimiantion of duplicates, we must follow the operator `
 ### 6.4.3 Grouping and Aggregation in SQL
 In a previous section we introduced the grouping-and-aggregation operator $\gamma$ for our extended relational algebra. SQL provides all the capability of the $\gamma$ operator throught he use of `aggregation` operators in SELECT clauses and a special `GROUP BY` clause.
 
+
 ### 6.4.4 Aggregation Operators
 SQL uses the five aggregation operators `SUM`, `AVG`, `MIN`, `MAX`, and `COUNT`. These operators are used by applying them to a scalar-valued expression, typically a column name, in a SELECT clause. One exception is the expression `COUNT(*)`, which counts all the tuples in the constructed relation.
 
@@ -404,3 +405,25 @@ Example: The problem of finding the sum of the lengths of all movies for each st
 ```
 
 ### 6.4.6 Grouping, Aggregation, and Nulls
+When the tuples have nulls, there are a few rules we must remember:
+- The value NULL is ignored in any aggregation (except for `COUNT(*)`).
+- On the other hand, NULL is treated as an ordinary value when forming groups. That is, we can have a group in which one or more of the grouping attributes are assigned the value NULL.
+- When we perform any aggregation except count over an empty bag of values, the result is NULL. The count of an empty bag is 0.
+
+### 6.4.7 HAVING Clauses
+Sometimes we might want to choose our groups based on some aggregate property of the groupt itself. The latter clause consists of the keyword `HAVING` followed by a condition about the group.
+
+Example: Suppose we want to print the total film length for only those producers who made at least one film prior to 1930, then we might propose the following query:
+
+```sql
+    /* Code 6.34: HAVING clauses ion SQL. */
+    SELECT name, SUM(length)
+    FROM MovieExec, Movies
+    WHERE producerNum = certNum
+    GROUP BY name
+    HAVING MIN(year) < 1930;
+```
+
+There are several rules we must remember about HAVING clauses:
+- An aggregation in a HAVING clause applies only to the tuples of the group being tested
+- Any attribute of relations in the FROM clause may be aggregated in the HAVING clause, but only those attributes that are in the GROUP BY list may appear unaggregated in the HAVING clause (the same rule applies for the SELECT clause)
