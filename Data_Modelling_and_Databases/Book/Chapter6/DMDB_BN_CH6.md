@@ -242,3 +242,85 @@ In SQL, one query can be used in various ways to help in the evaluation of anoth
 1. Subqueries can return a single constant, and this constant can be compared with another value in a WHERE clause.
 2. Subqueries can return relations that can be used in various ways in WHERE clauses.
 3. Subqueries can appear in FROM clauses, followed by a tuple variable that represents the tuples in the reult of the subquery.
+
+### 6.3.1 Subqueries that Produce Scalar Values
+An atomic value that can appear as one component of a tuple is referred to as a `scalar`. 
+
+Sometimes we might deduce from information about keys, of from other information, that there will be only a single value is produced from a select-from-where expression. If so, we can use this expression, surrounded by parantheses, as if it were a constant.
+
+### 6.3.2 Conditions Involving Relations
+There are a number of SQL operators that we can apply to a relation $R$ and produce a boolean result. However, the realtion $R$ must be expressed as a subquery. As a trick, if we want to apply these operators to a stored table `Foo`, we can use the subquery `(SELECT * FROM Foo)`.
+
+Following are the definitions of the `operators`:
+- `EXISTS R` is a condition that is true if and only if $R$ is not empty.
+- `s IN R` is true if and only if $s$ is equal to one of the values in $R$. Likewise, `s NOT IN R` is true if and only if $s$ is equal to no value in $R$.
+- `s > ALL R` is true if and only if $s$ is greater than every value in unary relation $R$ (we migh replace `>` with any of the five comparison operators).
+- `s > ANY R` is true if and only if $s$ is greater than at least one value in unary relation $R$ (again, we might repalce `>` by any comparison operator).
+
+### 6.3.3 Cinditions Involving Tuples
+A tuple in SQL is represented by a parenthesized list of scalar values. If a tuple $t$ has the same number off components as a relation $R$, then it makes sense to compare $t$ and $R$ in expressions of the type listed in the previous section.
+
+Example: A query asking for all the producers of movies in which Harrison Ford stars could look like this:
+
+```sql
+    /* Code 6.20: Subqueries. */
+    SELECT name
+    FROM MovieExec
+    WHERE certNum IN
+        (SELECT producerNum
+         FROM  Movies
+         WHERE (title, year) IN
+            (SELECT movieTitle, movieYear
+             FROM StarsIn
+             WHERE starName = 'Harrison Ford')
+        );
+```
+
+It is important to note that we should analyze any query with *subqueries from the inside out.*
+
+Incidentally, the nested query of *Code 6.20* can, like many nested queries, be written as a single select-from-where expression with relations in the FROM clause for each of the relations mentioned in the main query or a subquery:
+
+```sql
+    /* Code 6.20: continuation. */
+    SELECT name
+    FROM MovieExec, Movies, StarsIn
+    WHERE certNum = producerNum AND
+          title = movieTitle AND
+          year = movieYear AND
+          starName = 'Harrison Ford'
+```
+
+### 6.3.4 Correlated Subqueries
+A more complicated use of nested subqueries reuiqres the subquery to be evaluated many times, once for each assignment of a value to some term in the subquery that comes from a tuple variable outside the subquery. A subquery of this type is called a `correlated` subquery.
+
+Example: Consider the following query finding movie titles that appear more than once:
+
+```sql
+    /* Code 6.21: Correlated subqueries. */
+    SELECT title
+    FROM Movies Old
+    WHERE year < ANY
+          (SELECT year
+           FROM Movies
+           WHERE title = OLd.title);
+```
+
+When writing a correlated query it is important that we be aware of the `scoping rules` for names. In general, an attribute in a subquery belongs to one of the tuple variables in that subquery's FROM clause if some tuple variable's relation has that attribute in its schema. If not, we look at the immediately surrounding subquery, then to the one surrounding that, and so on.
+
+Howevery, we can arrange for an attribute to belong to another tuple variable if we prefix it by that tuple variable and a dot. That is why we introduced the alias *Old* for the *Movies* relation of the outer query.
+
+### 6.3.4 Subqueries in FROM Clauses
+Another use for subqueries is as relations in a FROM clause. In a FROM list, instead of a stored relation, we may use a parenthesized subquery. Since we don't have a name for the result of this subquery, we must give it a tuple-variable alias.
+
+Example: Let us reconsider the problem of *Code 6.20*, where we wrote a query that finds the producers of Harrison Ford's movies:
+
+```sql
+    SELECT name
+    FROM MovieExec, (SELECT producerNum
+                     FROM Movies, StarsIn
+                     WHERE title = movieTitle AND
+                           year = movieYear AND
+                           starName = 'Harrison Ford'
+                    ) Prod
+    WHERE certNum = Prod.producerNum;
+```
