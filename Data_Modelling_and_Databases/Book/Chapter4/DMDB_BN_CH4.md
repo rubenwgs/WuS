@@ -80,3 +80,21 @@ Example:
 <img src="./Figures/DMDB_BN_Fig4-2.PNG" width="600px"/><br>
 
 While, in principle, a collection of entity sets connected by `isa` relationships could have any structure, we shall limit isa-structures to trees, in which there is one `root` entity set that is the most general, with progressively more specialized entity sets extending below the root in a tree.
+
+## 4.2 Design Principles
+### 4.2.1 Faithfulness
+First and foremost, the design should be faithful to the specifications of the application. That is, entity sets and their attributes should reflect reality.
+
+### 4.2.2 Avoiding Redundancy
+For instance, we have used a relationship *Owns* between movies and studios. We might also choose to have an attribute *studioName* of entity set *Movies*. While there is nothing illegal about doing so, it is dangerous for several reasons:
+1. Doing so leads to repetition of a fact, with the result that extra space is required to represent the data.
+2. There is an update-anomaly potential, since we might change the realtionship but not the attribute, or vice-versa.
+
+### 4.2.3 Simplicity Counts
+Avoid introducing more elements into your design than is absolutely necessary.
+
+### 4.2.4 Choosing the Right relationships
+Entity sets can be connected in various ways by relationships. However, adding to our design every possible relationship is not often a good idea. Doing so can lead to redundancy, update anomalies, and deletion anomalies, where the connected pairs or sets of entities for one relationship can be deduced from one or more other relationships.
+
+### 4.2.5 Picking the Right Kind of Element
+Sometimes we have options regarding the type of design element used to represent a real-world concept. Many of these choices are between using attributes and using entity set/relationship combinations. In general, an attribute is simpler to implement than either an entity set or a relationship. However, making everything an attribute will usually get us into trouble.
