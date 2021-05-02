@@ -477,3 +477,104 @@ Example: Consider transferring CHF 100 from the account numbered 123 to the acco
     SET balance = balance - 100
     WHERE acctNo = 123;
 ```
+
+Now, if there is a failure between step 1 and step 2, we have a problem, namely, the bank gave CHF 100 "away".
+
+The problem is that certain combinations of database operations, like the two updates of the previous example, need to be done `atomically`, that is, either they are both done or neither is done.
+
+### 6.6.3 Transactions
+The solution to the problem of serialization and atomicity posed in the previous sections is to group database operations into `transactions`. A transaction is a collection of one or more operations on the database that must be executed atomically.
+
+The SQL command `START TRANSACTION` is used to mark the beginning of a transaction. There are two ways to end a transaction:
+1. The SQL statement `COMMIT` causes the transaction to end successfully. Whatever changes to the database were caused by the SQL statement or statements since the current transaction began are installed permanently in the database.
+2. The SQL statement `ROLLBACK` causes the transaction to abort. Any changes made in response to the SQL statements of the transaction are undone.
+
+### 6.6.4 Read-Only Transactions
+When a transaction only reads data and does not write data, we have more freedom to let the transaction execute in parallel with other transactions. If we tell the SQL execution system that our current transaction is `read-only`, that is, it will never change the database, then it is quite possible that the SQL system will be able to take advantage of that knowledge.
+
+We tell the SQL system that the next transaction is read-only by:
+
+```sql
+    SET TRANSACTION READ ONLY;
+```
+
+We can also inform SQL that the coming transaction may write data by the statement
+
+```sql
+    SET TRANSACTION READ WRITE;
+```
+
+However, this option is the default.
+
+### 6.6.5 Dirty Reads
+`Dirty data` is a common term for data written by a transaction that has not yet committed. A `dirty read` is a read of dirty data written by another transaction. The risk in reading dirty data is that the transaction that wrote it may eventually abort.
+
+SQL allows us to specify that dirty reads are acceptable for a given transaction. We use the `SET TRANSACTION` statement that we discussed previously. The appropriate from for a transaction like that is:
+
+```sql
+    SET TRANSACTION READ WRITE
+        ISOLATION LEVEL READ UNCOMMITTED;
+```
+
+The statement above does two things:
+1. The first line declares that the transaction may write data
+2. The second line declares that the transmission may run with "isolation level" `read-uncommited`. That is, the transaction is allowed to read dirty data.
+
+### 6.6.6 Other Isolation Levels
+SQL provides a total of four `isolation levels`. We have already seen serializable and read-uncommited. The other two are `read-commited` and `repeatable-read`. They can be set by:
+
+```sql
+    SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
+```
+
+```sql
+    SET TRANSACTION ISOLATION LEVEL REPEATABLE READ;
+```
+
+For each, the default is that transactions are read-write, so we can add `READ ONLY` to either statement, if appropriate. Incidentally, we also have the option of specifying:
+
+```sql
+    SET TRANSACTION ISOLATION LEVEL SERIALIZABLE;
+```
+
+However, that is the SQL default and need not be stated explicitly.
+
+The `read-commited` isolation level, as its name implies, forbids the reading of dirty data. However, it does allow a transaction running at this isolation level to issue the same query several times and get different answers, as long as the answer reflects data that has been written by transactions that already committed.
+
+Under `repeatable-read isolation`, if a tuple is retrieved the first time, then we can be sure that the identical tuple will be retrieved again if the query is repeated. However, it is also possible that a second or subsequent execution of the same query will retrieve `phantom tuples`. The latter are tuples that result from insertions into the database while our transaction is executing.
+
+Following is a summary of the differences between the four SQL isolation levels:
+
+| Isolation Level  | Dirty Reads | Nonrepeatable Reads | Phantoms    |
+| :--------------- | :---------: | :-----------------: | :---------: |
+| Read Uncommitted | Allowed     | Allowed             | Allowed     |
+| Read Committed   | Not Allowed | Allowed             | Allowed     |
+| Repeatable Read  | Not Allowed | Not Allowed         | Allowed     |
+| Serializable     | Not Allowed | Not Allowed         | Not Allowed |
+
+## 6.7 Summary of Chapter 6
+#### SQL
+The language `SQL` is the principal query language for relational database systems. The most recent full standard is called SQL-99 or SQL3.
+
+#### Select-From-Where Queries
+The most common form of SQL query has the form `select-from-where`. It allows us to take the product of several relations (the `FROM` clause), apply a condition to the tuples of the result (the `WHERE` clause), and produce desired components (the `SELECT` clause).
+
+#### Subqueries
+Select-from-where queries can also be used as `subqueries` within a WHERE clause of `FROM` clause of another query. The operators `EXISTS`, `IN`, `ALL`, and `ANY` may be used to express boolean-valued conditions about the relations that are the result of a subquery in a `WHERE` clause.
+
+#### Set Operations on Relations
+We can take the union, intersection, or difference of relations by connecting the relations, or connecting queries defining the relations, with the keywords `UNION`, `INTERSECT`, and `EXCEPT`, respectively.
+
+#### Join Expressions
+SQL has operators such as `NATURAL JOIN` that may be applied to relations, either as queries by themselves or to define relations in a `FROM` clause.
+
+#### Null Values
+SQL provides a special value `NULL` that appears in components of tuples for which no concrete value is available. The arithmetic and logic of `NULL` is unusual. Comparison of any value to `NULL`, even another `NULL`, gives the truth value `UNKNOWN`.
+
+#### Outerjoins
+SQL provides an `OUTER JOIN` operator that joins relations but also includes in the result dangling tuples from one or both relations; the dangling tuples are padded with `NULL`'s in the resulting relation.
+
+##### The BAg Model of Relations
+SQL actually regards relations as bags of tuples, not sets of tuples. We can force elimination of duplicate tuples with the keyword `DISTINC`, while keyword `ALL` allows the result to be a bag in certain circumstances where bags are not the default.
+
+#### Aggregations
