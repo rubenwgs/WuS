@@ -574,7 +574,17 @@ SQL provides a special value `NULL` that appears in components of tuples for whi
 #### Outerjoins
 SQL provides an `OUTER JOIN` operator that joins relations but also includes in the result dangling tuples from one or both relations; the dangling tuples are padded with `NULL`'s in the resulting relation.
 
-##### The BAg Model of Relations
+##### The Bag Model of Relations
 SQL actually regards relations as bags of tuples, not sets of tuples. We can force elimination of duplicate tuples with the keyword `DISTINC`, while keyword `ALL` allows the result to be a bag in certain circumstances where bags are not the default.
 
 #### Aggregations
+The values appearing in once column of a relation can be summerized (`aggregated`) by using one of the keywords `SUM`, `AVG`, `MIN`, `MAX`, or `COUNT`. Tuples can be partitioned prior to aggregation with the keywords `GROUP BY`. Certain groups can be eliminated with a clause introduced by the keyword `HAVING`.
+
+#### Modification Statements
+SQL allows us to change the tuples in a relation. We may `INSERT` (add new tuples), `DELETE` (remove tuples), or `UPDATE` (change some of the existing tuples), by writing SQL statements using one of these three keywords.
+
+#### Transactions
+SQL allows the programmer to group SQL statements into `transactions`, which may be committed or rolled back (aborted).
+
+#### Isolation Levels
+SQL defines four `isolation levels` called, from most stringent to least stringent: *serializable* (the transaction must appear to run either completely before or completely after each other transaction), *repeatable-read* (every tuple read in response to a query will reappear if the query is repeated), *read-commited* (only tuples written by transactions that have already commited may be seen by this transaction), and *read-uncommited* (no constraint on what the transaction may see).
