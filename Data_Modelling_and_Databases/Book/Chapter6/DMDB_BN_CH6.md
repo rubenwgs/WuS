@@ -427,3 +427,53 @@ Example: Suppose we want to print the total film length for only those producers
 There are several rules we must remember about HAVING clauses:
 - An aggregation in a HAVING clause applies only to the tuples of the group being tested
 - Any attribute of relations in the FROM clause may be aggregated in the HAVING clause, but only those attributes that are in the GROUP BY list may appear unaggregated in the HAVING clause (the same rule applies for the SELECT clause)
+
+## 6.6 Transactions in SQL
+### 6.6.1 Serializability
+
+Example: Assume you want to choose a seat for a flight. Then there might a relation such as:
+
+```sql
+    Flights(fltNo, fltDate, seatNo, seatStatus)
+```
+
+upon which we can issue the query:
+
+```sql
+    SELECT seatNo
+    FROM Flights
+     WHERE fltNo = 123 AND fltDate = DATE '2008-12-25'
+        AND seatStatus = 'available';
+```
+
+When the customer clicks on an empty seat, say 22A, the seat may be reserved with the following query:
+
+```sql
+    UPDATE Flights
+    SET seatStatus = 'occupied'
+    WHERE fltNo = 123 AND fltDate = DATE '2008-12-25' AND seatNo = '22A';
+```
+
+However we run into a problem, when two customers each first issue the first query (both see seat 22A as available) and then one-by-one issue the second query. This results in both reserving the same seat.
+
+The problem is solved in SQL by the notion of a "transaction", which is informally a group of operations that need to be performed together. SQL allows the programmer to state that a certain transaction must be `serializable` with respect to other transactions. That is, these transactions must behave as if they were run `serially` - one at a time, with no overlap.
+
+### 6.6.2 Atomicity
+It is possible for a single operation to put the database in an unacceptable state if there is a hardware or software "crash" while the operation is executing.
+
+Example: Consider transferring CHF 100 from the account numbered 123 to the account 456. We might execute the following steps:
+1. Add CHF 10 to account 456 by the SQL update statement:
+
+```sql
+    UPDATE Accounts
+    SET balance = balance + 100
+    WHERE acctNo = 456;
+```
+
+2. Subtract CHF 100 from account 123 by SQL update statement:
+
+```sql
+    UPDATE Accounts
+    SET balance = balance - 100
+    WHERE acctNo = 123;
+```
