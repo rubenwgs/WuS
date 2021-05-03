@@ -98,3 +98,37 @@ Entity sets can be connected in various ways by relationships. However, adding t
 
 ### 4.2.5 Picking the Right Kind of Element
 Sometimes we have options regarding the type of design element used to represent a real-world concept. Many of these choices are between using attributes and using entity set/relationship combinations. In general, an attribute is simpler to implement than either an entity set or a relationship. However, making everything an attribute will usually get us into trouble.
+
+## 4.3 Constraints in the E/R Model
+### 4.3.1 Keys in the E/R Model
+A `key` for an entity set $E$ is a set $K$ of one or more attributes such that, given any two distinct entities $e_1$ and $e_2$ in $E$, $e_1$ and $e_2$ cannot have identical values for each of the attributes in the key $K$.
+
+Some important points to remember are:
+- Every entity set must have a key, although in some cases, the key may actually belong to another entity set.
+- There can be more than one possible key for entity set. However, it is customary to pick one key as the `primary key`.
+- When an entity set is involved in an isa-hierarchy, we require that the root entity set has all the attributes needed for a key, and that the key for each entity is found from its component in the root entity set.
+
+### 4.3.2 Representing Keys in the E/R Model
+In our E/R-diagram notation, we `underline` the attributes belonging to a key for an entity set. There is no notation for representing the situation where there are several keys for an entity set, we underline only the primary key.
+
+You should also be aware that in some unusual situations, the attributes forming the key for an entity set do not belong to the entity set itself. We shall defer this matter, called *weak entity sets*, until Section 4.4.
+
+### 4.3.3 Referential Integrity
+`Referential-integrity constraints` says that a value appearing in one context must also appear in another.
+
+The arrow notation in E/R diagrams is able to indicate whether a relationship is expected to support referential integrity in one or more directions. Suppose $R$ is a relationship from entity set $E$ to entity set $F$. A rounded arrow-head pointing to $F$ indicates not only that the relatiosnhips is many-to-one from $E$ to $F$, but that the entity of set $F$ related to a given entity of set $E$ is required to exist.
+
+Example:
+
+<img src="./Figures/DMDB_BN_Fig4-3.PNG" width="650px"/><br>
+
+### 4.3.4 Degree Constraints
+In the E/R model, we can attach a bounding number to the edges that connect a relationship to an entity set, indicating limits on the number of entities that can be connected to any one entity of the related entity set.
+
+<img src="./Figures/DMDB_BN_Fig4-4.PNG" width="550px"/><br>
+
+## 4.4 Weak Entity Sets
+It is possible for an entity set's key to be composed of attributes, some or all of which belong to another entity set. Such an entity set is called a `weak entity set`.
+
+### 4.4.1 Causes of Weak Entity Sets
+There are two principal reasons we need weak entity sets. First, sometimes entity sets faill into a hierarchy based on classifications
