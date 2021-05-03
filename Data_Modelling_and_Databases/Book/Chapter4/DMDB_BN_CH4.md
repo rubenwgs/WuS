@@ -220,3 +220,65 @@ Each of the three aproaches, which we shall refer to as "straight-E/R", "object-
 1. It can be expensive to answer queries involving several relations, so we would prefer to find all the attributes we needed to answer a query in one relation. The nulls approach uses only one relation for all the attributes, so it has an advantage in this regard.
 2. We would like not to use too many relations. Here again ,the nulls method shines, since it requires only one relation. However, there is a difference between the other two methods, since in the straight-E/R approach, we use only one relation per entity set in the hierarchy. In the object-oriented approach, if we have a root and $n$ children, then there are $2^n$ different classes of entities, and we need that many relations.
 3. We would like to minimize space and avoid repreating information. Since the object-oriented method uses only one tuple per entity, and that tuple has components for only those attributes that make sense for the entity, this approach offers the minimum possible space usage. The nulls approach also has only one tuple per entity, but these tuples are "long", i.e., they have components for all attributes, whether or not they are appropriate for a given entity. The straight-E/R method has several tuples for each entity, but only the key attributes are repeated. Thus, this method could use either more or less space than the nulls method.
+
+## 4.7 Unified Modeling Language
+`UML (Unified Modeling Language)` was developed originally as a graphical notation for describing software designs in an object-oriented style. It has been extended, with some modifications, to be a popular notation for describing database designs, and it is this portion of UML that we shall study here.
+
+Following a comparison between UML and E/R terminology:
+
+| UML               | E/R Model                    |
+| :---------------- | :--------------------------- |
+| Class             | Entity set                   |
+| Association       | Binary relationship          |
+| Association Class | Attributes on a relationship |
+| Subclass          | Isa hierarchy                |
+| Aggregation       | Many-to-one relationship     |
+| Composition       | Many-to-one relationship with referential integrity |
+
+### 4.7.1 UML Classes
+A `class` in UML is similar to an entity set in the E/R model. The notation for a class is rather different, however:
+
+<img src="./Figures/DMDB_BN_Fig4-6.PNG" width="250px"/><br>
+
+The box for a class is divided into three parts. At the top is the `name` of the class. The middle has the `attributes`, which are like instance variables of a class. The bottom portion is for `methods`. Neither the E/R model nor the relational model provides methods. However, they are an important concept, and one that actually appears in modern relational systems, called "object-relational" DBMS's.
+
+In this section, we shall not use methods in our design.
+
+### 4.7.2 Keys for UML Classes
+As for entity sets, we can declare one `key` for a UML class. To do soe, we follow each attribute in the key by the letters `PK`, standing for "primary key".
+
+### 4.7.3 Associations
+A binary relationship between classes is called an `association`. There is no analog of multiway relationships in UML. Rather, a multiway relationship has to be broken into binary relationships.
+
+<img src="./Figures/DMDB_BN_Fig4-7.PNG" width="600px"/><br>
+
+Every association has constraints on the number of objects from each of its classes that can be connected to an object of other class. We indicate these constraints by a label of the form $m..n$ at each end. The meaning of this label is that each object at the other end is connected to at least $m$ and at most $n$ objects at this end. In addition:
+- A $*$ in palce of $n$, as in $m..*$, stands for "infinity".
+- A $*$ alone, in place of $m..n$, stands for the range $0..*$, that is, no constraint at all on the number of objects.
+- If there is no label at all at an end of an association edge, then the label is taken to be $1..1$, i.e., "exactly one".
+
+### 4.7.4 Self-Associations
+An association can have both ends at the same class. Such an association is called a `self-association`. To distinguish the two roles played by one class in a self-association, we give the association two names, one for each end.
+
+### 4.7.5 Association Classes
+We can attach attributes to an association in much the way we did in the E/R model. In UML, we create a new class, called an `association class`, and attach it to the middle of the association.
+
+<img src="./Figures/DMDB_BN_Fig4-8.PNG" width="650px"/><br>
+
+The association class has its own name, but its attributes may be thought of as attributes of the association to which it attaches.
+
+### 4.7.6 Subclasses in UML
+Any UML class can have a hierarchy of subclasses below it. The primary key comes from the root of the hierarchy, just as with E/R hierarchies. UML permits a class $C$ to have four different kinds of subclasses below it, depending on our choices of answers to two questions:
+1. `Complete` versus `Partial`. Is every object in the class $C$ a member of some subclass? If so, the subclasses are *complete*, otherwise they are *partial* or *incomplete*.
+2. `Disjoint` versus `Overlapping`. Are the subclasses *disjoint* (an object cannot be in two of the subclasses)? If an object can be in two or more of the subclasses, then the subclasses are said to be *overlapping*.
+
+To represent the class/subclass relationship in UML diagrams, we use a triangular, open arrow pointing to the superclass. The subclasses are usually connected by a horizontal line, feeding into the arrow.
+
+<img src="./Figures/DMDB_BN_Fig4-9.PNG" width="650px"/><br>
+
+### 4.7.7 Aggregations and Compositions
+An `aggregation` is a line between two classes that ends in an open diamond at one end. The implication of the diamond is that the label at the end must be $0..1$, i.e., the aggregation is a many-to-one association from the class at the opposite end to the class at the diamond end.
+
+A `composition` is similar to an association, but the label at the diamond end must be $1..1$. that is, every object at the opposite end from the diamond must be connected to exactly one object at the diamond end. Compositions are distinguished by making the diamond be solid black.
+
+<img src="./Figures/DMDB_BN_Fig4-10.PNG" width="650px"/><br>
