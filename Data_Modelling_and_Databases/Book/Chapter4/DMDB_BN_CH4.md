@@ -171,4 +171,27 @@ While these two rules cover much of the ground, there are also several special s
 For each non-weak entity set, we shall create a relation of the same name and with the same set of attributes. This relation will not have any indication of the relationships in which the entity set participates.
 
 ### 4.5.2 From E/R Relationships to Relations
-Relationships in the E/R model are also represented by relations. The relation for a given arelationship $R$ has the following attributes:
+Relationships in the E/R model are also represented by relations. The relation for a given relationship $R$ has the following attributes:
+1. For each entity set involved in relationship $R$, we take its key attribute or attributes as part of the schema of the relation for $R$.
+2. If the relationship has attributes, then these are also attributes of relation $R$.
+
+If one entity set is involved several times in a relationship, in different roles, then its key attributes each appear as many times as there are roles. We must rename the attributes to avoid name duplication.
+
+### 4.5.3 Combining Relations
+One common situation where we might want to combine relations occurs when there is an entity set $E$ with a many-to-one relationship $R$ from $E$ to $F$. The relations from $E$ and $R$ will each have the key for $E$ in their relations chema. In addition, the relation for $E$ will have in its schema the attributes of $E$ that are not in the key, and the realtion for $R$ will have the key attributes of $F$ and any attributes of $R$ itself. Becuase $R$ is many-to-one, all these attributes are functionally determined by the key for $E$, and we can combine them into one relation with a schema consisting of:
+1. All attributes of $E$.
+2. They key attributes of $F$.
+3. Any attributes belonging to relationship $R$.
+
+### 4.5.4 Handling Weak Entity Sets
+When a weak entity set appears in an E/R diagram, we need to do three things differently:
+1. The relation for the weak entity set $W$ itself must include not only the attributes of $W$ but also the key attributes of the supporting entity sets.
+2. The relation for any relationship in which the weak entity set $W$ appears must use as a key for $W$ all of its key attributes, including those of other entity sets that contribute to $W$'s key.
+3. However, a supporting relationship $R$, from the weak entity set $W$ to a supporting entity set, need not be converted to a relation at all.
+
+The phenomenon, that a supporting relationship needs no relation, is universal for weak entity sets. The following is a modified rule for converting to relations entity sets that are weak:
+- If $W$ is a weak entity set, construct for $W$ a relation whose schema consists of:
+    1. All attributes of $W$.
+    2. All attributes of supporting relationships for $W$.
+    3. For each supporting relationship for $W$, say a many-to-one relationship from $W$ to entity set $E$, all the key attributes of $E$.
+- Do not construct a relation for any supporting relationship  for $W$.
