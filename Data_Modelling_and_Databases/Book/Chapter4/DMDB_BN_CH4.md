@@ -131,4 +131,28 @@ In the E/R model, we can attach a bounding number to the edges that connect a re
 It is possible for an entity set's key to be composed of attributes, some or all of which belong to another entity set. Such an entity set is called a `weak entity set`.
 
 ### 4.4.1 Causes of Weak Entity Sets
-There are two principal reasons we need weak entity sets. First, sometimes entity sets faill into a hierarchy based on classifications
+There are two principal reasons we need weak entity sets. First, sometimes entity sets faill into a hierarchy based on classifications unrelated to the isa-hierarchy. If entities of set $E$ are subunits of entities in set $F$, then it is possible that the names of $E$-entities are not unique until we take into account the name of the $F$-entity to which the $E$ entity is subordinate.
+
+Example: A movie studio might have several film crews. The crews might be designated by a given studio as *crew 1*, *crew 2*, and so on. However, other studios might use the same designations for crews. Therefore, to name a crew uniquely, we need to give both the name of the studio to which the crew belongs and its number.
+
+<img src="./Figures/DMDB_BN_Fig4-5.PNG" width="650px"/><br>
+
+The double-rectangle indicates a weak entity set, and the double-diamond indicates a many-to-one relationship that helps provide the key for the weak entity set.
+
+### 4.4.2 Requirements for Weak Entity Sets
+We cannot obtain key attributes for a weak entity set indiscriminately. Rather, if $E$ is a weak entity set then its key consists of:
+1. Zero or more of its own attributes, and
+2. Key attributes from entity sets that are reached by certain many-to-one relationships from $E$ to other entity sets. These many-to-one relationships are called `supporting relationships` for $E$, and the entity sets reached from $E$ are `supporting entity sets`.
+
+In order for $R$, a many-to-one relationship from $E$ to some entity set $F$, to be a supporting relationship for $E$, the following conditions must be obeyed
+1. $R$ must be binary, many-to-one relationship from $E$ to $F$.
+2. $R$ must have referential integrity from $E$ to $F$. That is, for every $E$-entity, there must be exactly one existing $F$-entity related to it by $R$.
+3. The attributes that $F$ supplies for the key of $E$ must be key attributes of $F$.
+4. However, if $F$ is itself weak, then some or all of the key attributes of $F$ supplied to $E$ will be key attributes of one or more entity sets of $F$ to which $F$ is connected by a supporting relationship.
+5. If there are several different supporting relationships from $E$ to the same entity set $F$, then each relationship is used to supply a copy of the key attributes of $F$ to help form the key of $E$.
+
+### 4.4.3 Weak Entity Set Notation
+We shall adopt the following conventions to indicate that an entity set is weak and to declare its key attributes:
+1. If an entity set is weak, it will be shown as a rectangle with a double border.
+2. Its supporting many-to-one relationships will be shown as diamonds with a double border.
+3. If an entity set supplies any attributes for its own key, then those attributes will be underlined.
