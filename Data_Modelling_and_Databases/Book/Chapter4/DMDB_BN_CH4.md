@@ -156,3 +156,19 @@ We shall adopt the following conventions to indicate that an entity set is weak 
 1. If an entity set is weak, it will be shown as a rectangle with a double border.
 2. Its supporting many-to-one relationships will be shown as diamonds with a double border.
 3. If an entity set supplies any attributes for its own key, then those attributes will be underlined.
+
+## 4.5 From E/R Diagrams to Relational Designs
+To a first approximation, converting an E/R design to a relational database schema is straightforward:
+- Turn each entity set into a relation with the saem set of attributes, and
+- Replace a relationship by a relation whose attributes are the keys for the connected entity sets.
+
+While these two rules cover much of the ground, there are also several special situations that we need to deal with, including:
+- Weak entity sets cannot be translated straightforwardly to relations
+- "Isa" relationships and subclasses require careful treatment
+- Sometimes, we do well to combine two relationships, especially the relation for an entity set $E$ and the relation that comes from a many-to-one relationship from $E$ to some other entity set.
+
+### 4.5.1 From Entity Sets to Relations
+For each non-weak entity set, we shall create a relation of the same name and with the same set of attributes. This relation will not have any indication of the relationships in which the entity set participates.
+
+### 4.5.2 From E/R Relationships to Relations
+Relationships in the E/R model are also represented by relations. The relation for a given arelationship $R$ has the following attributes:
