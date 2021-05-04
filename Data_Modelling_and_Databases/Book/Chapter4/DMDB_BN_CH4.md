@@ -309,3 +309,99 @@ However, it is also possible, in UML, to use a composition as we used supporting
 
 <img src="./Figures/DMDB_BN_Fig4-11.PNG" width="650px"/><br>
 
+## 4.9 Object Definition Language
+`ODL (Object Definition Language)` is a text-based language for specifying the structure of databases in object-oriented terms. Like UML, the class is the central concept in ODL. Classes in ODL have a name, attributes, and methods, just as UML classes do. Relationships, which are analogous to UML's associations, are not an independent concept in ODL, but are embedded within classes as an additional family of proeprties.
+
+### 4.9.1 Class Declarations
+A `declaration` of a `class` in ODL, in its simplest form, is:
+
+```odl
+    class <name> {
+        <list of properties>
+    };
+```
+
+A `proeprty` can be an *attribute*, a *relationship*, or a *method*.
+
+### 4.9.2 Attributes in ODL
+The simplest kind of property is the `attribute`. In ODL, attributes need not be of simple types, such as integers and strings. ODL has a type system, described in Section 4.9.6, that allows us to form structured types and collection types. For example, an attribute `address` might have a structured type with fields for the street, city, and zip code.
+
+Example: We might define the classes *Movie* and *Star* in the following way:
+
+```odl
+    class Movie {
+        attribute string title;
+        attribute integer year;
+        attribute integer length;
+        attribute enum Genres {drama, comedy, sciFi, teen} genre;
+    }
+
+    class Star {
+        attribute string name;
+        attribute Strcut Addr
+            {string street, string city} address;
+    }
+```
+
+### 4.9.3 Relationships in ODL
+An ODL relationship is declared inside a class declaration, by the keyword `relationship`, a type, and the name of the relationship. The type of a relationship describes what a single object of the class is connected to by the relationship. Typically, this type is either another class (many-to-one) or a collection type (many-to-many).
+
+Example: We want each *Movie* object to connect the set of *Star* objects that are its stars:
+
+```odl
+    relationship Set<Star> stars;
+```
+
+### 4.9.4 Inverse Relationships
+Just as we might like to access the stars of a given movie, we might like to know the movies in which a given star acted. To get this information into *Star* objects, we can add the line
+
+```odl
+    relationship Set<Movie> starredIn;
+```
+
+to the delcaration of class *Star*.
+
+We expect that if a star $S$ is in the *stars* set for movie $M$, then movie $M$ is in the *starredIn* set for star $S$. We indicate this connection between the relationships *stars* and *starredIn* by placing in each of their declarations the keyword `inverse` and the name of the other relationship.
+
+### 4.9.5 Multiplicity of Relationships
+Like the binary relationships of the E/R model, a pair of inverse relationships in ODL can be classified as either many-to-many, many-to-one in either direction, or one-to-one. The type declarations for the pair of relationships tells us which (either defined as a class or a set).
+
+### 4.9.6 Types in ODL
+ODL offers the database designer a type system similar to that found in C or other conventional programming languages. In ODL, the basis consists of:
+
+1. `Primitive types`: integer, float, character, character string, boolean, and *enumarations*.
+2. `Class names`, such as *Movie*, or *Star*, which represent types that are actually structures.
+
+These types are combined into structured types using the following `type constructors`:
+- Set of type $T$, denoted as `Set<T>`
+- Bag of type $T$, denoted as `Bag<T>`
+- List of type $T$, denoted as `List<T>`
+- Array of $i$ elements of type $T$, denoted as `Array<T, i>`
+- Dictionary, denoted as `Dictionary<T, S>`, where each pair consists of a value of the *key type* $T$ and a value of the *range type* $S$.
+- Structures. If $T_1, \, T_2,..., \, T_n$ are types, and $F_1, \ F_2,..., \, F_n$ are names of fields, then `Struct N {T1 F1, T2 F2,..., Tn Fn}` denotes the type named $N$ whose elements are structures with $n$ fields. The $i$th field is named $F_i$ and has type $T_i$.
+
+### 4.9.7 Subclasses in ODL
+We can declare one class $C$ to be a `subclass` of another class $D$. To do so, follow the name $C$ in its declaration with the keyword `extends` and the name $D$. Then, class $C$ inherits all the properties of $D$, and may have additional properties of its own.
+
+Example: We can create a subclass *Cartoon* for *Movie* with the ODL declaration:
+
+```odl
+    class Cartoon extends Movie {
+        relationship Set<Star> voices;
+    }
+```
+
+### 4.9.8 Declaring Keys in ODL
+The declaration of a `key` or keys for a class is optional. The reason is that ODL, being object-oriented, assumes that all objects have an object-identity.
+
+In ODL we may declare one or more attributes to be a key for a class by using the keyword `key` or `keys` followed by the attribute or attributes forming keys.
+
+Example: To declare that the set of two attributes *title* and *year* form a key for class *Movie*, we could begin its declaration by:
+
+```odl
+    class Movie (key (title, year)) {...};
+```
+
+The ODL standard also allows properties other than attributes to appear in keys. There is no fundamental problem with a method or relationship being declared a key or part of a key, since keys are advisory statements that the DBMS can take advantage of or not, as it wishes.
+
+## 4.10 From ODL Designs to Relational Designs
