@@ -282,3 +282,30 @@ An `aggregation` is a line between two classes that ends in an open diamond at o
 A `composition` is similar to an association, but the label at the diamond end must be $1..1$. that is, every object at the opposite end from the diamond must be connected to exactly one object at the diamond end. Compositions are distinguished by making the diamond be solid black.
 
 <img src="./Figures/DMDB_BN_Fig4-10.PNG" width="650px"/><br>
+
+## 4.8 From UML Diagrams to Relations
+### 4.8.1 UML-to-Relations Basics
+Here is an outline of the points that should be familiar from our discussion in Section 4.5:
+- `Classes to Relations`: For each class, create a relation whose name is the name of the class, and whose attributes are the attributes of the class.
+- `Associations to Relations`: For each association, create a relation with the name of that association. The attributes of the relation are the key attributes of the two connected classes.
+
+### 4.8.2 From UML subclasses to Relations
+The three options enumerated in Section 4.6 apply to `UML subclass hierarchies` as well. Recall these options are "E/R style", "object-oriented", and "nulls". Here are some considerations:
+1. If a hierarchy is disjoint at every level, then an object-oriented representation is suggested.
+2. If the hierarchy is both complete and disjoint at every level, then the task is even simpler. If we use the object-oriented approach, then we have only to construct relations for the classes at the leaves of the hierarchy.
+3. If the hierarchy is large and overlapping at some or all levels, then the E/R approach is indicated.
+
+### 4.8.3 From Aggregations and Compositions to Relations
+Aggregations and compositions are really types of many-to-one associations. Thus, one approach to their representation in a relational database schema is to convert them as we do for any association in Section 4.8.1.
+
+However, there is a hidden assumption that this implementation of aggregations and compositions is undesirable. Recall from Section 4.5.3 that when we have an entity set $E$ and a many-to-one relationship $R$ from  $E$ to another entity set $F$, we have the option - some would say the abligation - to combine the relation for $E$ with the relation for $R$. That is, the one relation constructed from $E$ and $R$ has all the attributes of $E$ plus the key attributes of $F$.
+
+We suggest that aggregations and compositions be treated routinely in this manner.
+
+### 4.8.4 The UML Analog of Weak Entity Sets
+We have not mentioned a UML notation that corresponds to the double-border notation for `weak entity sets` in the E/R model. There is a sense in which none is needed. The reason is that UML, unlike E/R, draws on the tradition of object-oriented systems, which takes the point of view that each object has its own `object-identity`. 
+
+However, it is also possible, in UML, to use a composition as we used supporting relationships for weak entity sets in the E/R model. This composition goes from the "weak" class to the "supporting" class. We shall use a special notation for a `supporting composition`: a small box attached to the *weak* class with "PK" in it will serve as the anchor for the supporting composition.
+
+<img src="./Figures/DMDB_BN_Fig4-11.PNG" width="650px"/><br>
+
