@@ -405,3 +405,87 @@ Example: To declare that the set of two attributes *title* and *year* form a key
 The ODL standard also allows properties other than attributes to appear in keys. There is no fundamental problem with a method or relationship being declared a key or part of a key, since keys are advisory statements that the DBMS can take advantage of or not, as it wishes.
 
 ## 4.10 From ODL Designs to Relational Designs
+ODL was actually intended as the data-definition part of a language standard for object oriented DBMS's, analogous to the *SQL CREATE TABLE* statement.
+However, it is also possible to see ODL as a text-based, high-level design notation, from which we eventually derive a relational database schema. Thus, in this section we shall consider how to convert ODL designs into relational designs.
+
+But, some new problems arise for ODL, including:
+1. Entity sets must have keys, but there is no such guarantee for ODL classes.
+2. While attributes in E/R, UML, and the relational model are of primitive type, there is no such constraint for ODL attributes.
+
+### 4.10.1 From ODL Classes to Relations
+As a starting point, let us assume that our goal is to have one relation for each class and for that relation to have one attribute for each property. We shall see many ways in which this approach must be modified. The restrictions we assume are:
+1. All properties of the class are attributes (not relationships or methods)
+2. The types of the attributes are primitive (no structures or sets)
+
+We can create an artificial attribute to represent the object-identity and serve as a key for the relation.
+
+### 4.10.2 Complex Attributes in Class
+Even when a class' properties are all attributes we may have some difficulty converting the class to a relation. The reason is that attributes in ODL can have complex types such as structures, sets, bags, or lists.
+
+Record structures whose fields are themselves primitive are the easiest to handle. We simply expand the structure definition, making one attribute of the relation for each field of the structure.
+
+### 4.10.3 Representing Set-Valued Attributes
+Values in ODL can also be built using type constructors *Set*, *Bag*, *List*, *Array*, and *Dictionary*.
+
+One approach to representing a set of values for an attribute $A$ is to make one tuple for each value. That tuple includes the appropriate values for all the other attributes besides $A$. This approach works, although it is likely to produce unnormalized relations.
+
+### 4.10.4 Representing Other Type Constructors
+Besides record structures and sets, an ODL class definition could use *Bag*, *List*, *Array*, or *Dictionary* to construct values. To represet bags, we might introduce a *count* attribute, for lists we might introduce a *position* attribute, etc.
+
+### 4.10.5 Representing ODL Relationships
+Usually, an ODL class definition will contain relationships to other ODL classes. As in the E/R model, we can create for each relationship a new relation that connects the keys of the two related classes. However, in ODL, relationships come in inverse pairs, and we must create only one relation for each pair.
+
+## 4.1.11 Summary of Chapter 4
+#### The Entity-Relationship Model
+In the E/R model we describe entity sets, relationships among entity sets, and attributes of entity sets and relationships.
+
+#### Entity-Relationship Diagrams
+We use rectangles, diamonds, and ovals to draw entity sets, relationships, and attributes, respectively.
+
+#### Multiplicity of Relationships
+Binary relationships can be one-one, many-one, or many-many.
+
+#### Good Design
+Designing database effectively requires that we represent the real world faithfully, that we select appropriate elements, and that we avoid redundancy.
+
+#### Subclasses
+The E/R model uses a special relationship *isa* to represent the fact that one entity set is a special case of another.
+
+#### Weak Entity Sets
+These require attributes of some supporting entity set to identify their own entities.
+
+#### Converting Entity Sets to Relations
+The relation for an entity set has one attribute for each attribute of the entity set. An exception is a weak entity set.
+
+#### Converting Relationships to Relations
+The relation for an E/R relationship has attributes corresponding to the key attributes of each entity set that participates in the relationship.
+
+#### Converting Isa Hierarchies to Relations
+There are several differrent approaches such as creating a realtion for each entitiy set with the key attributes of the hierarchy's root plus the attributes of the entitiy set itself.
+
+#### Unified Modeling Language
+In UML, we describe classes and associations between classes. Classes are analogous to E/R entity sets, and associations are like binary E/R relationships.
+
+#### UML Subclass Hierarchies
+UML permits classes to have subclasses, with inheritance from the superclass.
+
+#### Converting UML Diagrams to Relations
+The methods are similar to those used for the E/R model. Classes become relations and associations become relations connecting the keys of the associated classes.
+
+#### Onject Definition Language
+This language is a notation for formally describing the schemas of databases in an object-oriented style.
+
+#### ODL Relationships
+A relationship in ODL must be binary. It is represented, in the two classes it connects, by names that are declared to be inverse of one another.
+
+#### The ODL Type System
+ODL allows types to be constructed by applying one of the type constructors.
+
+#### Keys in ODL
+Keys are optional in ODL.
+
+#### Converting ODL Classes to Relations
+The method is the same as for E/R or UML, except if the class has attributes of complex type.
+
+#### Converting ODL Relationships to Relations
+The method is the same as for E/R relationships, except that we must first pair ODL relationships and their inverses, and create only one relation for the pair.
