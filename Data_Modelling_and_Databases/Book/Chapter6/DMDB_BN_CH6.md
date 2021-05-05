@@ -3,7 +3,6 @@
 - Date: 08.03.2021
 - Contact: ruben.schenk@inf.ethz.ch
 
-
 # 6. The Database Language SQL
 ## 6.1 Simple Queries in SQL
 One of the simplest forms of queries in SQL is to ask for those tuples of some relation that satisfy a condition. Such a query is analogous to a selection in relational algebra. this simple query uses the three keywords `SELECT`, `FROM`, and `WHERE` that characterize SQL.
