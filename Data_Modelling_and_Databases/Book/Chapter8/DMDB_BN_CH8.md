@@ -93,3 +93,40 @@ Theinsertion on *ParamountMovies* is executed as if it were the same insertion o
     INSERT INTO Movies(title, year)
     VALUES('Star Trek', 1979);
 ```
+
+We may also `delete` from an updatable view. The deletion, like the insertion, is passed through to the underlying relation $R$. However, to make sure that only tuples that can be seen in the view are deleted, we add (using the `AND`) the condition of the WHERE clause in the view to the WHERE clause of the deletion.
+
+Example: Suppose we wish to delete from the updatable *ParamountMovies* view all movies with "Trek" in their titles:
+
+```sql
+/* Code 8.6: Deletion via updatable views. */
+    DELETE FROM ParamountMovies
+    WHERE title LIKE '%Trek%';
+```
+
+This deletion is translated into an equivalent deletion on the *Movies* base table:
+
+```sql
+    /* Code 8.6: Continuation. */
+    DELETE FROM Movies
+    WHERE title LIKE '%Trek%' AND studioName = 'Paramount';
+```
+
+Similarly, an `update` one an updatable view is passed through to the under lying relation.
+
+### 8.2.3 Instead-Of Triggers on Views
+When a trigger is defined on a view, we canb use `INSTEAD OF` in place of `BEFORE` or `AFTER`. If we do so, then when an event awakens the trigger, the action of the trigger is done instead of the event itself. That is, an instead-of trigger intercepts attempts to modify the view and in its place performs whatever action the database designer deems appropriate.
+
+Example: Let us consider the following instead-of trigger:
+
+```sql
+    /* Code 8.8: Instead-of triggers in SQL. */
+    CREATE TRIGGER ParamountInsert
+    INSTEAD OF INSERT ON ParamountMovies
+    REFERENCING NEW ROW AS NewRow
+    FOR EACH ROW
+    INSERT INTO Movies(title, year, studioName)
+    VALUES(NewRow.title, NewRow.year, 'Paramount');
+```
+
+Much of the trigger is unsurprising. We see the keyword `INSTEAD OF` on line (2), establishing that an attempt to isnert into *ParamountMovies* will never take place. Rather, lines (5) and (6) is the action that replaces the attempted insertion.
