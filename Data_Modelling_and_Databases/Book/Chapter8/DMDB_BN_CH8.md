@@ -47,4 +47,14 @@ Example: We may query the view *ParamountMovies* just as if it were a stored tab
 finds the movies made by Paramount in 1979.
 
 ### 8.1.3 Renaming Attributes
-Sometimes, wemight
+Sometimes, we might prefer to give a view's attributes names of our own choosing. We may specify the attributes of the view by listing them, surrounded by parentheses, after the name of the view in the CREATE VIEW statement. 
+
+Example: For instance, we could write:
+
+```sql
+    CREATE VIEW MovieProd(movieTitle, prodName) AS
+        SELECT title, name
+        FROM Movies, MovieExec
+        WHERE producerNum = certNum;
+```
+
