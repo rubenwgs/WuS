@@ -130,3 +130,52 @@ Example: Let us consider the following instead-of trigger:
 ```
 
 Much of the trigger is unsurprising. We see the keyword `INSTEAD OF` on line (2), establishing that an attempt to isnert into *ParamountMovies* will never take place. Rather, lines (5) and (6) is the action that replaces the attempted insertion.
+
+## 8.3 Indexes in SQL
+An `index` on an attribute $A$ of a relation is a data structure that makes it efficient to find those tuples that have a fixed value for attribute $A$. We could think of the index as a binary search tree of *(key, value)* paris, in which a key $a$ (one of the values that attribute $A$ may have) is associated with a value that is the set of locations of the tuples that have $a$ in the component of attribute $A$.
+
+We shall refer to the attributes of the index as the `index key` when a distinction needs to be made.
+
+### 8.3.1 Motivation for Indexes
+When relations are very large, it becomes expensive to scan all the tuples of a relation to find those tuples that match a given condition. 
+
+For example, consider the following query:
+
+```sql
+    SELECT *
+    FROM Movies
+    WHERE studioName = `Disney` AND year = 1990;
+```
+
+The naive way to implement this query is to get all 10'000 tuples and test the condition of the WHERE clause on each. It would be much more efficient if we had some way of getting only the 200 tuples from the year 1990 and testing each of them to see if the studio was Disney.
+
+### 8.3.2 Declaring Indexes
+Suppose we want to have an index on attribute *year* for the relation *Movies*. Then we say:
+
+```sql
+    CREATE INDEX YearIndex ON Movies(year);
+```
+
+The result will be that an index whose name is *YearIndex* will be created on attribute *year* of the relation *Movies*. Henceforth, SQL queries that specify a year may be executed by the SQL query processor in such a way that only those tuples of *Movies* with the specified year are ever examined.
+
+Example: Since *title* and *year* form a key for *Movies*, we might expect it to be common that values for both these attributes will be specified, or neither will. The following is a typical declaration of an index on these two attributes:
+
+```sql
+    /* Code 8.10: Indexes in SQL. */
+    CREATE INDEX KeyIndex ON Movies(title, year);
+```
+
+If we wish to `delete the index`, we simply use its name in a statement like:
+
+```sql
+    DROP INDEX YearIndex;
+```
+
+## 8.4 Selection of Indexes
+Choosing which indexes to create requires the database designer to analyze a trade-off. In practice this choice is one of principal factors that influence whether a database design gives acceptable performance. Two important factors to consider are:
+- The existence of an index on an attribute may speed up greatly the execution of queries on the respective attribute.
+- On the other hand, every index built for one or more attribute makes insertions, deletions, and updates to the respective relation more complex and time-consuming.
+
+### 8.4.1 A Simple Cost Model
+To understand how to choose indexes for a database, we first need to know where the time is spent answering queries. For the moment, let us state that the tuples of a relation are normally distributed among many pages of a disk. Therefore, to examine even one tuple requires that the whole page be brought into main memory.
+
