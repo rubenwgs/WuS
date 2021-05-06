@@ -58,3 +58,38 @@ Example: For instance, we could write:
         WHERE producerNum = certNum;
 ```
 
+## 8.2 Modifying Views
+In limited circumstances it is possible to execute an insertion, deletion, or update to a view. At first, this idea makes no sense at all, since the view does not exist the way a base table (stored relation) does.
+
+For many views, it is simply not possible to do that. However, for sufficiently simple views, called `updatable views`, it is possible to translate modification of the view into an equivalent modification on the base table, and the modification can be done to the base table instead.
+
+### 8.2.1 View Removal
+An extrem modification of a view is to `delete` it altogether. This modification may be done whether or not the view is updatable. A typical `DROP` statement is
+
+```sql
+    DROP VIEW ParamountMovies;
+```
+
+Note that this statement *deletes the definition of the view*, so we may no longer make queries or issue modification commands involving this view. However dropping the view does not affect any tuples of the underlying relation *Movies*.
+
+### 8.2.2 Updatable View
+SQL provides a formal definition of when modifications to a view are permitted. The SQL rules are complex, but roughly, they permit modifications on views that are defined by selecting (using SELECT, not SELECT DISTINCT) some attributes from one Relation $R$. Some important technical points:
+- The WHERE clause must not involve $R$ in a subquery.
+- The FROM clause can only consist of one occurrence of $R$ and no other relation.
+- The list in the SELECT clause must include enough attributes that for every tuple inserted into the view, we can fill the other attributes out with NULL values or the proper default.
+
+Example: Suppose we insert into view *ParamountMovies* a tuple like:
+
+```sql
+    /* Code 8.5: Inserting into views. */
+    INSERT INTO ParamountMovies
+    VALUES('Star Trek', 1979);
+```
+
+Theinsertion on *ParamountMovies* is executed as if it were the same insertion on *Movies*:
+
+```sql
+    /* 8.5: Continuation. */
+    INSERT INTO Movies(title, year)
+    VALUES('Star Trek', 1979);
+```
