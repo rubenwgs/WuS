@@ -179,3 +179,152 @@ Choosing which indexes to create requires the database designer to analyze a tra
 ### 8.4.1 A Simple Cost Model
 To understand how to choose indexes for a database, we first need to know where the time is spent answering queries. For the moment, let us state that the tuples of a relation are normally distributed among many pages of a disk. Therefore, to examine even one tuple requires that the whole page be brought into main memory.
 
+### 8.4.2 Some Useful Indexes
+Often, the most useful index we can put on a relation is an `index on its key`. There are two reasons:
+1. Queries in which a value for the key is specified are common.
+2. Since there is at most one tuple with a given key value, the index returns either nothing or one location for a tuple. Thus, at most one page must be retrieved to get that tuple into main memory.
+
+There are two situations in which an index can be effective, even if it is not on a key:
+1. If the attribute is almost a key, that is, relatively few tuples have a given value for that attribute.
+2. If the tuples are *clustered* on that attribute. We `cluster` a relation on an attribute by grouping the tuples with a common value for that attribute onto as few pages as possible.
+
+### 8.4.3 Calculating the Best Index to Create
+It might seem that the more indexes we create, the more likely it is that an index useful for a given query will be available. However, if modifications are the most frequent action, then we should be very conservative about creating indexes, since each modification on a relation $R$ forces us to change any index on one or more of the modified attributes of $R$.
+
+Following an example of how to calculate the best index:  
+Let us consider the relation `StarsIn(movieTitle, movieYear, starName)`. Suppose that there are three database operations that we somestimes perform on this relation:
+
+```sql
+    /* Q1 */
+    SELECT movieTitle, movieYear
+    FROM StarsIn
+    WHERE starName = 2;
+    /* for some constant s */
+```
+
+```sql
+    /* Q2 */
+    SELECT starName
+    FROM StarsIn
+    WHERE movieTitle = t AND movieYear = y;
+    /* for some constants t and y */
+```
+
+```sql
+    /* I */
+    INSERT INTO StarsIn VALUES(t, y, s);
+    /* for some constants t, y, and s. */
+```
+
+Let us make the following assumptions about the data:
+1. `StarsIn` occupies $10$ pages, so if we need to examine the entire relation the cost is $10$.
+2. On the average, a star has appeared in 3 movies and a movie has3 stars.
+3. Even with an index, it will take 3 disk accesses to find the 3 tuples for a star or movie.
+4. One disk access is needed to read a page of the index. If an index page must be modified, then another disk access is needed to write back the modified page (for example in an insertion).
+
+The following table gives the costs of each of the three operations:
+
+| Action  | No Index          | Star Index | Movie Index | Both Indexes    |
+| ------: | :---------------: | :--------: | :---------: | :-------------: |
+| $Q_1$   | $10$              | $4$        | $10$        | $4$             |
+| $Q_2$   | $10$              | $10$       | $4$         | $4$             |
+| $I$     | $2$               | $4$        | $4$         | $6$             |
+| Average | $2 + 8p_1 + 8p_2$ | $4 + 6p_2$ | $4 + 6p_1$  | $6-2p_1 - 2p_2$ |
+
+The final row gives the average cost of an action, on the assumption that the fraction of the time we do $Q_1$ is $p_1$ and the fraction of the time we do $Q_2$ is $p_2$, therefore, the fraction of the time we do $I$ is $1-p_1-p_2$. Depending on $p_1$ and $p_2$, any of the four choices of index/no index can yield the best average cost for the three actions.
+
+### 8.4.4 Automatic Selection of Indexes to Create
+Tuning a database is aprocess that includes not only index selection, but the choice of many different parameters. There are a number of tools that have been designed to take the responsibility from the database designer and have the system tune itself, or at least advise the designer on good choices.
+
+Here is an outline of how the index-selection portion of tuning advisors work:
+1. The first step is to establish the query workload. We may be able to examine a log and find a set of representative queries and database modifications for the database at hand.
+2. The designer may be offered the opportunity to specify some constraints, e.g., indexes that must, or must not, be chosen.
+3. The tuning advisor generates a set of possible `candidate indexes`, and evaluates each one. Typical queries are given to the query optimizier of the DBMS.
+4. The index set resulting in the lowest cost for the given workload is suggested to the designer, or it is automatically created.
+
+## 8.5 Materialized Views
+A view describes how a new relation can be constructed from base tables by executing a query on those tables. If a view is used frequently enoughy, it may even be efficient to `materialize` it, that is, to maintain its value at all times.
+
+In principle, the DBMS needs to recompute a materialized view every time one of its base tables changes in any way. For simple views, it is possible to limit the number of times we need to consider changing the materialized view.
+
+Example: Suppose we frequently want to find the name of the producer of a given movie. We might find it advantageous to materialize a view as follows:
+
+```sql
+    /* Code 8.15: Materialized views. */
+    CREATE MATERIALIZED VIEW MovieProd AS
+        SELECT title, year, name
+        FROM Movies, MovieExec
+        WHERE producerNum = certNum
+```
+
+It is important to note that many common types of materialized views do allow the view to be maintained `incrementally`. That is, we never have to reconstruct the whole view from scratch. Rather, insertions, deletions, and updates to a base table can be implemented in a join view by a small number of queries to the base tables followed by modification statements on the materialized view.
+
+### 8.5.2 Periodic Maintenance of Materialized Views
+There is another setting in which we may use materialized views, yet not have to worry about the cost or complexity of maintaining them up-to-date as the underlying base tables change. For example, an analyst may not need the exact current state of a database for its analysis.
+
+What is usually done is to create materialized views, but not to try to keep them up-to-date as the base tables change. Rather, the materialized views are reconstructed periodically (typically each night), when other activity in the database is low. The materialized views are only used by analysts, and their data might be out of date by as much as 24 hours.
+
+### 8.5.3 Rewriting Queries to Use Materialized Views
+A materialized view can be referred to in the FROM clause of a query, just as a virtual view can. However, becuase a materialized view is stored in the database, it is possible to rewrite a query to use a materialized view, even if that view was not mentioned in the query as written.
+
+Suppose we have a mterialized view $V$ defined by a query of the form
+
+```sql
+    SELECT L_v
+    FROM R_v
+    WHERE C_v
+```
+
+where $L_V$ is a list of attributes, $R_V$ is a list of relations, and $C_V$ is a condition. Similarly, suppose we have a query $Q$ of the same form:
+
+```sql
+    SELECT L_q
+    FROM R_q
+    WHERE C_q
+```
+
+Here are the conditions under which we can repalce part of the query $Q$ by the view $V$.
+1. The realtions in list $R_V$ all appear in the list $R_Q$.
+2. The condition $C_Q$ is equivalent $C_V \text{ AND } C$ for some condition $C$.
+3. If $C$ is needed, then the attributes of relations on list $R_V$ that $C$ mentions are attributes on the list $L_V$.
+4. Attributes on the list $L_Q$ that come from relations on the list $R_V$ are also on the list $L_V$.
+
+If all these conditions are met, then we can rewrite $Q$ to use $V$, as follows:
+1. Replace the list $R_Q$ by $V$ and the realtions are in list $R_Q$ but not on $R_V$.
+2. Repalce $C_Q$ by $C$. If $C$ is not needed (i.e., $C_V = C_Q$), then there is no WHERE clause.
+
+### 8.5.4 Automatic Creation of Materialized Views
+The ideas that were discussed in Section 8.4.4 for indexes can apply as well to materialized views. We first need to establish or approximate the query workload. An automated materialized-view-selection advisor needs to generate `candidate views`. The process can be limited if we remember that there is no point in creating a materialized view that does not help for at least one query of our expected workload.
+
+We can limit ourselves to candidate materialized views that:
+1. Have a list of relations in the FROM clause that is a subset of those in the FROM clause of at least one query of the workload.
+2. Have a WHERE clause that is the AND Of conditions that each appear in at least one query.
+3. Have a list of attributes in the SELECT clause that is sufficient to be used in at least one query.
+
+## 8.6 Summary of Chapter 8
+#### Virtual Views
+A `virtual view` is a definition of how one relation (the *view*) may be constructed logically from tables stored in the database or other views.
+
+#### Updatable Views
+Some virtual views on a single relation are `updatable`, meaning that we can insert into, delete from, and update the view as if it were a stored table.
+
+#### Instead-Of-Triggers
+SQL allows a special type of trigger to apply to a virtual view.
+
+#### Indexes
+While not part of the SQL standard, commercial SQL systems allow the declaration of `indexes` on attributes.
+
+#### Choosing Indexes
+While indexes speed up queries, they slow down database modifications, since the indexes on the modified relations must also be modified.
+
+#### Automatic Index Selection
+Some DBMS's offer tools that choose indexes for a database automatically.
+
+#### Materialized Views
+Instead of treating a view as a query on base tables, we can use the query as a definition of an additional stored relation, whose value is a function of the values of the base tables.
+
+#### Maintaining Materialized Views
+As the base tables change, we must make the corresponding changes to any materialized view whose value is affected by the change.
+
+#### Rewriting Queries to Use Materialized Views
+The condition under which a query can be rewritten to use a materialized view are complex. However, if the query optimizier can perform such rewritings, then an automatic design tool can consider the improvement in performance that results from creating materialized views.
