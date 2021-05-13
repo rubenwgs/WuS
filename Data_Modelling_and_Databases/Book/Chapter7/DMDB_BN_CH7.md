@@ -115,3 +115,51 @@ The problem shown in the example above can be solved as follows:
 To inform the DBMS about point $(2)$, the declaration of any constraint (e.g., key, foreign-key, etc.) may be followed by one of `DEFERRABLE` or `NOT DEFERRABLE`. The later is the default, and means that every time a database modification statement is executed, the constraint is checked immediately afterwards. However, if we declare a constraint to be DEFERRABLE, then we have the option of having it wait until a transaction is complete before checking the constraint.
 
 We follow the keyword DEFERRABLE by either `INITIALLY DEFERRED` or `INITIALLY IMMEDIATE`. In the former case, checking will be deferred to just before each transaction commits. In the latter case, the check will be made immediately after each statement.
+
+## 7.2
+Within a SQL CREATE TABLE statement, we can declare two kinds of constraints:
+1. A constraint on a single attribute.
+2. A constraint on a tuple as a whole.
+
+We will introduce the different types of constraints in the following subchapters.
+
+### 7.2.1 Not-Null Constraints
+One simple constraint to associate with an attribute is `NOT NULL`. The effect is to disallow tuples in which this attribute is NULL. The constraint is declared by the keywords `NOT NULL` following the declaration of the attribute in a CREATE TABLE statement.
+
+### 7.2.2 Attribute-BAsed CHECK Constraints
+More complex constraints can be attached to an attribute declaration by the keyword `CHECK` and a parenthesized condition that must hold for every value of this attribute. In principle the condition can be anything that could follow WHERE in a SQL query.
+
+An attribute-based `CHECK` constraint is checked *whenever any tuple gets a new value for this attribute*. The new value could be introduced by any update for the tuple, or it could be part of an inserted tuple.
+
+Example: Suppose we want to require that certificate numbers be at least six digits. We could modify Code 7.1 to:
+
+```sql
+    /* Code 7.6: Attribute CHECKS. */
+    presCNum INT REFERENCES MovieExec(certNum)
+                    CHECK (presCNum >= 100000)
+```
+
+### 7.2.3 Tuple-Base CHECK Constraints
+To declare a constraint on the tuples of a single table $R$, we may add to the list of attributes and key or foreign-key declarations, in $R$'s CREATE TABLE statement, the keyword `CHECK` followed by a parenthesized condition. This condition can be anything that could appear in a WHERE clause. It is interpreted as a condition about a tuple in the table $R$.
+
+The condition of a tuple-base `CKECK` constraint is *checked every time a tuple is inserted into* $R$ *and every time a tuple of* $R$ *is updated*.  
+However, if the condition mentions some other relation in a subquery, and a change to that relation causes the condition to become false for some tuple in $R$, the check does not inhibit this change. In fact, even a deletion from $R$ can cause the condition to become false, if $R$ is mentioned in a subquery.
+
+Example: Assume we want to put a constraint on the tuples of the *MovieStar* relation, namely that if the star's gender is male, then his name must not begin with 'Ms.'. We can introduce this constraint the following way:
+
+```sql
+    /* Code 7.8: Tuple CHECKS. */
+    CREATE TABLE MovieStar (
+        name CHAR(30) PRIMARY KEY,
+        address VARCHAR(255),
+        gender CHAR(1),
+        birthdate DATE,
+        CHECK (gender = 'F' OR name NOT LIKE 'Ms.%')
+    );
+```
+
+### 7.2.4 Comparison of Tuple- and Attribute-Based Constraints
+If a constraint on a tuple involves more than one attribute of that tuple, then it must be written as a tuple-based constraint. However, if the cosntraint involves only one attribute of the tuple, then it can be written as either a tuple- or attribute- based constraint.
+
+When only one attribute of the tuple is involved, then the condition checked is the same, regardless of whether a tuple- or attribute-based constraint is written. However, the *tuple-based constraint will be checked more frequently than the attrbiute-based constraint* - whenerver any attribute of the tuple changes, rather than only when the attribute mentioned in the constraint changes.
+
