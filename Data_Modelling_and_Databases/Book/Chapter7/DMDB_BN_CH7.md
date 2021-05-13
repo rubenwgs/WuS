@@ -237,3 +237,48 @@ The following table lists the principal differences among attribute-based checks
 | Tuple-based CHECK     | Element of relation schema | On insertion to relation or tuple update     | Not if subqueries   |
 | Assertion             | Element of database schema | On any change to any mentioned relation      | Yes                 |
 
+## 7.5 Triggers
+`Triggers`, sometimes called `event-condition-action rules` or `ECA rules`, differ from the kinds of constraints discussed previously in three ways.
+1. Triggers are only awakened when certain `events`, specified by the database programmer, occur. The sorts of events allowed are usually insert, delete, or update to a particular relation.
+2. Once awakened by its triggering event, the trigger tests a `condition`. If the condition doesn't hold, then nothing else associated with the trigger happens in response to this event.
+3. If the condition of the trigger is satisfied, the `action` associated with the trigger is performed by the DBMS.
+
+### 7.5.1 Triggers in SQL
+The SQL trigger statement gives the user a number of different options in the event, condition, and action parts. Here are the principal features:
+1. The check of the trigger's condition and the action of the trigger may be executed either on the *state of the database* that exists before the triggering event itself is executed or on the state that exists after the triggering event is executed.
+2. The condition and action can refer to both old and/or new values of tuples that were updated in the triggering event.
+3. It is possible to define update events that are limited to a particular attribute or set of attributes.
+4. The programmer has an option of specifying that the trigger executes either:
+   1. Once for each modified tuple (a `row-level trigger`), or
+   2. Once for all the tuples that are changed in one SQL statement (a `statement-level trigger`).
+
+We now look at some details of the syntax for triggers with the following example code:
+
+```sql
+    /* Code 7.13: A SQL trigger. */
+    1: CREATE TRIGGER NetWorthTrigger
+    2: AFTER UPDATE OF netWorth ON MovieExec
+    3: REFERENCING
+    4:   OLD ROW AS OldTuple,
+    5:   NEW ROW AS NewTuple
+    6: FOR EACH ROW
+    7: WHEN (OldTuple.netWorth > NewTuple.netWorth)
+    8:   UPDATE MovieExec
+    9:   SET netWorth = OldTuple.netWorth
+    10:  WHERE certNum = NewTuple.certNum;
+```
+
+- Line (1) introduced the declaration with the keywords CREATE TRIGGER and the name of the trigger
+- Line (2) then gives the triggering event, namely the update of the *netWorth*
+- Lines (3) - (5) set up a way for the condition and action portions of the trigger to talk about both the old tuple and the new tuple
+- Line (6) expresses the requirement that this trigger is executed once for each updated tuple
+- Line (7) is the condition part of the trigger
+- Lines (8) - (10) form the action portion
+
+### 7.5.2 The Options for Trigger Design
+In the points that follow, we shall outline the options that are offered by triggers and how to express these options.
+- In line (2) we may replace AFTER by BEFORE, in which case the WHEN condition is tested on the database state that exists before the triggering event is executed.
+- Besides UPDATE, other possible triggering events are INSERT and DELETE. The *OF netWorth* clause in line (2) is optional for UPDATE events and is not permitted for INSERT or DELETE events.
+- The WHEN clause is optional. If it is missing, then the action is executed whenever the trigger is awakened.
+- While we showed a single SQL statement as an action, there can be any number of such statements, separated by semicolons and surrounded by BEGIN ... END.
+- If we omit the FOR EACH ROW on line (6)
