@@ -191,3 +191,49 @@ Example: Let us see how we would drop and add some constraints on the relation *
     ALTER TABLE MovieStar ADD CONSTRAINT NoAndro
         CHECK (gender IN ('F', 'M'));
 ```
+
+## 7.4 Assertions
+The most powerful forms of active elements in SQL are not associated with particular tuples or components of tuples. These elements, called `triggers` and `assertions`, are part of the database schema, on a par with tables.
+- An `assertion` is a boolean-valued SQL expresiion that must be true at all times.
+- A `trigger` is a series of actions that are associated with certain events, such as insertion into a particular relation, and that are performed whenever events arise.
+
+### 7.4.1 Creating Assertions
+The SQL standard proposes a simple form of `assertions` that allos us to enforce any condition (expression that can follow WHERE). Like other schema elements, we declare an assertion with a CREATE statement. The form of an assertion is:
+
+```sql
+    CREATE ASSERTION <assertion-name> CHECK (<condition>)
+```
+
+The condition in an assertion must be true when the assertion is created and must remain true. Any database modifiaction that causes it to become false will be rejected.
+
+### 7.4.2 Using Assertions
+There is a difference between the way we write tuple-based CHECK constraints and the way we write assertions. Tuple-based checks can refer directly to the attributes of that relation in whose declaration they appear. An assertion has no such privilege. Any attributes referred to in the condition must be introduced in the assertion, typically by mentioning their relation in a select-from-where expression.
+
+Example: Suppose we wish to require that no one can become the president of a studio unless their net worth is at least 10'000'000 dollars. We can declare an assertion to the effect that the set of movies studios with presidents having a net worth less than 10'000'000 dollars is empty. This assertion is shown in the following example code:
+
+```sql
+    /* Code 7.11: Assertions in SQL. */
+    CREATE ASSERTION RichPres CHECK
+        (NOT EXISTS
+            (SELECT Studio.name
+             FROM Studio, MovieExec
+             WHERE presCNum = certNum AND netWorth < 10000000
+            )
+        );
+```
+
+As a final point, it is possible to drop an assertion. The statement to do so follows the pattern for any database schema element:
+
+```sql
+    DROP ASSERTION <assertion name>
+```
+
+### 7.4.3 Comparison of Constraints
+The following table lists the principal differences among attribute-based checks, tuple-based checks, and assertions.
+
+| Type of Constraint    | Where Declared             | When Activated                               | Guaranteed to Hold? |
+| :-------------------- | :------------------------- | :------------------------------------------- | :------------------ |
+| Attribute-based CHECK | With attribute             | On insertion to relation or attribute update | Not if subqueries   |
+| Tuple-based CHECK     | Element of relation schema | On insertion to relation or tuple update     | Not if subqueries   |
+| Assertion             | Element of database schema | On any change to any mentioned relation      | Yes                 |
+
