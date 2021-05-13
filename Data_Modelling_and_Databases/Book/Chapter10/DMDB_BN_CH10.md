@@ -79,3 +79,45 @@ The statement ends with one of the following:
 
 It is permissible to replace `REVOKE` by `REVOKE GRANT OPTION FOR`, in which case the core privileges themselves remain, but the option to grant them to others removed.
 
+## 10.2 Recursion in SQL
+### 10.2.1 Defining Recursive Relations in SQL
+The `WITH` statement in SQL allows us to define temporary relations, recursive or not. To define a recursive relation, the relation can be used within the WITH statement itself. A simple form of the WITH statement is:
+
+```sql
+    WITH R AS <definition of R> <query involving R>
+```
+
+That is, one defines a temporary relation named $R$, and then uses $R$ in some query. The temporary relation is not available outside the query that is part of the WITH statement.
+
+Example: The figure below shows a graph representing some flights of two hypothetical airlines.
+
+<img src="./Figures/DMDB_Fig10-2.PNG" width="600px"/><br>
+
+The simplest recursive question we can ask is "For what pairs of cities $(x, y)$ is it possible to get from city $x$ to city $y$ by taking one or more flights?" Before writing this query in recursive SQL, it is useful to express the recursion in the Datalog notation of Section 5.3.
+
+The following two Datalog rules describe a relation $Reaches(x,y)$  that contains exactly these pairs of cities.
+
+$$
+Reaches(x,y) \leftarrow Flights(a,x,y,d,r) \\
+Reaches(x,y) \leftarrow Reaches(x,z) \land Reaches(z,y)
+$$
+
+The first rule says that $Reaches$ contains those pairs of cities for which there is a direct flight from the first to the second. The airline $a$, departure time $d$, and arrival time $r$ ar arbitrary in this rule. The second rule says that if you can reach from city $x$ to city $z$ and you can reach from $z$ to city $y$, then you can reach from $x$ to $y$.
+
+From the two Datalog rules for $Reaches$ we can develop a SQL query that produces the relation $Reaches$. This SQL query places the Datalog rules for $Reaches$ in a WITH statement, and follows it by a query:
+
+```sql
+    /* Code 10.8: Recursive definitions in SQL. */
+    WITH RECURSIVE Reaches(frm, to) AS
+            (SELECT from, to FROM Flights)
+        UNION
+            (SELECT R1.frm, R2.to
+             FROM Reaches R1, Reaches R2
+             WHERE R1.to = R2.frm)
+    SELECT * FROM Reaches;
+```
+
+### 10.2.2 Problematic Expressions in Recursive SQL
+The SQL standard for recursion does not allow an arbitrary collection of mutually recursive relations to be written in a WITH clause. There is a small matter that the standard requires only that *linear* recursion be supported.
+
+Furthermore, to be a legal SQL recursion, the definition of a recursive relation $R$ may be involve only the use of mutually recursive relation $S$ (including $R$ itself) if that use is *monotone in $S$. A use of $S$ is `monotone` if adding an arbitrary tuple to $S$ might add one or more tuples to $R$, or it might leave $R$ unchanged, but it can never cause any tuple to be deleted from $R$.
