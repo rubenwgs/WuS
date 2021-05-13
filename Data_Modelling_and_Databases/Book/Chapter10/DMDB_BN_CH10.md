@@ -30,3 +30,52 @@ First, SQL elements such as schemas or modules have an owner. The owner of somet
 2. When a session is initiated by a CONNECT statement, there is an opportunity to indicated the user with an AUTHORIZATION clause.
 3. When a module is created, there is an option to give it an owner by using an AUTHORIZATION clause.
 
+### 10.1.3 The Privilege-Checking Process
+As we saw above, each module, schema, and session has an associated user. In SQL terms, there is an associated authorization ID for each. Any SQL operation has two parties:
+1. The database elements upon which the operation is performed and
+2. The agent that causes the operation.
+
+The privileges available to the agent derive from a particular authorization ID called the `current authorization ID`. That ID is either
+1. The module authorization ID, if the module that the agent is executing has an authorization ID, or
+2. The session authorization ID if not.
+
+We may execute the SQL operation only if the current authorization ID possesses all the privileges needed to carry out the operation on the database elements involved.
+
+### 10.1.4 Granting Privileges
+So far, the only way we have seen to have privileges on a database element is to be the creator or owner of that element. SQL provides a `GRANT` statement to allow one user to give a privilege to another. The first user retains the privilege granted, as well. Thus, `GRANT` can be thought of as "*copy a privilege*".
+
+There is one important difference between granting privileges and copying. Each privilege has an associated `grant option`. That is, one user may have a privilege like SELECT on table *Movies* "with grant option". Then the first user may grant the privilege SELECT on *Movies* to a third user.
+
+A `grant statement` has the form:
+
+```sql
+    GRANT <privilege list> ON <database element> TO <user list>
+```
+
+possibly followed by `WITH GRANT OPTION`.  
+The database element is typically a relation, either a base table or a view. If it is another kind of element, the name of the element is preceded by the type of that element, e.g., ASSERTION.
+
+### 10.1.5 Grant Diagrams
+Because of the complex web of grants and overlapping privileges that may result from a sequence of grants, it is useful to represent grants by a graph called a `grant diagram`. A SQL system maintains a representation of this diagram to keep track of both privileges and their origins.
+
+The nodes of a grant idagram correspond to a user and a privilege. A user may hold two privileges, one of which is strictly more general than the other (e.g., SELECT on $R$ and SELECT on $R(A)$). These two privileges are also represented by two different nodes.
+
+If user $U$ grnats privileges $P$ to user $V$, and this grant was based on the fact that $U$ holds privilege $Q$ ($Q$ could be $P$ with hte grant option, or it could be some generalization of $P$), then we create an arc from the node for $U/Q$ to the node $V/P$.
+
+Example: Following an example of a grant diagram:
+
+<img src="./Figures/DMDB_BN_Fig10-1.PNG" height="650px"/><br>
+
+### 10.1.6 Revoking Privileges
+A granted privilege can be revoked at any time. The revoking of privileges may be required to `cascade`, in the sense that revoking a privilege with the grant option that has been passed on to other users may require those privileges to be revoked too. The simple form of a `revoke statement` begins with:
+
+```sql
+    REVOKE <privilege list> ON <database element> FROM <user list>
+```
+
+The statement ends with one of the following:
+1. `CASCADE`. If chosen, then when the specified privileges are revoked, we also revoke any privileges that were granted only because of the revoked privileges.
+2. `RESTRICT`. In this case, the revoke statement cannot be executed if the cascading rule described in the previous item would result in the revoking of any privileges due to the revoked privileges having been passed on to others.
+
+It is permissible to replace `REVOKE` by `REVOKE GRANT OPTION FOR`, in which case the core privileges themselves remain, but the option to grant them to others removed.
+
