@@ -304,4 +304,4 @@ We can decalre an `assertion` as an element of a database schema. The declaratio
 Assertions are checked whenever there is a change to one of the relations involved. Attribute- and tuple-based checks are only checked when the attribute or relation to which they apply changes by insertion or update.
 
 #### Triggers
-The SQL standard includes `triggers` that specify certain events that awaken them. Once awakened, a condition can be checked, and if truee, s specified sequence of actions will be executed.
+The SQL standard includes `triggers` that specify certain events that awaken them. Once awakened, a condition can be checked, and if true, a specified sequence of actions will be executed.
