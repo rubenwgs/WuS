@@ -281,4 +281,5 @@ In the points that follow, we shall outline the options that are offered by trig
 - Besides UPDATE, other possible triggering events are INSERT and DELETE. The *OF netWorth* clause in line (2) is optional for UPDATE events and is not permitted for INSERT or DELETE events.
 - The WHEN clause is optional. If it is missing, then the action is executed whenever the trigger is awakened.
 - While we showed a single SQL statement as an action, there can be any number of such statements, separated by semicolons and surrounded by BEGIN ... END.
-- If we omit the FOR EACH ROW on line (6)
+- If we omit the FOR EACH ROW on line (6) or replace it by the default FOR EACH STATEMENT, then a row-level trigger becomes a statement-level trigger. It is executed once whenever a statement of the appropriate type is executed, no matter how many rows it actually affects.
+- In a statement-level trigger, we cannot refer to old and new tuples directly. Howevery, any trigger can refer to the relation of old tuples and the relation of new tuples, using declarations such as *OLD TABLE AS OldStuff* and *NEW TABLE AS NewStuff*.
