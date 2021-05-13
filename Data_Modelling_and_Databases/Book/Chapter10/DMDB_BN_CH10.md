@@ -121,3 +121,5 @@ From the two Datalog rules for $Reaches$ we can develop a SQL query that produce
 The SQL standard for recursion does not allow an arbitrary collection of mutually recursive relations to be written in a WITH clause. There is a small matter that the standard requires only that *linear* recursion be supported.
 
 Furthermore, to be a legal SQL recursion, the definition of a recursive relation $R$ may be involve only the use of mutually recursive relation $S$ (including $R$ itself) if that use is *monotone in $S$. A use of $S$ is `monotone` if adding an arbitrary tuple to $S$ might add one or more tuples to $R$, or it might leave $R$ unchanged, but it can never cause any tuple to be deleted from $R$.
+
+***The rest of chapter 10 is left out of this summary for the time being. It seems that is is not relevant for the exam.***
