@@ -283,3 +283,25 @@ In the points that follow, we shall outline the options that are offered by trig
 - While we showed a single SQL statement as an action, there can be any number of such statements, separated by semicolons and surrounded by BEGIN ... END.
 - If we omit the FOR EACH ROW on line (6) or replace it by the default FOR EACH STATEMENT, then a row-level trigger becomes a statement-level trigger. It is executed once whenever a statement of the appropriate type is executed, no matter how many rows it actually affects.
 - In a statement-level trigger, we cannot refer to old and new tuples directly. Howevery, any trigger can refer to the relation of old tuples and the relation of new tuples, using declarations such as *OLD TABLE AS OldStuff* and *NEW TABLE AS NewStuff*.
+
+## 7.6 Summary of Chapter 7
+#### Referential-Integrity Constraints
+WE can decalre that a value appearing in some attribute or set of attributes must also appear in the corresponding attribute(s) of some tuple of the same or another relation. To do so, we use a `REFERENCES` or `FOREIGN KEY` declaration in the schema.
+
+#### Attribute-Based Check Constraints
+We can place a constraint on the value of any aatribute by adding the keyword `CHECK` and the condition to be checked after the declaration of that attribute in its relation schema.
+
+#### Tuple-Based Check Constraints
+We can place a constraint on the tuples of a relation by adding the keyword `CHECK` and the condition to be checked to the declaration of the relation itself.
+
+#### Modifying Constraints
+A tuple-based check can be added or deleted with an `ALTER` statement for the appropriate table.
+
+#### Assertions
+We can decalre an `assertion` as an element of a database schema. The declaration gives a condition to be checked.
+
+#### Invoking the Checks
+Assertions are checked whenever there is a change to one of the relations involved. Attribute- and tuple-based checks are only checked when the attribute or relation to which they apply changes by insertion or update.
+
+#### Triggers
+The SQL standard includes `triggers` that specify certain events that awaken them. Once awakened, a condition can be checked, and if truee, s specified sequence of actions will be executed.
