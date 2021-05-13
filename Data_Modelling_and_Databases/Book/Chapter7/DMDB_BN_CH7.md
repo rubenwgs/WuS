@@ -163,3 +163,31 @@ If a constraint on a tuple involves more than one attribute of that tuple, then 
 
 When only one attribute of the tuple is involved, then the condition checked is the same, regardless of whether a tuple- or attribute-based constraint is written. However, the *tuple-based constraint will be checked more frequently than the attrbiute-based constraint* - whenerver any attribute of the tuple changes, rather than only when the attribute mentioned in the constraint changes.
 
+## 7.3 Modification of Constraints
+It is possible to add, modify, or delete constraints at any time. The way to express such modifications depends on whether the constraint involved is associated with an attribute, a talbe, or a database schema.
+
+### 7.3.1 Giving Names to Constraints
+In order to modify or delete an existing constraint, it is necessary that the constraint has a name. TO do so, we precede the constraint by the keyword `CONSTRAINT` and a name for the constraint.
+
+Example: Assume we want to check that the gender attribute in the *MovieStar* relation is either *F* or *M*. We can introduce this check the following way:
+
+```sql
+    /* Code 7.9: Giving names to constraints. */
+    gender CHAR(1) CONSTRAINT NoAndro CHECK (gender IN ('F', 'M'))
+```
+
+### 7.3.2 Altering Constraints on Tables
+We mentioned in a previous section that we can switch the checking of a constraint from immediate to deferred or vice-versa with a `SET CONSTRAINT` statement. Other changes to constraints are effected with an ALTER TABLE statement.
+
+`ALTER TABLE` statements can affect constraints in several ways. You may drop a constraint with keyword `DROP` and the name of the constraint to be dropped. You may also add a constraint with the keyword `ADD`, followed by the constraint to be added.  
+Note, however, that the added constraint must be of a kind that can be associated with tuples, such as tuple-based constraints, key, or foreign-key constraints. Also note that you cannot add a constraint to a table unless it holds at that time for every tuple in the table.
+
+Example: Let us see how we would drop and add some constraints on the relation *MovieStar*. The following sequence of statements drops the *NoAndro* constraint and adds it again:
+
+```sql
+    /* Code 7.10: Dropping and adding constraints to a relation. */
+    ALTER TABLE MovieStar DROP CONSTRAINT NoAndro;
+
+    ALTER TABLE MovieStar ADD CONSTRAINT NoAndro
+        CHECK (gender IN ('F', 'M'));
+```
