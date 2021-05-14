@@ -18,14 +18,14 @@ These constraints, called `foreign-key constraints`, assert that a value appeari
 
 ### 7.1.1 Declaring Foreign-Key Constraints
 
-A foreign key cosntraint is an assertion that values for certain attributes must make sense. In SQL we may decalre an attribute or attributes of one relation to be a `foreign key`, referencing some attribute(s) of a second relation. The implication of this declaration is twofold:
+A foreign key constraint is an assertion that values for certain attributes must make sense. In SQL we may declare an attribute or attributes of one relation to be a `foreign key`, referencing some attribute(s) of a second relation. The implication of this declaration is twofold:
 
-1. The referenced attribute(s) of the second realtion must be declared UNIQUE or the PRIMARY KEY for this relation.
+1. The referenced attribute(s) of the second relation must be declared UNIQUE or the PRIMARY KEY for this relation.
 2. Values of the foreign key appearing in the first relation must also appear in the referenced attributes of some tuple.
 
 As for primary keys, we have two ways to declare a foreign key:
 
-1. If the foreign key is a single attribute we may follow its name and type by a declaration that it *references" some attribute of some talbe. The form of the declaration is
+1. If the foreign key is a single attribute we may follow its name and type by a declaration that it *references" some attribute of some table. The form of the declaration is
 
     ```sql
         REFERENCES <table>(<attribute>)
@@ -77,7 +77,7 @@ For changes to the referenced relation, of which the last two modifications are 
 2. `The Cascade Policy`. Under this policy, changes to the referenced attribute(s) are mimicked at the foreign key.
 3. `The Set-Null Policy`. Here, when a modification to the referenced relation affects a foreign-key value, the latter is changed to NULL.
 
-These options may be chosen for deletes and updates, independently, and they are stated with the declaration of the foreign key. We decalre them with `ON DELETE` or `ON UPDATE` followed by our choice of `SET NULL` or `CASCADE`.
+These options may be chosen for deletes and updates, independently, and they are stated with the declaration of the foreign key. We declare them with `ON DELETE` or `ON UPDATE` followed by our choice of `SET NULL` or `CASCADE`.
 
 Example: We might modify our code example 7.1 the following way:
 
@@ -101,7 +101,7 @@ Assume the situation of code example 7.1.Now, Arnold Schwarzenegger decides to f
     VALUES('La Vista', 'New York', 23456);
 ```
 
-we are in trouble. The reason is that there is no tuple of *MovieExec* with certificate number $23456$, so there is an abvious violation of the foreign-key constraint.  
+we are in trouble. The reason is that there is no tuple of *MovieExec* with certificate number $23456$, so there is an obvious violation of the foreign-key constraint.  
 One possible fix is to first insert the tuple for *La Vista* without a president's certificate, as:
 
 ```sql
@@ -159,7 +159,7 @@ Example: Suppose we want to require that certificate numbers be at least six dig
 
 To declare a constraint on the tuples of a single table $R$, we may add to the list of attributes and key or foreign-key declarations, in $R$'s CREATE TABLE statement, the keyword `CHECK` followed by a parenthesized condition. This condition can be anything that could appear in a WHERE clause. It is interpreted as a condition about a tuple in the table $R$.
 
-The condition of a tuple-base `CKECK` constraint is *checked every time a tuple is inserted into* $R$ *and every time a tuple of* $R$ *is updated*.  
+The condition of a tuple-base `CHECK` constraint is *checked every time a tuple is inserted into* $R$ *and every time a tuple of* $R$ *is updated*.  
 However, if the condition mentions some other relation in a subquery, and a change to that relation causes the condition to become false for some tuple in $R$, the check does not inhibit this change. In fact, even a deletion from $R$ can cause the condition to become false, if $R$ is mentioned in a subquery.
 
 Example: Assume we want to put a constraint on the tuples of the *MovieStar* relation, namely that if the star's gender is male, then his name must not begin with 'Ms.'. We can introduce this constraint the following way:
@@ -177,13 +177,13 @@ Example: Assume we want to put a constraint on the tuples of the *MovieStar* rel
 
 ### 7.2.4 Comparison of Tuple- and Attribute-Based Constraints
 
-If a constraint on a tuple involves more than one attribute of that tuple, then it must be written as a tuple-based constraint. However, if the cosntraint involves only one attribute of the tuple, then it can be written as either a tuple- or attribute- based constraint.
+If a constraint on a tuple involves more than one attribute of that tuple, then it must be written as a tuple-based constraint. However, if the constraint involves only one attribute of the tuple, then it can be written as either a tuple- or attribute- based constraint.
 
-When only one attribute of the tuple is involved, then the condition checked is the same, regardless of whether a tuple- or attribute-based constraint is written. However, the *tuple-based constraint will be checked more frequently than the attrbiute-based constraint* - whenerver any attribute of the tuple changes, rather than only when the attribute mentioned in the constraint changes.
+When only one attribute of the tuple is involved, then the condition checked is the same, regardless of whether a tuple- or attribute-based constraint is written. However, the *tuple-based constraint will be checked more frequently than the attribute-based constraint* - whenever any attribute of the tuple changes, rather than only when the attribute mentioned in the constraint changes.
 
 ## 7.3 Modification of Constraints
 
-It is possible to add, modify, or delete constraints at any time. The way to express such modifications depends on whether the constraint involved is associated with an attribute, a talbe, or a database schema.
+It is possible to add, modify, or delete constraints at any time. The way to express such modifications depends on whether the constraint involved is associated with an attribute, a table, or a database schema.
 
 ### 7.3.1 Giving Names to Constraints
 
@@ -217,18 +217,18 @@ Example: Let us see how we would drop and add some constraints on the relation *
 
 The most powerful forms of active elements in SQL are not associated with particular tuples or components of tuples. These elements, called `triggers` and `assertions`, are part of the database schema, on a par with tables.
 
-- An `assertion` is a boolean-valued SQL expresiion that must be true at all times.
+- An `assertion` is a boolean-valued SQL expression that must be true at all times.
 - A `trigger` is a series of actions that are associated with certain events, such as insertion into a particular relation, and that are performed whenever events arise.
 
 ### 7.4.1 Creating Assertions
 
-The SQL standard proposes a simple form of `assertions` that allos us to enforce any condition (expression that can follow WHERE). Like other schema elements, we declare an assertion with a CREATE statement. The form of an assertion is:
+The SQL standard proposes a simple form of `assertions` that allows us to enforce any condition (expression that can follow WHERE). Like other schema elements, we declare an assertion with a CREATE statement. The form of an assertion is:
 
 ```sql
     CREATE ASSERTION <assertion-name> CHECK (<condition>)
 ```
 
-The condition in an assertion must be true when the assertion is created and must remain true. Any database modifiaction that causes it to become false will be rejected.
+The condition in an assertion must be true when the assertion is created and must remain true. Any database modification that causes it to become false will be rejected.
 
 ### 7.4.2 Using Assertions
 
@@ -314,17 +314,17 @@ In the points that follow, we shall outline the options that are offered by trig
 - The WHEN clause is optional. If it is missing, then the action is executed whenever the trigger is awakened.
 - While we showed a single SQL statement as an action, there can be any number of such statements, separated by semicolons and surrounded by BEGIN ... END.
 - If we omit the FOR EACH ROW on line (6) or replace it by the default FOR EACH STATEMENT, then a row-level trigger becomes a statement-level trigger. It is executed once whenever a statement of the appropriate type is executed, no matter how many rows it actually affects.
-- In a statement-level trigger, we cannot refer to old and new tuples directly. Howevery, any trigger can refer to the relation of old tuples and the relation of new tuples, using declarations such as *OLD TABLE AS OldStuff* and *NEW TABLE AS NewStuff*.
+- In a statement-level trigger, we cannot refer to old and new tuples directly. However, any trigger can refer to the relation of old tuples and the relation of new tuples, using declarations such as *OLD TABLE AS OldStuff* and *NEW TABLE AS NewStuff*.
 
 ## 7.6 Summary of Chapter 7
 
 #### Referential-Integrity Constraints
 
-WE can decalre that a value appearing in some attribute or set of attributes must also appear in the corresponding attribute(s) of some tuple of the same or another relation. To do so, we use a `REFERENCES` or `FOREIGN KEY` declaration in the schema.
+WE can declare that a value appearing in some attribute or set of attributes must also appear in the corresponding attribute(s) of some tuple of the same or another relation. To do so, we use a `REFERENCES` or `FOREIGN KEY` declaration in the schema.
 
 #### Attribute-Based Check Constraints
 
-We can place a constraint on the value of any aatribute by adding the keyword `CHECK` and the condition to be checked after the declaration of that attribute in its relation schema.
+We can place a constraint on the value of any attribute by adding the keyword `CHECK` and the condition to be checked after the declaration of that attribute in its relation schema.
 
 #### Tuple-Based Check Constraints
 
@@ -336,7 +336,7 @@ A tuple-based check can be added or deleted with an `ALTER` statement for the ap
 
 #### Assertions
 
-We can decalre an `assertion` as an element of a database schema. The declaration gives a condition to be checked.
+We can declare an `assertion` as an element of a database schema. The declaration gives a condition to be checked.
 
 #### Invoking the Checks
 
