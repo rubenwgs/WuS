@@ -12,7 +12,7 @@ Views can also be materialized, in the sense that they are constructed periodica
 
 ## 8.1 Virtual Views
 
-Relations that are defined with a CREATE TABLE statement actually exist in the database. They are *persistent*, in the sense that they can be expected to exist indefinitely and not to change unless they are explicitely told to change by a SQL modification statement.
+Relations that are defined with a CREATE TABLE statement actually exist in the database. They are *persistent*, in the sense that they can be expected to exist indefinitely and not to change unless they are explicitly told to change by a SQL modification statement.
 
 There is another class of SQL relations, called `(virtual) views`, that do not exist physically. Rather, they are defined by an expression much like a query.
 
@@ -26,7 +26,7 @@ The simplest form of `view definition` is:
 
 The view definition is an SQL query.
 
-Example: Suppose we want to have a view that is part of the *Movies* relation, specifically, the titles and yyears of the movies made by Paramaount Studios. We can define this view by:
+Example: Suppose we want to have a view that is part of the *Movies* relation, specifically, the titles and years of the movies made by Paramount Studios. We can define this view by:
 
 ```sql
     /* Code 8.1: Views in SQL. */
@@ -72,7 +72,7 @@ For many views, it is simply not possible to do that. However, for sufficiently 
 
 ### 8.2.1 View Removal
 
-An extrem modification of a view is to `delete` it altogether. This modification may be done whether or not the view is updatable. A typical `DROP` statement is
+An extreme modification of a view is to `delete` it altogether. This modification may be done whether or not the view is updatable. A typical `DROP` statement is
 
 ```sql
     DROP VIEW ParamountMovies;
@@ -96,7 +96,7 @@ Example: Suppose we insert into view *ParamountMovies* a tuple like:
     VALUES('Star Trek', 1979);
 ```
 
-Theinsertion on *ParamountMovies* is executed as if it were the same insertion on *Movies*:
+The insertion on *ParamountMovies* is executed as if it were the same insertion on *Movies*:
 
 ```sql
     /* 8.5: Continuation. */
@@ -126,7 +126,7 @@ Similarly, an `update` one an updatable view is passed through to the under lyin
 
 ### 8.2.3 Instead-Of Triggers on Views
 
-When a trigger is defined on a view, we canb use `INSTEAD OF` in place of `BEFORE` or `AFTER`. If we do so, then when an event awakens the trigger, the action of the trigger is done instead of the event itself. That is, an instead-of trigger intercepts attempts to modify the view and in its place performs whatever action the database designer deems appropriate.
+When a trigger is defined on a view, we can use `INSTEAD OF` in place of `BEFORE` or `AFTER`. If we do so, then when an event awakens the trigger, the action of the trigger is done instead of the event itself. That is, an instead-of trigger intercepts attempts to modify the view and in its place performs whatever action the database designer deems appropriate.
 
 Example: Let us consider the following instead-of trigger:
 
@@ -140,7 +140,7 @@ Example: Let us consider the following instead-of trigger:
     VALUES(NewRow.title, NewRow.year, 'Paramount');
 ```
 
-Much of the trigger is unsurprising. We see the keyword `INSTEAD OF` on line (2), establishing that an attempt to isnert into *ParamountMovies* will never take place. Rather, lines (5) and (6) is the action that replaces the attempted insertion.
+Much of the trigger is unsurprising. We see the keyword `INSTEAD OF` on line (2), establishing that an attempt to insert into *ParamountMovies* will never take place. Rather, lines (5) and (6) is the action that replaces the attempted insertion.
 
 ## 8.3 Indexes in SQL
 
@@ -213,7 +213,7 @@ There are two situations in which an index can be effective, even if it is not o
 It might seem that the more indexes we create, the more likely it is that an index useful for a given query will be available. However, if modifications are the most frequent action, then we should be very conservative about creating indexes, since each modification on a relation $R$ forces us to change any index on one or more of the modified attributes of $R$.
 
 Following an example of how to calculate the best index:  
-Let us consider the relation `StarsIn(movieTitle, movieYear, starName)`. Suppose that there are three database operations that we somestimes perform on this relation:
+Let us consider the relation `StarsIn(movieTitle, movieYear, starName)`. Suppose that there are three database operations that we sometimes perform on this relation:
 
 ```sql
     /* Q1 */
@@ -257,18 +257,18 @@ The final row gives the average cost of an action, on the assumption that the fr
 
 ### 8.4.4 Automatic Selection of Indexes to Create
 
-Tuning a database is aprocess that includes not only index selection, but the choice of many different parameters. There are a number of tools that have been designed to take the responsibility from the database designer and have the system tune itself, or at least advise the designer on good choices.
+Tuning a database is a process that includes not only index selection, but the choice of many different parameters. There are a number of tools that have been designed to take the responsibility from the database designer and have the system tune itself, or at least advise the designer on good choices.
 
 Here is an outline of how the index-selection portion of tuning advisors work:
 
 1. The first step is to establish the query workload. We may be able to examine a log and find a set of representative queries and database modifications for the database at hand.
 2. The designer may be offered the opportunity to specify some constraints, e.g., indexes that must, or must not, be chosen.
-3. The tuning advisor generates a set of possible `candidate indexes`, and evaluates each one. Typical queries are given to the query optimizier of the DBMS.
+3. The tuning advisor generates a set of possible `candidate indexes`, and evaluates each one. Typical queries are given to the query optimizer of the DBMS.
 4. The index set resulting in the lowest cost for the given workload is suggested to the designer, or it is automatically created.
 
 ## 8.5 Materialized Views
 
-A view describes how a new relation can be constructed from base tables by executing a query on those tables. If a view is used frequently enoughy, it may even be efficient to `materialize` it, that is, to maintain its value at all times.
+A view describes how a new relation can be constructed from base tables by executing a query on those tables. If a view is used frequently enough, it may even be efficient to `materialize` it, that is, to maintain its value at all times.
 
 In principle, the DBMS needs to recompute a materialized view every time one of its base tables changes in any way. For simple views, it is possible to limit the number of times we need to consider changing the materialized view.
 
@@ -292,9 +292,9 @@ What is usually done is to create materialized views, but not to try to keep the
 
 ### 8.5.3 Rewriting Queries to Use Materialized Views
 
-A materialized view can be referred to in the FROM clause of a query, just as a virtual view can. However, becuase a materialized view is stored in the database, it is possible to rewrite a query to use a materialized view, even if that view was not mentioned in the query as written.
+A materialized view can be referred to in the FROM clause of a query, just as a virtual view can. However, because a materialized view is stored in the database, it is possible to rewrite a query to use a materialized view, even if that view was not mentioned in the query as written.
 
-Suppose we have a mterialized view $V$ defined by a query of the form
+Suppose we have a materialized view $V$ defined by a query of the form
 
 ```sql
     SELECT L_v
@@ -310,17 +310,17 @@ where $L_V$ is a list of attributes, $R_V$ is a list of relations, and $C_V$ is 
     WHERE C_q
 ```
 
-Here are the conditions under which we can repalce part of the query $Q$ by the view $V$:
+Here are the conditions under which we can replace part of the query $Q$ by the view $V$:
 
-1. The realtions in list $R_V$ all appear in the list $R_Q$.
+1. The relations in list $R_V$ all appear in the list $R_Q$.
 2. The condition $C_Q$ is equivalent $C_V \text{ AND } C$ for some condition $C$.
 3. If $C$ is needed, then the attributes of relations on list $R_V$ that $C$ mentions are attributes on the list $L_V$.
 4. Attributes on the list $L_Q$ that come from relations on the list $R_V$ are also on the list $L_V$.
 
 If all these conditions are met, then we can rewrite $Q$ to use $V$, as follows:
 
-1. Replace the list $R_Q$ by $V$ and the realtions are in list $R_Q$ but not on $R_V$.
-2. Repalce $C_Q$ by $C$. If $C$ is not needed (i.e., $C_V = C_Q$), then there is no WHERE clause.
+1. Replace the list $R_Q$ by $V$ and the relations are in list $R_Q$ but not on $R_V$.
+2. Replace $C_Q$ by $C$. If $C$ is not needed (i.e., $C_V = C_Q$), then there is no WHERE clause.
 
 ### 8.5.4 Automatic Creation of Materialized Views
 
@@ -368,4 +368,4 @@ As the base tables change, we must make the corresponding changes to any materia
 
 #### Rewriting Queries to Use Materialized Views
 
-The condition under which a query can be rewritten to use a materialized view are complex. However, if the query optimizier can perform such rewritings, then an automatic design tool can consider the improvement in performance that results from creating materialized views.
+The condition under which a query can be rewritten to use a materialized view are complex. However, if the query optimizer can perform such rewritings, then an automatic design tool can consider the improvement in performance that results from creating materialized views.
