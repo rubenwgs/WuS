@@ -16,7 +16,7 @@ In the `entity-relationship model` (or `E/R model`) the structure of data is rep
 
 ### 4.1.1 Entity Sets
 
-An `entity` is an abstarct object of some sort, and a collection of similar entities forms an `entity set`. An entity in some way resembles an "object" in the sense of object-oriented programming.
+An `entity` is an abstract object of some sort, and a collection of similar entities forms an `entity set`. An entity in some way resembles an "object" in the sense of object-oriented programming.
 
 In our movie-database example, each movie is an entity, and the set of all movies constitutes an entity set.
 
@@ -28,7 +28,7 @@ In our version of E/R model, we shall assume that attributes are of primitive ty
 
 ### 4.1.3 Relationships
 
-`Relationships` are connections among two or more entity sets. for isntance, if *Movies* and *Stars* are two entity sets, we could have a relationship *Stars-in* that connects movies and stars.
+`Relationships` are connections among two or more entity sets. for instance, if *Movies* and *Stars* are two entity sets, we could have a relationship *Stars-in* that connects movies and stars.
 
 While `binary relationships`, those between two entity sets, are by far the most common type of relationship, the E/R model allows relationships ti involve any number of entity sets.
 
@@ -70,7 +70,7 @@ The E/R model makes it convenient to define relationships involving more than tw
 
 ### 4.1.8 Roles in Relationships
 
-It is possible that one entity set appears two or more times in a single relationship. If so, we draw as many lines from the relationship to the entity set as the entitiy set appears in the relationship. Each line to the entity set represents a different `role` that the entity set plays in the relationship. We therefore label the edges between the entity set and relationship by names, which we call "roles".
+It is possible that one entity set appears two or more times in a single relationship. If so, we draw as many lines from the relationship to the entity set as the entity set appears in the relationship. Each line to the entity set represents a different `role` that the entity set plays in the relationship. We therefore label the edges between the entity set and relationship by names, which we call "roles".
 
 ### 4.1.9 Attributes on Relationships
 
@@ -88,7 +88,7 @@ To do so, we introduce a new entity set whose entities we may think of as tuples
 
 ### 4.1.11 Subclasses in the E/R Model
 
-Often, an entity set contains certain entities that have special properties not associated with all members of the set. If so, we find it useful to define certain special-case entitiy sets, or `subclasses`, each with its own special attributes and/or relationships. We connect an entity set to its subclasses using a relationship called `isa`.
+Often, an entity set contains certain entities that have special properties not associated with all members of the set. If so, we find it useful to define certain special-case entity sets, or `subclasses`, each with its own special attributes and/or relationships. We connect an entity set to its subclasses using a relationship called `isa`.
 
 An `isa` relationship is a special kind of relationship, and to emphasize that it is unlike other relationships, we use a special notation: a triangle.
 
@@ -109,7 +109,7 @@ First and foremost, the design should be faithful to the specifications of the a
 For instance, we have used a relationship *Owns* between movies and studios. We might also choose to have an attribute *studioName* of entity set *Movies*. While there is nothing illegal about doing so, it is dangerous for several reasons:
 
 1. Doing so leads to repetition of a fact, with the result that extra space is required to represent the data.
-2. There is an update-anomaly potential, since we might change the realtionship but not the attribute, or vice-versa.
+2. There is an update-anomaly potential, since we might change the relationship but not the attribute, or vice-versa.
 
 ### 4.2.3 Simplicity Counts
 
@@ -145,7 +145,7 @@ You should also be aware that in some unusual situations, the attributes forming
 
 `Referential-integrity constraints` says that a value appearing in one context must also appear in another.
 
-The arrow notation in E/R diagrams is able to indicate whether a relationship is expected to support referential integrity in one or more directions. Suppose $R$ is a relationship from entity set $E$ to entity set $F$. A rounded arrow-head pointing to $F$ indicates not only that the relatiosnhips is many-to-one from $E$ to $F$, but that the entity of set $F$ related to a given entity of set $E$ is required to exist.
+The arrow notation in E/R diagrams is able to indicate whether a relationship is expected to support referential integrity in one or more directions. Suppose $R$ is a relationship from entity set $E$ to entity set $F$. A rounded arrow-head pointing to $F$ indicates not only that the relationships is many-to-one from $E$ to $F$, but that the entity of set $F$ related to a given entity of set $E$ is required to exist.
 
 Example:
 
@@ -163,7 +163,7 @@ It is possible for an entity set's key to be composed of attributes, some or all
 
 ### 4.4.1 Causes of Weak Entity Sets
 
-There are two principal reasons we need weak entity sets. First, sometimes entity sets faill into a hierarchy based on classifications unrelated to the isa-hierarchy. If entities of set $E$ are subunits of entities in set $F$, then it is possible that the names of $E$-entities are not unique until we take into account the name of the $F$-entity to which the $E$ entity is subordinate.
+There are two principal reasons we need weak entity sets. First, sometimes entity sets fail into a hierarchy based on classifications unrelated to the isa-hierarchy. If entities of set $E$ are subunits of entities in set $F$, then it is possible that the names of $E$-entities are not unique until we take into account the name of the $F$-entity to which the $E$ entity is subordinate.
 
 Example: A movie studio might have several film crews. The crews might be designated by a given studio as *crew 1*, *crew 2*, and so on. However, other studios might use the same designations for crews. Therefore, to name a crew uniquely, we need to give both the name of the studio to which the crew belongs and its number.
 
@@ -198,7 +198,7 @@ We shall adopt the following conventions to indicate that an entity set is weak 
 
 To a first approximation, converting an E/R design to a relational database schema is straightforward:
 
-- Turn each entity set into a relation with the saem set of attributes, and
+- Turn each entity set into a relation with the same set of attributes, and
 - Replace a relationship by a relation whose attributes are the keys for the connected entity sets.
 
 While these two rules cover much of the ground, there are also several special situations that we need to deal with, including:
@@ -222,7 +222,7 @@ If one entity set is involved several times in a relationship, in different role
 
 ### 4.5.3 Combining Relations
 
-One common situation where we might want to combine relations occurs when there is an entity set $E$ with a many-to-one relationship $R$ from $E$ to $F$. The relations from $E$ and $R$ will each have the key for $E$ in their relations chema. In addition, the relation for $E$ will have in its schema the attributes of $E$ that are not in the key, and the realtion for $R$ will have the key attributes of $F$ and any attributes of $R$ itself. Becuase $R$ is many-to-one, all these attributes are functionally determined by the key for $E$, and we can combine them into one relation with a schema consisting of:
+One common situation where we might want to combine relations occurs when there is an entity set $E$ with a many-to-one relationship $R$ from $E$ to $F$. The relations from $E$ and $R$ will each have the key for $E$ in their relations schema. In addition, the relation for $E$ will have in its schema the attributes of $E$ that are not in the key, and the relation for $R$ will have the key attributes of $F$ and any attributes of $R$ itself. Because $R$ is many-to-one, all these attributes are functionally determined by the key for $E$, and we can combine them into one relation with a schema consisting of:
 
 1. All attributes of $E$.
 2. They key attributes of $F$.
@@ -270,11 +270,11 @@ There is one more approach to representing information about a hierarchy of enti
 
 ### 4.6.4 Comparison of Approaches
 
-Each of the three aproaches, which we shall refer to as "straight-E/R", "object-oriented", and "nulls", respectively, have advantages and disadvantages. Here is alist of the principal issues:
+Each of the three approaches, which we shall refer to as "straight-E/R", "object-oriented", and "nulls", respectively, have advantages and disadvantages. Here is a list of the principal issues:
 
 1. It can be expensive to answer queries involving several relations, so we would prefer to find all the attributes we needed to answer a query in one relation. The nulls approach uses only one relation for all the attributes, so it has an advantage in this regard.
 2. We would like not to use too many relations. Here again ,the nulls method shines, since it requires only one relation. However, there is a difference between the other two methods, since in the straight-E/R approach, we use only one relation per entity set in the hierarchy. In the object-oriented approach, if we have a root and $n$ children, then there are $2^n$ different classes of entities, and we need that many relations.
-3. We would like to minimize space and avoid repreating information. Since the object-oriented method uses only one tuple per entity, and that tuple has components for only those attributes that make sense for the entity, this approach offers the minimum possible space usage. The nulls approach also has only one tuple per entity, but these tuples are "long", i.e., they have components for all attributes, whether or not they are appropriate for a given entity. The straight-E/R method has several tuples for each entity, but only the key attributes are repeated. Thus, this method could use either more or less space than the nulls method.
+3. We would like to minimize space and avoid repeating information. Since the object-oriented method uses only one tuple per entity, and that tuple has components for only those attributes that make sense for the entity, this approach offers the minimum possible space usage. The nulls approach also has only one tuple per entity, but these tuples are "long", i.e., they have components for all attributes, whether or not they are appropriate for a given entity. The straight-E/R method has several tuples for each entity, but only the key attributes are repeated. Thus, this method could use either more or less space than the nulls method.
 
 ## 4.7 Unified Modeling Language
 
@@ -313,7 +313,7 @@ A binary relationship between classes is called an `association`. There is no an
 
 Every association has constraints on the number of objects from each of its classes that can be connected to an object of other class. We indicate these constraints by a label of the form $m..n$ at each end. The meaning of this label is that each object at the other end is connected to at least $m$ and at most $n$ objects at this end. In addition:
 
-- A $*$ in palce of $n$, as in $m..*$, stands for "infinity".
+- A $*$ in place of $n$, as in $m..*$, stands for "infinity".
 - A $*$ alone, in place of $m..n$, stands for the range $0..*$, that is, no constraint at all on the number of objects.
 - If there is no label at all at an end of an association edge, then the label is taken to be $1..1$, i.e., "exactly one".
 
@@ -369,7 +369,7 @@ The three options enumerated in Section 4.6 apply to `UML subclass hierarchies` 
 
 Aggregations and compositions are really types of many-to-one associations. Thus, one approach to their representation in a relational database schema is to convert them as we do for any association in Section 4.8.1.
 
-However, there is a hidden assumption that this implementation of aggregations and compositions is undesirable. Recall from Section 4.5.3 that when we have an entity set $E$ and a many-to-one relationship $R$ from  $E$ to another entity set $F$, we have the option - some would say the abligation - to combine the relation for $E$ with the relation for $R$. That is, the one relation constructed from $E$ and $R$ has all the attributes of $E$ plus the key attributes of $F$.
+However, there is a hidden assumption that this implementation of aggregations and compositions is undesirable. Recall from Section 4.5.3 that when we have an entity set $E$ and a many-to-one relationship $R$ from  $E$ to another entity set $F$, we have the option - some would say the obligation - to combine the relation for $E$ with the relation for $R$. That is, the one relation constructed from $E$ and $R$ has all the attributes of $E$ plus the key attributes of $F$.
 
 We suggest that aggregations and compositions be treated routinely in this manner.
 
@@ -383,7 +383,7 @@ However, it is also possible, in UML, to use a composition as we used supporting
 
 ## 4.9 Object Definition Language
 
-`ODL (Object Definition Language)` is a text-based language for specifying the structure of databases in object-oriented terms. Like UML, the class is the central concept in ODL. Classes in ODL have a name, attributes, and methods, just as UML classes do. Relationships, which are analogous to UML's associations, are not an independent concept in ODL, but are embedded within classes as an additional family of proeprties.
+`ODL (Object Definition Language)` is a text-based language for specifying the structure of databases in object-oriented terms. Like UML, the class is the central concept in ODL. Classes in ODL have a name, attributes, and methods, just as UML classes do. Relationships, which are analogous to UML's associations, are not an independent concept in ODL, but are embedded within classes as an additional family of properties.
 
 ### 4.9.1 Class Declarations
 
@@ -395,7 +395,7 @@ A `declaration` of a `class` in ODL, in its simplest form, is:
     };
 ```
 
-A `proeprty` can be an *attribute*, a *relationship*, or a *method*.
+A `property` can be an *attribute*, a *relationship*, or a *method*.
 
 ### 4.9.2 Attributes in ODL
 
@@ -413,7 +413,7 @@ Example: We might define the classes *Movie* and *Star* in the following way:
 
     class Star {
         attribute string name;
-        attribute Strcut Addr
+        attribute Struct Addr
             {string street, string city} address;
     }
 ```
@@ -436,7 +436,7 @@ Just as we might like to access the stars of a given movie, we might like to kno
     relationship Set<Movie> starredIn;
 ```
 
-to the delcaration of class *Star*.
+to the declaration of class *Star*.
 
 We expect that if a star $S$ is in the *stars* set for movie $M$, then movie $M$ is in the *starredIn* set for star $S$. We indicate this connection between the relationships *stars* and *starredIn* by placing in each of their declarations the keyword `inverse` and the name of the other relationship.
 
@@ -448,7 +448,7 @@ Like the binary relationships of the E/R model, a pair of inverse relationships 
 
 ODL offers the database designer a type system similar to that found in C or other conventional programming languages. In ODL, the basis consists of:
 
-1. `Primitive types`: integer, float, character, character string, boolean, and *enumarations*.
+1. `Primitive types`: integer, float, character, character string, boolean, and *enumerations*.
 2. `Class names`, such as *Movie*, or *Star*, which represent types that are actually structures.
 
 These types are combined into structured types using the following `type constructors`:
@@ -519,7 +519,7 @@ One approach to representing a set of values for an attribute $A$ is to make one
 
 ### 4.10.4 Representing Other Type Constructors
 
-Besides record structures and sets, an ODL class definition could use *Bag*, *List*, *Array*, or *Dictionary* to construct values. To represet bags, we might introduce a *count* attribute, for lists we might introduce a *position* attribute, etc.
+Besides record structures and sets, an ODL class definition could use *Bag*, *List*, *Array*, or *Dictionary* to construct values. To represent bags, we might introduce a *count* attribute, for lists we might introduce a *position* attribute, etc.
 
 ### 4.10.5 Representing ODL Relationships
 
@@ -561,7 +561,7 @@ The relation for an E/R relationship has attributes corresponding to the key att
 
 #### Converting Isa Hierarchies to Relations
 
-There are several differrent approaches such as creating a realtion for each entitiy set with the key attributes of the hierarchy's root plus the attributes of the entitiy set itself.
+There are several different approaches such as creating a relation for each entity set with the key attributes of the hierarchy's root plus the attributes of the entity set itself.
 
 #### Unified Modeling Language
 
@@ -575,7 +575,7 @@ UML permits classes to have subclasses, with inheritance from the superclass.
 
 The methods are similar to those used for the E/R model. Classes become relations and associations become relations connecting the keys of the associated classes.
 
-#### Onject Definition Language
+#### Object Definition Language
 
 This language is a notation for formally describing the schemas of databases in an object-oriented style.
 
