@@ -13,12 +13,12 @@
 A `data model` is a notation for describing data or information. The description generally consists of three parts:
 
 1. *Structure of the data*: In the database world, data models are at somewhat higher level than data structures, and are sometimes referred to as *conceptual model* to emphasize the difference in level.
-2. *Operations on the data*: We are generally allowed to perform a limited set of `queries` (operations that retrieve information) and `modifications` (operations that cahnge the database).
+2. *Operations on the data*: We are generally allowed to perform a limited set of `queries` (operations that retrieve information) and `modifications` (operations that change the database).
 3. *Constraints on the data*: Database data models usually have a way to describe limitations on what the data can be.
 
 ### 2.1.3 The Relational Model in Brief
 
-The relational model is based on tables. The structure portion of the relational model migh appear to resemble an array of structs in C, where the column headers are the field names, and each of the rows represent the values of one struct in the array.
+The relational model is based on tables. The structure portion of the relational model might appear to resemble an array of structs in C, where the column headers are the field names, and each of the rows represent the values of one struct in the array.
 
 ## 2.2 Basics of the Relational Model
 
@@ -31,7 +31,7 @@ In this section, we shall introduce the most important terminology regarding rel
 | Gone With the Wind | 1939   | 231      | drama   |
 | Star Wars          | 1977   | 124      | sciFi   |
 | Wayne's World      | 1992   | 95       | comedy  |
-*Table 2.3: The realtion 'Movies'*
+*Table 2.3: The relation 'Movies'*
 
 ### 2.2.1 Attributes
 
@@ -47,7 +47,7 @@ The set of schemas for the relations of a database is called a `relational datab
 
 ### 2.2.3 Tuples
 
-The rows of a relation, other than the header row containing the attribute names, are called `tuples`. A tuple has one compinent for each attribute of the relation.  
+The rows of a relation, other than the header row containing the attribute names, are called `tuples`. A tuple has one component for each attribute of the relation.  
 For example,
 
 > (Gone With the Wind, 1939, 231, drama)
@@ -84,7 +84,7 @@ We indicate the attribute or attributes that form a key for a relation ny underl
 
 > Movies(<ins>title</ins>, <ins>year</ins>, length, genre)
 
-While we might be sure that *title* and *year* can serve as a key for *Movies*, many real-world databses use artificial keys, doubting that it is safe to make any assumption about the values of attributes outside their control.
+While we might be sure that *title* and *year* can serve as a key for *Movies*, many real-world databases use artificial keys, doubting that it is safe to make any assumption about the values of attributes outside their control.
 
 > Short summaries of some keywords:
 >
@@ -161,7 +161,7 @@ deletes the *studioName* attribute.
 
 ### 2.3.5 Default Values
 
-When we create or modify tuples, we sometimes do not have values for all components. In general, any palce we decalre an attribute and its data type, we may add the keyword `DEFAULT`and an appropriate value. The value is either `NULL` or a constant.
+When we create or modify tuples, we sometimes do not have values for all components. In general, any place we declare an attribute and its data type, we may add the keyword `DEFAULT`and an appropriate value. The value is either `NULL` or a constant.
 
 As an example, we might want to use *?* as a default for *studioName* and *NULL* as a default *producerNum*. We could replace the declarations of *studioName* and *producerNum* in Code 2.7 by:
 
@@ -184,7 +184,7 @@ There are two declarations that may be used to indicate keyness:
 - `PRIMARY KEY`, or
 - `UNIQUE`
 
-If `PRIMARY KEY` is used, then attributes in $S$, where $S$ is the set of keys, are not allowed to have *NULL* as a value. *NULL* is permitted if the set $S$ is declared as `UNQIUE`, however.
+If `PRIMARY KEY` is used, then attributes in $S$, where $S$ is the set of keys, are not allowed to have *NULL* as a value. *NULL* is permitted if the set $S$ is declared as `UNIQUE`, however.
 
 ```sql
     /* Code 2.9: Making 'fullName' the key. */
@@ -242,7 +242,7 @@ The three operations `union`, `intersection`, and `difference` are defined as fo
 
 When we apply these operations to relations, we need to put some conditions on $R$ and $S$:
 
-1. $R$ and $S$ musthave schemas with identical sets of attributes, and the domains for each attrtibute must be the same in $R$ and $S$.
+1. $R$ and $S$ must have schemas with identical sets of attributes, and the domains for each attribute must be the same in $R$ and $S$.
 2. Before we compute a set-theoretic operation of sets of tuples, the columns of $R$ and $S$ must be ordered so that the order of attributes is the same for both relations.
 
 ### 2.4.5 Projection
@@ -257,9 +257,9 @@ Example: Assume the following relation *Movies*:
 | Galaxy Quest  | 1999 | 104    | comedy | DreamWorks | 67890       |
 | Wayne's World | 1992 | 95     | comedy | Paramount  | 99999       |
 
-*Figure 2.13: The realtion 'Movies'.*
+*Figure 2.13: The relation 'Movies'.*
 
-We can now project thisrelation onto the first three attributes with the following expression:
+We can now project this relation onto the first three attributes with the following expression:
 
 $$\pi_{\text{title, year, length}}(\text{Movies})$$
 
@@ -340,7 +340,7 @@ Then the result of the expression $R \times S$ is given by:
 
 ### 2.4.8 Natural Joins
 
-Often we find a need to `join` them by pairing onlythose tuples that match in some way. The simplest sort of match is the `natural join` of two relations $R$ and $S$, denoted $R \bowtie S$, in which we pair only those tuples from $R$ and $S$ that agree in whatever attributes are common to the schemas of $R$ and $S$.
+Often we find a need to `join` them by pairing only those tuples that match in some way. The simplest sort of match is the `natural join` of two relations $R$ and $S$, denoted $R \bowtie S$, in which we pair only those tuples from $R$ and $S$ that agree in whatever attributes are common to the schemas of $R$ and $S$.
 
 More precisely, let $A_1, \, A_2,..., \, A_n$ be all the attributes that are in both the schema $R$ and the schema of $S$. Then a tuple $r$ from $R$ and a tuple $s$ from $S$ are successfully paired if and only if $r$ and $s$ agree on each of the attributes $A_1, \, A_2,..., \, A_n$.
 
@@ -371,7 +371,7 @@ Example: Let $C := R.B < S.B$, then the result of the expression $R \bowtie_{R.B
 
 ### 2.4.10 Combining Operations to Form Queries
 
-Relational algebra, like all algebras, allows us to form expressions of arbitrary complexity by applying operations to the result of other operations. One can construct expressions of relational algebra by applying operators to subexpressions, using parantheses when necessary to indicate grouping of operands.
+Relational algebra, like all algebras, allows us to form expressions of arbitrary complexity by applying operations to the result of other operations. One can construct expressions of relational algebra by applying operators to subexpressions, using parentheses when necessary to indicate grouping of operands.
 
 Example: Suppose we want to know, from our *Movies* relation, "What are the titles and years of movies made by Fox that are at least 100 minutes long?". One way to compute the answer to this query is:
 
@@ -380,7 +380,7 @@ Example: Suppose we want to know, from our *Movies* relation, "What are the titl
 3. Compute the intersection of $(1)$ and $(2)$.
 4. Project the relation from $(3)$ onto the attributes *title* and *year*.
 
-Alternatively, we could represent the same expression in a conventional, linear notation, with parantheses. The formula:
+Alternatively, we could represent the same expression in a conventional, linear notation, with parentheses. The formula:
 
 $$\pi_{\text{title, year}} \Big(\sigma_{\text{length } \geq 100}(\text{Movies}) \cap \sigma_{\text{studioName } = \text{ 'Fox'}}(\text{Movies}) \Big)$$
 
@@ -390,7 +390,7 @@ represents the same expression.
 
 We shall use the operator $\rho_{S(A_1, \, A_2,..., \, A_n)}(R)$ to rename a relation $R$. The resulting relation has exactly the same tuples as $R$, but the name of the relation is $S$. Moreover, the attributes of the result relation $S$ are named $A_1, \, A_2,..., \, A_n$.
 
-If we only want to change the name of the realtion to $S$ and leave the attributes as they are in $R$, we can just say $\rho_S(R)$.
+If we only want to change the name of the relation to $S$ and leave the attributes as they are in $R$, we can just say $\rho_S(R)$.
 
 ### 2.4.12 Relationships Among Operations
 
