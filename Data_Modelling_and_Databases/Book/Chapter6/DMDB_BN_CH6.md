@@ -27,7 +27,7 @@ for all movies produced by Disney Studios in 1990. In SQL, we say:
 
 - The `FROM` clause gives the relation or relations to which the query refers.
 - The `WHERE` clause is a condition, much like a selection-condition in relational algebra. Tuples must satisfy the condition in order to match the query.
-- The `SELECT` clause tells which attributes of the tuples matching the condition are produced as part of the answer. The `*` in this example indicates that the entire tuples isproduced.
+- The `SELECT` clause tells which attributes of the tuples matching the condition are produced as part of the answer. The `*` in this example indicates that the entire tuples is produced.
 
 ### 6.1.1 Projection in SQL
 
@@ -42,9 +42,9 @@ Example: Suppose we wish to modify the query of Code 6.1 to produce only the mov
     WHERE studioName = 'Disney' AND year = 1990;
 ```
 
-Sometimes, we wish to produce a relation with column headers different from the attributes of the realtion mentioned in the `FROM` clause. We may follow the name of the attribute by the keyword `AS` and an `alias`, which becomes the header in the result relation.
+Sometimes, we wish to produce a relation with column headers different from the attributes of the relation mentioned in the `FROM` clause. We may follow the name of the attribute by the keyword `AS` and an `alias`, which becomes the header in the result relation.
 
-Example: We can modify Code 6.2 to produce a realtion with attrbiutes `name` and `duration` in place of `title` and `length`.
+Example: We can modify Code 6.2 to produce a relation with attributes `name` and `duration` in place of `title` and `length`.
 
 ```sql
     /* Code 6.3: Attribute renaming in queries. */
@@ -66,7 +66,7 @@ Remark: SQL is *case insensitive*, meaning that it treats upper- and lower-case 
 
 ### 6.1.2 Selection in SQL
 
-The selection operator of relational algebra, and much more, is available thorug the `WHERE` clause of SQL. We may build expressions by comparing valuesusing the six common comparison operators: `=, <>, <, >, <=,` and `>=`. The last four operators are as in C, but `<>` is the SQL sym,bol for "*not equal to*" (!=) and `=` in SQL is equality (==).
+The selection operator of relational algebra, and much more, is available through the `WHERE` clause of SQL. We may build expressions by comparing values using the six common comparison operators: `=, <>, <, >, <=,` and `>=`. The last four operators are as in C, but `<>` is the SQL sym,bol for "*not equal to*" (!=) and `=` in SQL is equality (==).
 
 We may also apply the usual arithmetic operators `+, *,` and so on, to numeric values before we compare them. We may apply the `concatenation` operator `||` to string. For example `'foo' || 'bar'` has value `'foobar'`.
 
@@ -79,13 +79,13 @@ The simple SQL queries that we have seen so far all have the form:
     WHERE C
 ```
 
-in which $L$ is a list of epxression, $R$ is a relation, and $C$ is a condition. The meaning of any such expression is the same as that of the relational-algebra expression:
+in which $L$ is a list of expression, $R$ is a relation, and $C$ is a condition. The meaning of any such expression is the same as that of the relational-algebra expression:
 
 $$\pi_L(\sigma_C(R))$$
 
 ### 6.1.3 Comparison of Strings
 
-Two strings are equal if they are the same sequence of characters. When comparing strings with differen declarations (`CHAR`, `VARCHAR`, etc.), only the actual strings are compared. SQL ignores any "pad" characters.
+Two strings are equal if they are the same sequence of characters. When comparing strings with different declarations (`CHAR`, `VARCHAR`, etc.), only the actual strings are compared. SQL ignores any "pad" characters.
 
 When we compare strings by on of the "less than" operators, such as `<` or `>=`, we are asking whether one precedes the other in lexicographic order.
 
@@ -100,7 +100,7 @@ SQL also provides the capability to compare strings on the basis of a simple pat
 
 where $s$ is a string and $p$ is a `pattern`, that is, a string with the optional use of the two special characters `%` and `_`. Ordinary characters ion $p$ match only themselves in $s$. But `%` in $p$ can match any sequence of 0 or more characters in $s$, and `_` in $p$ matches any one character in $s$.
 
-Similary, `s NOT LIKE p` is true if and only if string $s$ does not match pattern $p$.
+Similarly, `s NOT LIKE p` is true if and only if string $s$ does not match pattern $p$.
 
 Example: We remember a movie "Star *something*", and we remember that the something has four letters. What could this movie be? We can retrieve all such names with the query:
 
@@ -209,7 +209,7 @@ each have attributes *name* and *address*. Suppose we wish to find pairs consist
 
 ### 6.2.3 Tuple Variables
 
-Disambiguating attributes by prefixing the relation name works as long as the query involves combining several different relations. However, sometimes we need to ask a query that invovles two or more tuples from the same relation.
+Disambiguating attributes by prefixing the relation name works as long as the query involves combining several different relations. However, sometimes we need to ask a query that involves two or more tuples from the same relation.
 
 We may lis a relation $R$ as many times as we need to in the FROM clause, but we need a way to refer to each occurrence of $R$. SQL allows us to define, for each occurrence of $R$ in the FROM clause, an "alias" which we shall refer to as a `tuple variable`.
 
@@ -231,7 +231,7 @@ There are several ways to define the meaning of the select-from-where expression
 
 #### Nested Loops
 
-If there are several tuple varaibles, we may imagine nested loops, one for each tuple variable, in which the varaibles each range over the tuples of their respective relations. For each assignment of tuples to the tuple varaibles, we decide whether the WHERE clause is true.
+If there are several tuple variables, we may imagine nested loops, one for each tuple variable, in which the variables each range over the tuples of their respective relations. For each assignment of tuples to the tuple variables, we decide whether the WHERE clause is true.
 
 #### Parallel Assignment
 
@@ -239,13 +239,13 @@ There is an equivalent definition in which we do not explicitly create nested lo
 
 #### Conversion to Relational Algebra
 
-A third approach is to relate the SQL query to relational algebra. We start with the tuple varaibles in the FROM clause and take the Cartesian product of their relations.  
-Having created the product, we apply a selection operator to it by converting the WHERE clause to a selection condition on the abvious way.  
+A third approach is to relate the SQL query to relational algebra. We start with the tuple variables in the FROM clause and take the Cartesian product of their relations.  
+Having created the product, we apply a selection operator to it by converting the WHERE clause to a selection condition on the obvious way.  
 Finally, we create from the SELECT clause a list of expressions for a final projection operation.
 
 ### 6.2.5 Union, Intersection, and Difference of Queries
 
-Sometimes we wish to combine relations using the `set operations` of realtional algebra: union, intersection, and difference. The keywords used are `UNION`, `INTERSECT`, and `EXCEPT` for $\cup, \, \cap,$ and $-,$ respectively. Words like UNION are used between two queries, and those queries msut be parenthesized.
+Sometimes we wish to combine relations using the `set operations` of relational algebra: union, intersection, and difference. The keywords used are `UNION`, `INTERSECT`, and `EXCEPT` for $\cup, \, \cap,$ and $-,$ respectively. Words like UNION are used between two queries, and those queries must be parenthesized.
 
 Example: Suppose we wanted the name and addresses of all female movie stars who are also movie executives with a networth over $ 10'000'000:
 
@@ -266,26 +266,26 @@ In SQL, one query can be used in various ways to help in the evaluation of anoth
 
 1. Subqueries can return a single constant, and this constant can be compared with another value in a WHERE clause.
 2. Subqueries can return relations that can be used in various ways in WHERE clauses.
-3. Subqueries can appear in FROM clauses, followed by a tuple variable that represents the tuples in the reult of the subquery.
+3. Subqueries can appear in FROM clauses, followed by a tuple variable that represents the tuples in the result of the subquery.
 
 ### 6.3.1 Subqueries that Produce Scalar Values
 
 An atomic value that can appear as one component of a tuple is referred to as a `scalar`.
 
-Sometimes we might deduce from information about keys, of from other information, that there will be only a single value is produced from a select-from-where expression. If so, we can use this expression, surrounded by parantheses, as if it were a constant.
+Sometimes we might deduce from information about keys, of from other information, that there will be only a single value is produced from a select-from-where expression. If so, we can use this expression, surrounded by parentheses, as if it were a constant.
 
 ### 6.3.2 Conditions Involving Relations
 
-There are a number of SQL operators that we can apply to a relation $R$ and produce a boolean result. However, the realtion $R$ must be expressed as a subquery. As a trick, if we want to apply these operators to a stored table `Foo`, we can use the subquery `(SELECT * FROM Foo)`.
+There are a number of SQL operators that we can apply to a relation $R$ and produce a boolean result. However, the relation $R$ must be expressed as a subquery. As a trick, if we want to apply these operators to a stored table `Foo`, we can use the subquery `(SELECT * FROM Foo)`.
 
 Following are the definitions of the `operators`:
 
 - `EXISTS R` is a condition that is true if and only if $R$ is not empty.
 - `s IN R` is true if and only if $s$ is equal to one of the values in $R$. Likewise, `s NOT IN R` is true if and only if $s$ is equal to no value in $R$.
-- `s > ALL R` is true if and only if $s$ is greater than every value in unary relation $R$ (we migh replace `>` with any of the five comparison operators).
-- `s > ANY R` is true if and only if $s$ is greater than at least one value in unary relation $R$ (again, we might repalce `>` by any comparison operator).
+- `s > ALL R` is true if and only if $s$ is greater than every value in unary relation $R$ (we might replace `>` with any of the five comparison operators).
+- `s > ANY R` is true if and only if $s$ is greater than at least one value in unary relation $R$ (again, we might replace `>` by any comparison operator).
 
-### 6.3.3 Cinditions Involving Tuples
+### 6.3.3 Conditions Involving Tuples
 
 A tuple in SQL is represented by a parenthesized list of scalar values. If a tuple $t$ has the same number off components as a relation $R$, then it makes sense to compare $t$ and $R$ in expressions of the type listed in the previous section.
 
@@ -321,7 +321,7 @@ Incidentally, the nested query of *Code 6.20* can, like many nested queries, be 
 
 ### 6.3.4 Correlated Subqueries
 
-A more complicated use of nested subqueries reuiqres the subquery to be evaluated many times, once for each assignment of a value to some term in the subquery that comes from a tuple variable outside the subquery. A subquery of this type is called a `correlated` subquery.
+A more complicated use of nested subqueries requires the subquery to be evaluated many times, once for each assignment of a value to some term in the subquery that comes from a tuple variable outside the subquery. A subquery of this type is called a `correlated` subquery.
 
 Example: Consider the following query finding movie titles that appear more than once:
 
@@ -337,7 +337,7 @@ Example: Consider the following query finding movie titles that appear more than
 
 When writing a correlated query it is important that we be aware of the `scoping rules` for names. In general, an attribute in a subquery belongs to one of the tuple variables in that subquery's FROM clause if some tuple variable's relation has that attribute in its schema. If not, we look at the immediately surrounding subquery, then to the one surrounding that, and so on.
 
-Howevery, we can arrange for an attribute to belong to another tuple variable if we prefix it by that tuple variable and a dot. That is why we introduced the alias *Old* for the *Movies* relation of the outer query.
+However, we can arrange for an attribute to belong to another tuple variable if we prefix it by that tuple variable and a dot. That is why we introduced the alias *Old* for the *Movies* relation of the outer query.
 
 ### 6.3.4 Subqueries in FROM Clauses
 
@@ -387,7 +387,7 @@ As we recall from Section 2.4.8, a `natural join` differs from a theta-join in t
 1. The join condition is that all pairs of attributes from the two relations having a common name are equated, and there are no other conditions.
 2. One of each pair of equated attributes is projected out.
 
-The SQL natural join behaves exactly this way. Keywords `NATURAL JOIN` appear between the realtions to express the $\bowtie$ operator. We migh write:
+The SQL natural join behaves exactly this way. Keywords `NATURAL JOIN` appear between the relations to express the $\bowtie$ operator. We might write:
 
 ```sql
     MovieStar NATURAL JOIN MovieExec;
@@ -395,7 +395,7 @@ The SQL natural join behaves exactly this way. Keywords `NATURAL JOIN` appear be
 
 ### 6.3.8 Outerjoins
 
-The `outerjoin` operator was introduced in a previous section as a way toa ugment the result of a join by the dangling tuples, padded with null values. In SQL, we can specify an outerjoin; NULL is used as the null value.
+The `outerjoin` operator was introduced in a previous section as a way to augment the result of a join by the dangling tuples, padded with null values. In SQL, we can specify an outerjoin; NULL is used as the null value.
 
 Example: Suppose we wish to take the outerjoin of the two relations *MovieStar* and *MovieExec*. SQL refers to the standard outerjoin, which pads dangling tuples from both of its argument,a s a *full outerjoin*. The syntax is as follows:
 
@@ -413,19 +413,19 @@ In this section we shall study some operations that act on relations as a whole,
 
 SQL's notion of relations differs from the abstract notion of relations presented in Section 2.2. A relation, being a set, cannot have more than one copy of any given tuple. When a SQL query creates a new relation, the SQL system does not ordinarily eliminate duplicates.
 
-Assume we form the Cartesian product of two relations, test each tuple with the WHERE clause and then give the passing tuples to the output for projection according to the SELECT clause. This projection may cause the same tuple to result from different uples of the product, and if so, each copy of the resulting tuple is printed in its turn.
+Assume we form the Cartesian product of two relations, test each tuple with the WHERE clause and then give the passing tuples to the output for projection according to the SELECT clause. This projection may cause the same tuple to result from different tuples of the product, and if so, each copy of the resulting tuple is printed in its turn.
 
-If we do not wish `duplciates` in the result, then we may follow the keyword `SELECT` by the keyword `DISTINCT`. That word tells SQL to produce only once copy of any tuple.
+If we do not wish `duplicates` in the result, then we may follow the keyword `SELECT` by the keyword `DISTINCT`. That word tells SQL to produce only once copy of any tuple.
 
 ### 6.4.2 Duplicates in Unions, Intersections, and Differences
 
-The union, intersection, and difference operations normally elimiante duplicates. That is, bags are converted to sets, and the set versions of the operation is applied.
+The union, intersection, and difference operations normally eliminate duplicates. That is, bags are converted to sets, and the set versions of the operation is applied.
 
-In order to prevent the elimiantion of duplicates, we must follow the operator `UNION`. `INTERSECT`, or `EXCEPT` by the keyword `ALL`.
+In order to prevent the elimination of duplicates, we must follow the operator `UNION`. `INTERSECT`, or `EXCEPT` by the keyword `ALL`.
 
 ### 6.4.3 Grouping and Aggregation in SQL
 
-In a previous section we introduced the grouping-and-aggregation operator $\gamma$ for our extended relational algebra. SQL provides all the capability of the $\gamma$ operator throught he use of `aggregation` operators in SELECT clauses and a special `GROUP BY` clause.
+In a previous section we introduced the grouping-and-aggregation operator $\gamma$ for our extended relational algebra. SQL provides all the capability of the $\gamma$ operator through he use of `aggregation` operators in SELECT clauses and a special `GROUP BY` clause.
 
 ### 6.4.4 Aggregation Operators
 
@@ -456,7 +456,7 @@ When the tuples have nulls, there are a few rules we must remember:
 
 ### 6.4.7 HAVING Clauses
 
-Sometimes we might want to choose our groups based on some aggregate property of the groupt itself. The latter clause consists of the keyword `HAVING` followed by a condition about the group.
+Sometimes we might want to choose our groups based on some aggregate property of the group itself. The latter clause consists of the keyword `HAVING` followed by a condition about the group.
 
 Example: Suppose we want to print the total film length for only those producers who made at least one film prior to 1930, then we might propose the following query:
 
@@ -572,11 +572,11 @@ SQL allows us to specify that dirty reads are acceptable for a given transaction
 The statement above does two things:
 
 1. The first line declares that the transaction may write data
-2. The second line declares that the transmission may run with "isolation level" `read-uncommited`. That is, the transaction is allowed to read dirty data.
+2. The second line declares that the transmission may run with "isolation level" `read-uncommitted`. That is, the transaction is allowed to read dirty data.
 
 ### 6.6.6 Other Isolation Levels
 
-SQL provides a total of four `isolation levels`. We have already seen serializable and read-uncommited. The other two are `read-commited` and `repeatable-read`. They can be set by:
+SQL provides a total of four `isolation levels`. We have already seen serializable and read-uncommitted. The other two are `read-committed` and `repeatable-read`. They can be set by:
 
 ```sql
     SET TRANSACTION ISOLATION LEVEL READ COMMITTED;
@@ -594,18 +594,18 @@ For each, the default is that transactions are read-write, so we can add `READ O
 
 However, that is the SQL default and need not be stated explicitly.
 
-The `read-commited` isolation level, as its name implies, forbids the reading of dirty data. However, it does allow a transaction running at this isolation level to issue the same query several times and get different answers, as long as the answer reflects data that has been written by transactions that already committed.
+The `read-committed` isolation level, as its name implies, forbids the reading of dirty data. However, it does allow a transaction running at this isolation level to issue the same query several times and get different answers, as long as the answer reflects data that has been written by transactions that already committed.
 
 Under `repeatable-read isolation`, if a tuple is retrieved the first time, then we can be sure that the identical tuple will be retrieved again if the query is repeated. However, it is also possible that a second or subsequent execution of the same query will retrieve `phantom tuples`. The latter are tuples that result from insertions into the database while our transaction is executing.
 
 Following is a summary of the differences between the four SQL isolation levels:
 
-| Isolation Level  | Dirty Reads | Nonrepeatable Reads | Phantoms    |
-| :--------------- | :---------: | :-----------------: | :---------: |
-| Read Uncommitted | Allowed     | Allowed             | Allowed     |
-| Read Committed   | Not Allowed | Allowed             | Allowed     |
-| Repeatable Read  | Not Allowed | Not Allowed         | Allowed     |
-| Serializable     | Not Allowed | Not Allowed         | Not Allowed |
+| Isolation Level  | Dirty Reads | Non-repeatable Reads | Phantoms    |
+| :--------------- | :---------: | :------------------: | :---------: |
+| Read Uncommitted | Allowed     | Allowed              | Allowed     |
+| Read Committed   | Not Allowed | Allowed              | Allowed     |
+| Repeatable Read  | Not Allowed | Not Allowed          | Allowed     |
+| Serializable     | Not Allowed | Not Allowed          | Not Allowed |
 
 ## 6.7 Summary of Chapter 6
 
@@ -639,11 +639,11 @@ SQL provides an `OUTER JOIN` operator that joins relations but also includes in 
 
 ##### The Bag Model of Relations
 
-SQL actually regards relations as bags of tuples, not sets of tuples. We can force elimination of duplicate tuples with the keyword `DISTINC`, while keyword `ALL` allows the result to be a bag in certain circumstances where bags are not the default.
+SQL actually regards relations as bags of tuples, not sets of tuples. We can force elimination of duplicate tuples with the keyword `DISTINCT`, while keyword `ALL` allows the result to be a bag in certain circumstances where bags are not the default.
 
 #### Aggregations
 
-The values appearing in once column of a relation can be summerized (`aggregated`) by using one of the keywords `SUM`, `AVG`, `MIN`, `MAX`, or `COUNT`. Tuples can be partitioned prior to aggregation with the keywords `GROUP BY`. Certain groups can be eliminated with a clause introduced by the keyword `HAVING`.
+The values appearing in once column of a relation can be summarized (`aggregated`) by using one of the keywords `SUM`, `AVG`, `MIN`, `MAX`, or `COUNT`. Tuples can be partitioned prior to aggregation with the keywords `GROUP BY`. Certain groups can be eliminated with a clause introduced by the keyword `HAVING`.
 
 #### Modification Statements
 
@@ -655,4 +655,4 @@ SQL allows the programmer to group SQL statements into `transactions`, which may
 
 #### Isolation Levels
 
-SQL defines four `isolation levels` called, from most stringent to least stringent: *serializable* (the transaction must appear to run either completely before or completely after each other transaction), *repeatable-read* (every tuple read in response to a query will reappear if the query is repeated), *read-commited* (only tuples written by transactions that have already commited may be seen by this transaction), and *read-uncommited* (no constraint on what the transaction may see).
+SQL defines four `isolation levels` called, from most stringent to least stringent: *serializable* (the transaction must appear to run either completely before or completely after each other transaction), *repeatable-read* (every tuple read in response to a query will reappear if the query is repeated), *read-committed* (only tuples written by transactions that have already committed may be seen by this transaction), and *read-uncommitted* (no constraint on what the transaction may see).
