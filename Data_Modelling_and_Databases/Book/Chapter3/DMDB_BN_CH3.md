@@ -206,3 +206,81 @@ We can prove by induction on the number of times that we apply the growing opera
 **Induction:** For the induction, suppose $D$ was added when we used the FD $B_1 B_2 \cdots B_m \rightarrow D$ of $S$. We know by the inductive hypothesis is that $R$ satisfies $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$. Now, suppose two tuples of $R$ agree on all of $A_1, \, A_2,..., \, A_n$. Then since $R$ satisfies $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$, the two tuples must agree on all of $B_1, \, B_2,..., \, B_m$. Since $R$ satisfies $B_1 B_2 \cdots B_m \rightarrow D$, we also know these two tuples agree on $D$. Thus, $R$ satisfies $A_1 A_2 \cdots A_n \rightarrow D$.
 
 #### Why the Closure Algorithm Discovers All True FD's
+
+Suppose $A_1 A_2 \cdots A_n \rightarrow B$ were an FD Algorithm 3.7 says does not follow from set $S$. WE must show that FD $A_1 A_2 \cdots A_n \rightarrow B$ really doesn't follow from $S$. That is, we must show that there is at least one relation instance that satisfies all the FD's in $S$, and yet does not satisfy $A_1 A_2 \cdots A_n \rightarrow B$.
+
+This instance $I$ is actually quite simple to construct. It is shown in the table below. $I$ has only two tuples: $t$ and $s$. The two tuples agree in all the attributes of $\{A_1, \, A_2,..., , A_n \}^+$, and they disagree in all other attributes. We must show first that $I$ satisfies all the FD's of $S$. and then that it does not satisfy $A_1 A_2 \cdots A_n \rightarrow B$.
+
+|      | $\{A_1, \, A_2,..., , A_n \}^+$ | Other Attributes |
+| :--- | :-----------------------------: | :--------------: |
+| $t:$ | $111 \cdots 11$                 | $000 \cdots 00$  |
+| $s:$ | $111 \cdots 11$                 | $111 \cdots 11$  |
+
+Suppose there were some FD $C_1 C_2 \cdots C_k \rightarrow D$ in set $S$ that instance $I$ does not satisfy. Since $I$ has only two tuples, $t$ and $s$, those must be the two tuples that violate $C_1 C_2 \cdots C_k \rightarrow D$. That is, $t$ and $s$ agree in all the attributes of $\{C_1, \, C_2,..., \, C_k \}$, yet disagree on $D$. If we examine the table above, we see that all of $C_1, \, C_2,..., , C_k$ must be among the attributes of $\{A_1, \, A_2,..., \, A_n \}$, because those are the only attributes on which $t$ and $s$ agree. Likewise, $D$ must be among the other attributes, because only on those attributes do $t$ and $s$ disagree.
+
+But then we did not compute the closure correctly. $C_1 C_2 \cdots C_k \rightarrow D$ should have been applied when $X$ was $\{A_1, \, A_2, ..., \, A_n\}$ to add $D$ to $X$. We conclude that $C_1 C_2 \cdots C_k \rightarrow D$ cannot exist, i.e. instance $I$ satisfies $S$.
+
+Second, we must show that $I$ does not satisfy $A_1 A_2 \cdots A_n \rightarrow B$. However, this part is easy. Surely, we know that $B$ is not in $\{A_1, \, A_2,.., \, A_n \}^+$, so $B$ is one of the attributes on which $t$ and $s$ disagree. Thus, $I$ does not satisfy $A_1 A_2 \cdots A_n \rightarrow B$.
+
+### 3.2.6 The Transitive Rule
+
+The `transitive rule` lets us cascade two FD's, and generalizes the observation of a previous example:
+
+- If $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$ and $B_1 B_2 \cdots B_m \rightarrow C_1 C_2 \cdots C_k$ hold in relation $R$, then $A_1 A_2 \cdots A_n \rightarrow C_1 C_2 \cdots C_k$ also holds in $R$.
+
+If some of the $C$'s are among the $A$'s, we may eliminate them from the right side by the trivial-dependencies rule.
+
+Example: The following table shows another version of the *Movies* relation:
+
+| $title$       | $year$ | $length$ | $genre$ | $studioName$ | $studioAddr$ |
+| :------------ | :----- | :------- | :------ | :----------- | :----------- |
+| Star Wars     | 1977   | 124      | sciFi   | Fox          | Hollywood    |
+| Eight Below   | 2005   | 120      | drama   | Disney       | Buena Vista  |
+| Wayne's World | 1992   | 95       | comedy  | Paramount    | Hollywood    |
+
+Two of the FD's that we might reasonably claim to hold are:
+
+$$
+\text{title year } \rightarrow \text{ studioName} \\
+\text{studioName } \rightarrow \text{ studioAddr}
+$$
+
+The transitive rule allows us to combine the two FD's above to get a new FD:
+
+$$
+\text{title year } \rightarrow \text{ studioAddr}
+$$
+
+### 3.2.7 Closing Sets of Functional Dependencies
+
+Sometimes we have a choice of which FD's we use to represent the full set of FD's for a relation. If we are given a set of FD's $S$, then any set of FD's equivalent to $S$ is said to be a `basis` for $S$. To avoid some of the explosion of possible bases, we shall limit ourselves to considering only bases whose FD's have singleton right sides. If we have any basis, we can apply the splitting rule to make the right sides be singletons. A `minimal basis` for a relation is a basis $B$ that satisfies three conditions:
+
+1. All the FD's in $B$ have singleton right sides.
+2. If any FD is removed from $B$, the result is no longer a basis.
+3. If for any FD in $B$ we remove one or more attributes from the left side of $F$, the result is no longer a basis.
+
+### 3.2.8 Projecting Functional Dependencies
+
+Suppose we have a relation $R$ with set of FD's $S$, and we project $R$ by computing $R_1 = \pi_L (R)$, for some list of attributes $R$. What FD's hold in $R_1$?
+
+The answer is obtained in principle by computing the `projection of functional dependencies` $S$, which is all FD's that:
+
+1. Follow from $S$, and
+2. Involve only attributes of $R_1$
+
+Since there may be a larger number of such FD's, and many of them may be redundant, we are free to simplify that set of FD's if we wish. The simple algorithm is summarized below:
+
+#### Algorithm 3.12: Projecting a Set of Functional Dependencies
+
+**INPUT:** A relation $R$ and a second relation $R_1$ computed by the projection $R_1 = \pi_L (R)$. Also, a set of FD's $S$ that hold in $R$.
+
+**OUTPUT:** The set of FD's that hold in $R_1$.
+
+**METHOD:**
+
+1. Let $T$ be the eventual output set of FD's. Initially, $T$ is empty.
+2. For each set of attributes $X$ that is a subset of the attributes of $R_1$, compute $X^+$. This computation is performed with respect to the set of FD's $S$, and may involve attributes that are in the schema of $R$ but not in $R_1$. Add to $T$ all nontrivial FD's $X \rightarrow A$ such that $A$ is both in $X^+$ and an attribute of $R_1$.
+3. Now, $T$ is a basis for the FD's that hold in $R_1$, but may not be a minimal basis. We may construct a minimal basis by modifying $T$ as follows:
+   1. If there is an FD $F$ in $T$ that follows from the other FD's in $T$, remove $F$ from $T$.
+   2. Let $Y \rightarrow B$ be an FD in $T$, with at least two attributes in $Y$, and let $Z$ be $Y$ with one of its attributes removed. If $Z \rightarrow B$ follows from the FD's in $T$ (including $Y \rightarrow B$), then replace $Y \rightarrow B$ by $Z \rightarrow B$.
+   3. Repeat the above steps in all possible way until no more changes to $T$ can be made.
