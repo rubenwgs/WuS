@@ -351,3 +351,107 @@ a) The relation *Movies2*.
 b) The relation *Movies3*.
 
 Notice how this decomposition eliminates the anomalies we mentioned in Section 3.3.1.
+
+### 3.3.3 Boyce-Codd Normal Form
+
+The goal of decomposition is to replace a relation by several that do not exhibit anomalies. There is, it turns out, a simple condition under which the anomalies discussed above can be guaranteed not to exist. This condition is called `Boyce-Codd normal form`, or `BCNF`.
+
+- A relation $R$ is in BCNF if and only if: whenever there is a nontrivial FD $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$ for $R$, it is the case that $\{A_1, \, A_2,..., \, A_n \}$ is a superkey for $R$.
+
+That is, the left side of every nontrivial FD must be a superkey. Recall that a superkey need not be minimal. Thus, an *equivalent statement of the BCNF condition is that the left side of every nontrivial FD must contain a key.*
+
+Example: Relation *Movies1* from above is not in BCNF. To see why, we first need to determine what sets of attributes are keys. We argued in a previous example, that $\{\text{title, year, starName} \}$ is the only key for *Movies1*.
+
+However, consider the FD
+
+$$
+\text{title year } \rightarrow \text{ length genre studioName}
+$$
+
+which holds in *Movies1* according to a previous discussion.
+
+Unfortunately, the left side of the above FD is not a superkey. Thus, the existence of this FD violates the BCNF condition and tells us *Movies1* is not in BCNF.
+
+### 3.3.4 Decomposition into BCNF
+
+By repeatedly choosing suitable decompositions, we can break any relation schema into a collection of subsets of its attributes with the following important properties:
+
+1. These subsets are the schemas of relations in BCNF.
+2. The data in the original relation is represented faithfully by the data in the relations that are the result of the decomposition, in a sense to be made precise in Section 3.4.1.
+
+The decomposition strategy we shall follow is to look for nontrivial FD $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$ that violates BCNF, i.e., $\{A_1, \, A_2,..., \, A_n \}$ is not a superkey. We shall add to the right side as many attributes as are functionally determined by $\{A_1, \, A_2,..., \, A_n \}$.
+
+Example: Consider a relation with schema
+
+$$
+\{\text{title, year, studioName, president, presAddr}\}
+$$
+
+That is, each tuple of this relation tells about a movie, its studio, the president of the studio, and the address of the president of the studio. Three FD's athat we would assume in this relation are
+
+$$
+\text{title year } \rightarrow \text{ studioName} \\
+\text{studioName } \rightarrow \text{ president} \\
+\text{president } \rightarrow \text{ presAddr} 
+$$
+
+By closing sets of these five attributes, we discover that $\{\text{title, year} \}$ is the only key for this relation. Thus, the last two FD's above violate BCNF. Suppose we choose to decompose starting with
+
+$$
+\text{studioName } \rightarrow \text{ president}
+$$
+
+First, we add to the right side of this functional dependency any other attributes in the closure of studioName. That closure includes *presAddr*, so our final choice of FD for the decomposition is:
+
+$$
+\text{studioName } \rightarrow \text{ president presAddr}
+$$
+
+The decomposition based on this FD yields the following two relation schemas:
+
+$$
+\{\text{title, year, studioName} \} \\
+\{\text{studioName, president, presAddr} \}
+$$
+
+If we use Algorithm 3.12 to project FD's, we determine that the FD's for the first relation has a basis:
+
+$$
+\text{title year } \rightarrow \text{ studioName}
+$$
+
+while the second has:
+
+$$
+\text{studioName } \rightarrow \text{president} \\
+\text{president } \rightarrow \text{presAddr}
+$$
+
+The sole key for the first relation is $\{\text{title, year} \}$, and it is therefore in BCNF. However, the second has $\{\text{studioName} \}$ for its only key but also the FD:
+
+$$
+\text{president } \rightarrow \text{ presAddr}
+$$
+
+which is a BCNF violation. Thus, we must decompose again, this time using the above FD. The resulting three relation schemas, all in BCNF, are:
+
+$$
+\{\text{title, year, studioName} \} \\
+\{\text{studioName, president} \} \\
+\{\text{president, presAddr} \}
+$$
+
+In general, we must keep applying the decomposition rule as many times as needed, until all our relations are in BCNF.
+
+#### Algorithm 3.20: BCNF Decomposition Algorithm
+
+**INPUT:** A relation $R_0$with a set of functional dependencies $S_0$.
+
+**OUTPUT:** A decomposition of $R_0$ into a collection of relations, all of which are in BCNF.
+
+**METHOD:** The following steps can be applied recursively to any relation $R$ and set of FD's $S$. Initially, apply them with $R=R_0$ and $S=S_0$.
+ 
+1. Check whether $R$ is in BCNF. If som nothing more needs to be done. Return $\{R \}$ as the answer. 
+2. If there are BCNF violations, let one be $X \rightarrow Y$. Use Algorithm 3.7 to compute $X^+$. Choose $R_1=X^+$ as one relation schema and let $R_2$ have attributes $X$ and those attributes of $R$ that are not in $X^+$.
+3. Use Algorithm 3.12 to compute the sets of FD's for $R_1$ and $R_2$, let these be $S_1$ and $S_2$ respectively.
+4. Recursively decompose $R_1$ and $R_2$ using this algorithm. Return the union of the results of these decompositions.
