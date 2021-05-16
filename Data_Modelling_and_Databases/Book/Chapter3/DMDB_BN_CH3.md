@@ -284,3 +284,70 @@ Since there may be a larger number of such FD's, and many of them may be redunda
    1. If there is an FD $F$ in $T$ that follows from the other FD's in $T$, remove $F$ from $T$.
    2. Let $Y \rightarrow B$ be an FD in $T$, with at least two attributes in $Y$, and let $Z$ be $Y$ with one of its attributes removed. If $Z \rightarrow B$ follows from the FD's in $T$ (including $Y \rightarrow B$), then replace $Y \rightarrow B$ by $Z \rightarrow B$.
    3. Repeat the above steps in all possible way until no more changes to $T$ can be made.
+
+## 3.3 Design of Relational Database Schemas
+
+Careless selection of relational database schema can lead to redundancy and related anomalies. In this section, we shall tackle the problem of design of good relation schemas in the following stages:
+
+1. We first explore in more details the problems that arise when our schema is poorly designed.
+2. Then, we introduce the idea of "decomposition", breaking a relation schema into two smaller schemas.
+3. Next, we introduce "Boyce-Codd normal form", or "BCNF", a condition on a relation schema that eliminates these problems.
+4. These points are tied together when we explain how to assure the BCNF condition by decomposing relation schemas.
+
+### 3.3.1 Anomalies
+
+Problems such as redundancy that occur when we try to cram too much into a single relation are called `anomalies`. The principal kind of anomalies that we encounter are:
+
+1. `Redundancy`. Information may be repeated unnecessarily in several tuples.
+2. `Update Anomalies`. We may change information in one tuple but leave the same information unchanged in another.
+3. `Deletion Anomalies`. If a set of values becomes empty, we may lose other information as a side effect.
+
+### 3.3.2 Decomposing Relations
+
+The accepted way to eliminate these anomalies is to `decompose` relations. Decomposition of $R$ involves splitting the attributes of $R$ to make the schemas of two new relations.
+
+Given a relation $R(A_1, \, A_2, ..., \, A_n)$, we may `decompose` $R$ into two relations $S(B_1, \, B_2,..., \, B_m)$ and $T(C_1, \, C_2,..., \, C_k)$ such that:
+
+1. $\{A_1, \, A_2,..., \, A_n \} = \{B_1, \, B_2,..., \, B_m \} \cup \{C_1, \, C_2,..., \, C_k \}$.
+2. $S = \pi_{B_1, \, B_2,..., \, B_m}(R)$
+3. $T = \pi_{C_1, \, C_2,..., \, C_k}(R)$
+
+Example: Let us decompose the *Movies1* relation shown below.
+
+| $title$            | $year$ | $length$ | $genre$ | $studioName$ | $starName$    |
+| :----------------- | :----- | :------- | :------ | :----------- | :------------ |
+| Star Wars          | 1997   | 124      | sciFi   | Fox          | Carrie Fisher |
+| Star Wars          | 1997   | 124      | sciFi   | Fox          | Mark Hamill   |
+| Star Wars          | 1997   | 124      | sciFi   | Fox          | Harrison Ford |
+| Gone With the Wind | 1939   | 231      | drama   | MGM          | Vivien Leigh  |
+| Wayne's World      | 1992   | 95       | comedy  | Paramount    | Dana Carvey   |
+| Wayne's World      | 1992   | 95       | comedy  | Paramount    | Mike Meyers   |
+
+Our choice, whose merit will be seen in Section 3.3.3, is to use:
+
+1. A relation called *Movies2*, whose schema is all the attributes except for *starName*.
+2. A relation called *Movies3*, whose schema consists of the attributes *title*, *year*, and *starName*.
+
+The projection of *Movies1* onto these two new schemas is shown below:
+
+| $title$            | $year$ | $length$ | $genre$ | $studioName$ |
+| :----------------- | :----- | :------- | :------ | :----------- |
+| Star Wars          | 1977   | 124      | sciFi   | Fox          |
+| Gone With the Wind | 1939   | 231      | drama   | MGM          |
+| Wayne's World      | 1992   | 95       | comedy  | Paramount    |
+
+a) The relation *Movies2*.
+
+
+| $title$            | $year$ | $starName$    |
+| :----------------- | :----- | :------------ |
+| Star Wars          | 1977   | Carrie Fisher |
+| Star Wars          | 1977   | Mark Hamill   |
+| Star Wars          | 1977   | Harrison Ford |
+| Gone With the Wind | 1939   | Vivien Leigh  |
+| Wayne's World      | 1992   | Dana Carvey   |
+| Wayne's World      | 1992   | Mike Meyers   |
+
+b) The relation *Movies3*.
+
+Notice how this decomposition eliminates the anomalies we mentioned in Section 3.3.1.
