@@ -679,3 +679,72 @@ Yet there is BCNF violation in the relation above. There are,in fact, no nontriv
 We leave it to the reader to check that none of the five attributes is functionally determined by the other four. Since there are no nontrivial FD's, it follows that all five attributes form the only key and that there are no BCNF violations.
 
 ### 3.6.2 Definition of Multivalued Dependencies
+
+A `multivalued dependency (MVD)` is a statement about some relation $R$ that when you fix the values for one set of attributes, then the values in certain other attributes are independent of the values of all other attributes in the relation. More precisely, we say the MVD
+
+$$
+A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m
+$$
+
+holds for a relation $R$ if when we restrict ourselves to the tuples of $R$ that have particular values for each of the attributes among the $A$'s, then the set of values we find among the $B$'s is independent of the set of values we find among the attributes of $R$ that are not among the $A$'s or $B$'s. Still more precisely, we say this MVD holds if
+
+- For each pair of tuples $t$ and $u$ of relation $R$ that agree on all the $A$'s, we can find in $R$ some tuple $v$ that agrees:
+  1. With both $t$ and $u$ on the $A$'s,
+  2. With $t$ on the $B$'s, and
+  3. With $u$ on all attributes of $R$ that are not among the $A$'s or $B$'s.
+
+Example: In a previous example we encountered an MVD that in our notation is expressed:
+
+$$
+\text{name } \twoheadrightarrow \text{ street city}
+$$
+
+That is, for each star's name, the set of addresses appears in conjunction with each of the star's movies. For an example of how the formal definition of this MVD applies, consider the first and fourth tuple from the relation above:
+
+| $name$    | $street$      | $city$    | $title$             | $year$ |
+| :-------- | :------------ | :-------- | :------------------ | :----- |
+| C. Fisher | 123 Maple St. | Hollywood | Star Wars           | 1977   |
+| C. Fisher | 5 Locust Ln.  | Malibu    | Empire Strikes Back | 1980   |
+
+If we let the first tuple be $t$ and the second be $u$, then the MVD asserts that we must also find in $R$ the tuple that has name *C. Fisher*, a street and city that agree with the first tuple, and other attributes (*title* and *year*) that agree with the second tuple. There is indeed such a tuple, it is the third tuple of the relation above.
+
+### 3.6.3 Reasoning About Multivalued Dependencies
+
+There are a number of rules about MVD's that are similar to the rules we learned for FD's in Section 3.2. For example, MVD's obey:
+
+- `Trivial MVD's`. The MVD
+    $$
+    A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m
+    $$
+
+    holds in any relation if $\{B_1, \, B_2,..., \, B_m \} \subseteq \{A_1, \, A_2,.., \, A_n \}$.
+- The `transitive rule` which say that if $A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m$ and $B_1 B_2 \cdots B_m \twoheadrightarrow C_1 C_2 \cdots C_k$ hold for some relation, then so does
+    $$
+    A_1 A_2 \cdots A_n \twoheadrightarrow C_1 C_2 \cdots C_k
+    $$
+
+    Any $C$'s that are also $A$'s must be deleted from the right side.
+
+On the other hand, MVD's do not obey the splitting part of the splitting/combining rule.  
+However, there are several new rules dealing with MVD's that we can learn.
+
+- `FD Promotion`. Every FD is an MVD. That is, if
+
+    $$
+    A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m
+    $$
+
+    then $A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m$.
+- `Complementation Rule`. If $A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m$ is an MVD for relation $R$, then $R$ also satisfies $A_1 A_2 \cdots A_n \twoheadrightarrow C_1 C_2 \cdots C_k$, where the $C$'s are all attributes of $R$ not among the $A$'s and $B$'s.
+
+An interesting consequence of the complementation rule is that there are some other MVD's that are trivial, but that look distinctly nontrivial.
+
+- `More Trivial MVD's`. IF all the attributes of relation $R$ are
+
+    $$
+    \{A_1, \, A_2,..., \, A_n, \, B_1, \, B_2,..., \, B_m \}
+    $$
+
+    then $A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m$ holds in $R$.
+
+### 3.6.4 Fourth Normal Form
