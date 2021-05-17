@@ -563,3 +563,47 @@ $$
 
 The first say that a theater is located in one city. The second is not obvious but is based on the common practice of not booking a movie into two theaters in the same city. We shall assert this FD if only for the sake of the example.
 
+On the other hand, two of the three sets of two attributes are keys. Clearly $\{\text{title, city} \}$ is a key because of the given FD that says these attributes functionally determine *theater*. It is also true that $\{\text{theater, title} \}$ is a key, because its closure includes *city* due ti the given FD $\text{theater } \rightarrow \text{ city}$.
+
+We conclude that the only two keys are
+
+$$
+\{\text{title, city} \} \\
+\{\text{theater, title} \}
+$$
+
+Now we immediately see a BCNF violation. We are given the functional dependency $\text{theater } \rightarrow \text{ city}$, but its left side is not a superkey. We are therefore tempted to decompose, using this BCNF-violating FD, into two relation schemas:
+
+$$
+\{\text{theater, city} \} \\
+\{\text{theater, title} \}
+$$
+
+There is a problem with this decomposition, concerning the FD
+
+$$
+\text{title city } \rightarrow \text{ theater}
+$$
+
+There could be current relations for the decomposed schemas that satisfy the FD $\text{theater } \rightarrow \text{ city}$ but that, when joined, yield a relation not satisfying $\text{title city } \rightarrow \text{ theater}$. For instance, the two relations
+
+| $theater$ | $city$     |
+| :-------- | :--------- |
+| Guild     | Menlo Park |
+| Park      | Menlo Park |
+
+and
+
+| $theater$ | $title$ |
+| :-------- | :------ |
+| Guild     | Antz    |
+| Park      | Antz    |
+
+are permissible according to the FD's that apply to each of the above relations, but when we join them we get two tuples
+
+| $theater$ | $city$     | $title$ |
+| :-------- | :--------- | :------ |
+| Guild     | Menlo Park | Antz    |
+| Park      | Menlo Park | Antz    |
+
+that violates the FD $\text{title city } \rightarrow \text{ theater}$.
