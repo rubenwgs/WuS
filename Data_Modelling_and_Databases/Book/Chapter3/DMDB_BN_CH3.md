@@ -654,4 +654,28 @@ We need to show three things: that the lossless-join and dependency-preservation
 2. `Dependency Preservation`. Each FD of the minimal basis has all its attributes in some relation of the decomposition. Thus, each dependency can be checked in the decomposed relations.
 3. `Third Normal Form`. If we have to add a relation whose schema is a key, then this relation is surely in 3NF. The reason is that all attributes of this relation are prime, and thus no violation of 3NF could be present in this relation.
 
+## 3.6 Multivalued Dependencies
 
+A "multivalued dependency" is an assertion that two attributes or sets of attributes are independent of one another. This condition is, as we shall see, a generalization of the notion of functional dependency, in the sense that every FD implies the corresponding multivalued dependency.
+
+### 3.6.1 Attribute Independence and Its Consequent Redundancy
+
+There are occasional situations where we design a relation schema and find it is in BCNF, yet the relation has a kind of redundancy that is not related to FD's. The most common source of redundancy in BCNF schemas is an attempt to put two or more set-valued properties of the key into a single relation.
+
+Example: In this example, we shall suppose that stars may have several addresses, which we break into street and city components. The set of addresses is one of the set-valued properties this relation will store. The second set-valued property of stars that we shall put into this relation is the set of titles and years of movies in which the star appeared.
+
+| $name$    | $street$      | $city$    | $title$             | $year$ |
+| C. Fisher | 123 Maple St. | Hollywood | Star Wars           | 1977   |
+| C. Fisher | 5 Locust Ln.  | Malibu    | Star Wars           | 1977   |
+| C. Fisher | 123 Maple St. | Hollywood | Empire Strikes Back | 1980   |
+| C. Fisher | 5 Locust Ln.  | Malibu    | Empire Strikes Back | 1980   |
+| C. Fisher | 123 Maple St. | Hollywood | Return of the Jedi  | 1983   |
+| C. Fisher | 5 Locust Ln.  | Malibu    | Return of the Jedi  | 1983   |
+
+There is no reason to associate an address with one movie and not another. Thus, the only way to express the fact that addresses and movies are independent properties of stars is to have each address appear with each movie. But when we repeat address and movie facts in all combinations, there is obvious redundancy.
+
+Yet there is BCNF violation in the relation above. There are,in fact, no nontrivial FD's at all.
+
+We leave it to the reader to check that none of the five attributes is functionally determined by the other four. Since there are no nontrivial FD's, it follows that all five attributes form the only key and that there are no BCNF violations.
+
+### 3.6.2 Definition of Multivalued Dependencies
