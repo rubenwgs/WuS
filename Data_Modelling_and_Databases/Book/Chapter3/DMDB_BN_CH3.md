@@ -455,3 +455,111 @@ In general, we must keep applying the decomposition rule as many times as needed
 2. If there are BCNF violations, let one be $X \rightarrow Y$. Use Algorithm 3.7 to compute $X^+$. Choose $R_1=X^+$ as one relation schema and let $R_2$ have attributes $X$ and those attributes of $R$ that are not in $X^+$.
 3. Use Algorithm 3.12 to compute the sets of FD's for $R_1$ and $R_2$, let these be $S_1$ and $S_2$ respectively.
 4. Recursively decompose $R_1$ and $R_2$ using this algorithm. Return the union of the results of these decompositions.
+
+## 3.4 Decomposition: The Good, Bad, and Ugly
+
+So far, we observed that before we decompose a relation schema into BCNF, it can exhibit anomalies. That's the "good". But decomposition can also have some bad, if not downright ugly, consequences. In this section, we shall consider three distinct properties we would like a decomposition to have.
+
+1. `Elimination of Anomalies` by decomposition as in Section 3.3.
+2. `Recoverability of Information`. Can we recover the original relation from the tuples in its decomposition?
+3. `Preservation of Dependencies`. If we check the projected FD's in the relations of the decomposition, can we be sure that when we reconstruct the original relation fro, the decomposition by joining, the result will satisfy the original FD's?
+
+### 3.4.1 Recovering Information from a Decomposition
+
+Since we learned that every two-attribute relation is in BCNF, why did we have to go through the trouble of Algorithm 3.20?  
+The answer is that the data in the decomposed relations, even if their tuples were each the projection of a relation instance of $R$, might not allow us to join the relations of the decomposition and get the instance $R$ back. If we do get $R$ back, then we say the decomposition has a `lossless join`.
+
+Ti simplify the situation, consider a relation $R(A, \, B, \, C)$ and an FD $b \rightarrow C$ that is a BCNF violation. The decomposition based on the FD $B \rightarrow C$ separates the attributes into relations $R_1(A, \, B)$ and $R_2(B, \, C)$.  
+Consider what happens if there are two tuples of $R$, say $t = (a, \, b, \, c)$ and $v = (d, \, b, \, e)$. When we project $t$ onto $R_1 (A, \, B)$ we get $u = (a, \, b)$, and when we project $v$ onto $R_2(B, \, C)$ we get $w = (b, \, e)$. These tuples also match in the natural join, and the resulting tuple is $x = (a, \, b, \, e)$. Is it possible that $x$ is a bogus tuple? That is, could $(a, \, b, , e)$ not be a tuple of $R$?  
+Since we assume the FD $B \rightarrow C$ for relation $R$, the answer is "no".
+
+Since $t$ is in $R$, it must be that $x$ is in $R$. Put another way, as long as FD $B \rightarrow C$ holds, the joining of two projected tuples cannot produce a bogus tuple. Rather, every tuple produced by the natural join is guaranteed to be a tuple of $R$.
+
+This argument works in general. We assumed $A, \, B,$ and $C$ were each single attributes, but the same argument would apply if they were any sets of attributes $X, \, Y,$  and $Z$. That is, if $Y \rightarrow Z$ holds in $R$, whose attributes are $X \cup Y \cup Z,$ then $R = \pi_{X \cup Y}(R) \bowtie \pi_{Y \cup Z}(R)$.
+
+We may conclude:
+
+> If we decompose a relation according to Algorithm 3.20, then the original relation can be recovered exactly by the natural join.
+
+### 3.4.2 The Chase Test for Lossless Join
+
+In Section 3.4.1 we argued why a particular decomposition, that of $R(A, \, B, \, C)$ into $\{A, \, B \}$ and $\{B, \, C \}$, with a particular FD, $B \rightarrow C$, had a lossless join.
+
+Now consider a more general situation. We have decomposed relation $R$ into relations with sets of attributes $S_1, \, S_2,..., \, S_k$. We have a given set of FD's $F$ that hold in $R$. Is it true that if we project $R$ onto the relations of the decomposition, then we can recover $R$ by taking the natural join of all these relations? That is, is it true that $\pi_{S_1}(R) \bowtie \pi_{S_2}(R) \bowtie \cdots \bowtie \pi_{S_k}(R) = R$? Three important things to remember are:
+
+- The natural join is associative and commutative. It does not matter in what order we join the projections. We shall get the same relation as a result.
+- Any tuple $t$ in $R$ is surely in $\pi_{S_1}(R) \bowtie \pi_{S_2}(R) \bowtie \cdots \bowtie \pi_{S_k}(R)$.
+- As a consequence, $\pi_{S_1}(R) \bowtie \pi_{S_2}(R) \bowtie \cdots \bowtie \pi_{S_k}(R) = R$ when the FD's in $F$ hold for $R$ if and only if every tuple in the join is also in $R$.
+
+The `chase` test for a lossless join is just an organized way to see whether a tuple $t$ in $\pi_{S_1}(R) \bowtie \pi_{S_2}(R) \bowtie \cdots \bowtie \pi_{S_k}(R)$ can be proved, using the FD's in $F$, also to be a tuple in $R$. If $t$ is in the join, then there must be tuples in $R$, say $t_1, \, t_2,..., \, t_k$, such that $t$ is in the join of the projections of each $t_i$ onto the set of attributes of $S_i$, for $i = 1, \, 2,..., \, k$. We therefore know that $t_i$ agrees with $t$ on the attributes of $S_i$, but $t_i$ has unknown values in its components not in $S_i$.
+
+We draw a picture of what we know, called a `tableau`. Assuming $R$ has attributes $A, \, B,...$ we use $a, \, b,...$ for the components of $t$. For $t_i$, we use the same letter as $t$ in the components that are in $S_i$, but we subscript the letter with $i$ if the component is not in $i$. In that way, $t_i$ will agree with $t$ for the attributes of $S_i$, but have a unique value - one that can appear nowhere else in the tableau - for other attributes.
+
+Example: Suppose we have relation $R(A, \, B, \, C, \, D)$, which we have decomposed into relations with sets of attributes $S_1 = \{A, \, D \}$, $S_2 = \{A, \, C \}$, and $S_3 = \{B, \, C, \, D \}$. Then the tableau for this decomposition is shown in the table below:
+
+| $A$   | $B$   | $C$   | $D$   |
+| :---- | :---- | :---- | :---- |
+| $a$   | $b_1$ | $c_1$ | $d$   |
+| $a$   | $b_2$ | $c$   | $d_2$ |
+| $a_3$ | $b$   | $c$   | $d$   |
+
+The first row corresponds to set of attributes $A$ and $D$. Notice that the components for attributes $A$ and $D$ are the unsubscripted letter $a$ and $d$. However, for the other attributes, $b$ and $c$, we add the subscript $1$ to indicate that they are arbitrary values.
+
+Remember that our original goal is to use the given set of FD's $F$ to prove that $t$ is really in $R$. In order to do so, we "chase" the tableau by applying the FD's in $F$ to equate symbols in the tableau whenever we can. If we discover that one of the rows is actually the same as $t$, then we have proved that any tuple $t$ in the join of the projections was actually a tuple of $R$.
+
+Example: Let us continue with the decomposition of the previous example, and suppose the given FD's are $A \rightarrow B$, $B \rightarrow C$, and $CD \rightarrow A$. Start with the tableau above. SInce the first two rows agree in their $A$-components, the FD $A \rightarrow B$ tells us they must also agree in their $B$-components. That is, $b_1 = b_2$. Then the resulting tableau is:
+
+| $A$   | $B$   | $C$   | $D$   |
+| :---- | :---- | :---- | :---- |
+| $a$   | $b_1$ | $c_1$ | $d$   |
+| $a$   | $b_1$ | $c$   | $d_2$ |
+| $a_3$ | $b$   | $c$   | $d$   |
+
+Now, we see that the first two rows have equal $B$-values, and so we may use the FD $B \rightarrow C$ to deduce that their $C$-components, $c_1$ and $c$, are the same.
+
+| $A$   | $B$   | $C$   | $D$   |
+| :---- | :---- | :---- | :---- |
+| $a$   | $b_1$ | $c$   | $d$   |
+| $a$   | $b_2$ | $c$   | $d_2$ |
+| $a_3$ | $b$   | $c$   | $d$   |
+
+Next, we observe that the first and third rows agree in both columns $C$ and $D$. Thus, we may apply the FD $CD \rightarrow A$ to deduce that these rows also have the same $A$-value, that is, $a = a_3$:
+
+| $A$   | $B$   | $C$   | $D$   |
+| :---- | :---- | :---- | :---- |
+| $a$   | $b_1$ | $c_1$ | $d$   |
+| $a$   | $b_2$ | $c$   | $d_2$ |
+| $a$   | $b$   | $c$   | $d$   |
+
+At this point, we see that the last row has become equal to $t$, that is, $(a, \, b, \, c, \, d)$. We have proved that if $R$ satisfies the FD's $A \rightarrow B, \, B \rightarrow C,$ and $CD \rightarrow A,$ then whenever we project onto $\{A, \, D \}, \, \{A, \, C \},$ and $\{B, \, C, \, D \}$ and rejoin, what we get must have been in $R$.
+
+### 3.4.3 Why the Chase Works
+
+There are two issues to address:
+
+1. Then the chase result in a row that matches the tuple $t$, why must the join be lossless?
+2. When, after applying FD's whenever we can, we still find no row of all unsubscripted variables, why must be the join not be lossless?
+
+Question $(1)$ is easy to answer. The chase process itself is a proof that one of the projected tuples from $R$ must in fact be the tuple $t$ that is produced by the join. We also know that every tuple in $R$ is sure to come back if we project and join. Thus, the chase has proved that the result of projection and join is exactly $R$.
+
+For the second question, suppose that we eventually derive a tableau without an unsubscripted row, and that this tableau does not allow us to apply any of the FD's to equate any symbols. We know that the $i$th row has unsubscripted symbols in the attributes of $S_i$, the $i$th relation of the decomposition. Thus, when we project this relation onto the $S_i$'s and take the natural join, we get the tuple with all unsubscripted variables. This tuple is not in $R$, so we conclude that the join is not lossless.
+
+### 3.4.4 Dependency Preservation
+
+We mentioned that it is not possible, in some cases, to decompose a relation into BCNF relations that have both the lossless-join and dependency-preservation properties. Below is an example where we need to make a tradeoff between preserving dependencies and BCNF.
+
+Example: Suppose we have a relation *Bookings* with attributes:
+
+1. *title*, the name of a movie.
+2. *theater*, the name of a theater where the movie is being shown.
+3. *city*, the city where the theater is located.
+
+The intend behind a tuple $(m, \, t, \, c)$ is that the movie with title $m$ is currently being shown at theater $t$ in city $c$. We might reasonably assert the following FD's:
+
+$$
+\text{theater } \rightarrow \text{ city} \\
+\text{title city } \rightarrow \text{ theater}
+$$
+
+The first say that a theater is located in one city. The second is not obvious but is based on the common practice of not booking a movie into two theaters in the same city. We shall assert this FD if only for the sake of the example.
+
