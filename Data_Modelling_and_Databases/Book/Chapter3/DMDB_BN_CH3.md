@@ -607,3 +607,51 @@ are permissible according to the FD's that apply to each of the above relations,
 | Park      | Menlo Park | Antz    |
 
 that violates the FD $\text{title city } \rightarrow \text{ theater}$.
+
+## 3.5 Third Normal Form
+
+The solution to the problem illustrated in the previous example is to relax our BCNF requirement slightly, in order to allow the occasional relation schema that cannot be decomposed into BCNF relations without our losing the ability to check the FD's. This relaxed condition is called "third normal form".
+
+### 3.5.1 Definition of Third Normal Form
+
+A relation $R$ is in `third normal form (3NF)` if:
+
+- Whenever $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$ is a nontrivial FD, either
+
+    $$
+    \{A_1, \, A_2,..., \, A_n \}
+    $$
+
+    is a superkey, or those of $B_1, \, B_2,..., \, B_m$ that are not among the $A$'s, are each a member of some key (not necessarily the same key).
+
+An attribute that is a member of some key is often said to be `prime`. Thus, the 3NF condition can be stated as "for each nontrivial FD, either the left side is a superkey, or the right side consists of prime attributes only".
+
+### 3.5.2 The Synthesis Algorithm for 3NF Schemas
+
+We can now explain and justify how we decompose a relation $R$ into a set of relations such that:
+
+1. The relations of the decomposition are all in 3NF.
+2. The decomposition has a lossless join.
+3. The decomposition has the dependency-preservation property.
+
+#### Algorithm 3.26: Synthesis of Third-Normal-Form Relations With a Lossless Join and Dependency Preservation
+
+**INPUT:** A relation $R$ and a set $F$ of functional dependencies that hold for $R$.
+
+**OUTPUT:** A decomposition of $R$ into a collection of relations, each of which is in 3NF. The decomposition has the lossless-join and dependency-preservation properties.
+
+**METHOD:** Perform the following steps:
+
+1. Find a minimal basis for $F$, say $G$.
+2. For each functional dependency $X \rightarrow A$ in $G$, use $XA$ as the schema of one of the relations in the decomposition.
+3. If none of the relation schemas from Step 2 is a superkey for $R$, add another relation whose schema is a key for $R$.
+
+### 3.5.3 Why the 3NF Synthesis Algorithm Works
+
+We need to show three things: that the lossless-join and dependency-preservation properties hold, and that all the relations of the decomposition are in 3NF.
+
+1. `Lossless Join`. Star with a relation of the decomposition whose set of attributes $K$ is a superkey. Consider the sequence of FD's that are used in Algorithm 3.7. to expand $K$ to become $K^+$. Since $K$ is a superkey, we know $K^+$ is all the attributes. The same sequence of FD applications on the tableau cause the subscripted symbols in the row corresponding to $K$ to be equated to unsubscripted symbols in the same order as the attributes were added to the closure. Thus, the chase test concludes that the decomposition is lossless.
+2. `Dependency Preservation`. Each FD of the minimal basis has all its attributes in some relation of the decomposition. Thus, each dependency can be checked in the decomposed relations.
+3. `Third Normal Form`. If we have to add a relation whose schema is a key, then this relation is surely in 3NF. The reason is that all attributes of this relation are prime, and thus no violation of 3NF could be present in this relation.
+
+
