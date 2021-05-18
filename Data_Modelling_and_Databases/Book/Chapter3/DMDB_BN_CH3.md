@@ -387,7 +387,7 @@ $$
 \{\text{title, year, studioName, president, presAddr}\}
 $$
 
-That is, each tuple of this relation tells about a movie, its studio, the president of the studio, and the address of the president of the studio. Three FD's athat we would assume in this relation are
+That is, each tuple of this relation tells about a movie, its studio, the president of the studio, and the address of the president of the studio. Three FD's that we would assume in this relation are
 
 $$
 \text{title year } \rightarrow \text{ studioName} \\
@@ -665,6 +665,7 @@ There are occasional situations where we design a relation schema and find it is
 Example: In this example, we shall suppose that stars may have several addresses, which we break into street and city components. The set of addresses is one of the set-valued properties this relation will store. The second set-valued property of stars that we shall put into this relation is the set of titles and years of movies in which the star appeared.
 
 | $name$    | $street$      | $city$    | $title$             | $year$ |
+| :-------- | :------------ | :-------- | :------------------ | :----- |
 | C. Fisher | 123 Maple St. | Hollywood | Star Wars           | 1977   |
 | C. Fisher | 5 Locust Ln.  | Malibu    | Star Wars           | 1977   |
 | C. Fisher | 123 Maple St. | Hollywood | Empire Strikes Back | 1980   |
@@ -672,9 +673,11 @@ Example: In this example, we shall suppose that stars may have several addresses
 | C. Fisher | 123 Maple St. | Hollywood | Return of the Jedi  | 1983   |
 | C. Fisher | 5 Locust Ln.  | Malibu    | Return of the Jedi  | 1983   |
 
+*Figure 3.10: Sets of addresses independent from movies.*
+
 There is no reason to associate an address with one movie and not another. Thus, the only way to express the fact that addresses and movies are independent properties of stars is to have each address appear with each movie. But when we repeat address and movie facts in all combinations, there is obvious redundancy.
 
-Yet there is BCNF violation in the relation above. There are,in fact, no nontrivial FD's at all.
+Yet there is no BCNF violation in the relation suggested by *Fig. 3.10*. There are, in fact, no nontrivial FD's at all.
 
 We leave it to the reader to check that none of the five attributes is functionally determined by the other four. Since there are no nontrivial FD's, it follows that all five attributes form the only key and that there are no BCNF violations.
 
@@ -699,14 +702,14 @@ $$
 \text{name } \twoheadrightarrow \text{ street city}
 $$
 
-That is, for each star's name, the set of addresses appears in conjunction with each of the star's movies. For an example of how the formal definition of this MVD applies, consider the first and fourth tuple from the relation above:
+That is, for each star's name, the set of addresses appears in conjunction with each of the star's movies. For an example of how the formal definition of this MVD applies, consider the first and fourth tuples from *Fig. 3.10*:
 
 | $name$    | $street$      | $city$    | $title$             | $year$ |
 | :-------- | :------------ | :-------- | :------------------ | :----- |
 | C. Fisher | 123 Maple St. | Hollywood | Star Wars           | 1977   |
 | C. Fisher | 5 Locust Ln.  | Malibu    | Empire Strikes Back | 1980   |
 
-If we let the first tuple be $t$ and the second be $u$, then the MVD asserts that we must also find in $R$ the tuple that has name *C. Fisher*, a street and city that agree with the first tuple, and other attributes (*title* and *year*) that agree with the second tuple. There is indeed such a tuple, it is the third tuple of the relation above.
+If we let the first tuple be $t$ and the second be $u$, then the MVD asserts that we must also find in $R$ the tuple that has name *C. Fisher*, a street and city that agree with the first tuple, and other attributes (*title* and *year*) that agree with the second tuple. There is indeed such a tuple, it is the third tuple of *Fig. 3.10*.
 
 ### 3.6.3 Reasoning About Multivalued Dependencies
 
@@ -748,3 +751,80 @@ An interesting consequence of the complementation rule is that there are some ot
     then $A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m$ holds in $R$.
 
 ### 3.6.4 Fourth Normal Form
+The redundancy that we found in Section 3.6.1 to be cause by MVD's can be eliminated if we use these dependencies for decomposition. In this section we shall introduce a new normal form, called "fourth normal form".
+
+The "fourth normal form" condition is essentially the BCNF condition, but applied to MVD's instead of FD's. Formally:
+
+- A relation $R$ is in `fourth normal form (4NF)` if whenever
+    
+    $$
+    A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m
+    $$
+
+    is a nontrivial MVD, $\{A_1, \, A_2,..., \, A_n \}$ is a superkey.
+
+That is, if a relation is in 4NF, then every nontrivial MVD is really an FD with a superkey on the left.
+
+Example: The relation of *Fig. 3.10* violates the 4NF condition. For example,
+
+$$
+\text{name } \twoheadrightarrow \text{ street city}
+$$
+
+is a nontrivial MVD, yet *name* by itself is not a superkey. In fact, the only key for this relation is all the attributes.
+
+### 3.6.5 Decomposition into Fourth Normal Form
+
+The 4NF decomposition algorithm is quite analogous to the BCNF decomposition algorithm.
+
+#### Algorithm 3.33: Decomposition into Fourth Normal Form
+
+**INPUT:** A relation $R_0$ with a set of functional and multivalued dependencies $S_0$.
+
+**OUTPUT:** A decomposition of $R_0$ into relations all of which are in 4NF. THe decomposition has the lossless-join property.
+
+**METHOD:** Do the following steps, with $R = R_0$ and $S = S_0$:
+
+1. Find a 4NF violation in $R$, say $A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m$, where
+
+    $$
+    \{A_1, \, A_2,..., \, A_n \}
+    $$
+
+    is not a superkey. Note this MVD could be a true MVD in $S$, or it could be derived from the corresponding FD $A_1 A_2 \cdots A_n \rightarrow B_1 B_2 \cdots B_m$ in $S$, since every FD is an MVD. If there is none, return. $R$ by itself is a suitable decomposition.
+2. If there is such a 4NF violation, break the schema for the relation $R$ that has the 4NF violation into two schemas:
+   1. $R_1$, whose schema is $A$'s and the $B$'s.
+   2. $R_2$, whose schema is the $A$'s and all attributes of $R$ that are not among the $A$'s or $B$'s.
+3. Find the FD's and MVD's that hold in $R_1$ and $R_2$. Recursively decompose $R_1$ and $R_2$ with respect to their projected.
+
+Example: Let us continue with the previous example. We observed that
+
+$$
+\text{name } \twoheadrightarrow \text{ street city}
+$$
+
+was a 4NF violation. The decomposition rule above tells us to replace the five-attribute schema by one schema that has only the three attributes in the above MVD and another schema that consists of the side, *name*, plus the attributes that do not appear in the MVD. We get the following two schemas:
+
+$$
+\{\text{name, street, city} \} \\
+\{\text{name, title, year} \}
+$$
+
+In each schema there are no nontrivial multivalued (or functional) dependencies, so they are in 4NF.
+
+Should one or both schemas of the decomposition not be in 4NF, we would have had to decompose the non-4NF schema(s).
+
+### 3.6.6 Relationships Among Normal Forms
+
+As we have mentioned, 4NF implies BCNF, which in turn implies 3NF. Thus. the sets of relation schemas (including dependencies) satisfying the three normal forms are related.
+
+A way to compare the normal forms is by the guarantees they make about the set of relations that result from a decomposition into a normal form. These observations are summarized in the table below:
+
+| Property                           | 3NF | BCNF | 4NF |
+| ---------------------------------: | :-- | :--- | :-- |
+| Eliminates redundancy due to FD's  | No  | Yes  | Yes |
+| Eliminates redundancy due to MVD's | No  | No   | Yes |
+| Preserves FD's                     | Yes | No   | No  |
+| Preserves MVD's                    | No  | No   | No  |
+
+## 3.7 An Algorithm for Discovering MVD's
