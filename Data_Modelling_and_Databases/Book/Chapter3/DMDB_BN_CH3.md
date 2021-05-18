@@ -828,3 +828,46 @@ A way to compare the normal forms is by the guarantees they make about the set o
 | Preserves MVD's                    | No  | No   | No  |
 
 ## 3.7 An Algorithm for Discovering MVD's
+
+Reasoning about MVD's, or combinations of MVD's and FD's, is rather more difficult that reasoning about FD's alone. For FD's, we have Algorithm 3.7. to decide whether or not an FD follows from some given FD's. In this section, we shall first show that the closure algorithm is really the same as the chase algorithm we studied in Section 3.4.2.
+
+### 3.7.1 The Closure and the Chase
+
+In Section 3.2.4 we saw how to take a set of attributes $X$ and compute its closure $X^+$ of all attributes that functionally depend on $X$. In that manner, we can test whether an FD $X \rightarrow Y$ follows from a given set of FD's $F$, by closing $X$ with respect to $F$ and seeing whether $Y \subseteq X^+$. WE could see the closure as a variant of the chase, in which the starting tableau and the goal condition are different from what we used in Section 3.4.2.
+
+A chase-based test for whether $X \rightarrow Y$ follows from $F$ can be summarized as:
+
+1. Start with a tableau having two rows that agree only on $X$.
+2. Chase the tableau using the FD's of $F$.
+3. If the final tableau agrees in all columns of $Y$, then $X \rightarrow Y$ holds. Otherwise it does not.
+
+Example: Let us repeat an example with a relation
+
+$$
+R(A, \, B, \, C, \, D, \, E, \, F)
+$$
+
+with FD's $AB \rightarrow C, \, BC \rightarrow AD, \, D \rightarrow E,$ and $CF \rightarrow B$. WE want to test whether $AB \rightarrow D$ holds. Start with the tableau:
+
+| $A$ | $B$ | $C$   | $D$   | $E$   | $F$   |
+| :-: | :-: | :---: | :---: | :---: | :---: |
+| $a$ | $b$ | $c_1$ | $d_1$ | $e_1$ | $f_1$ |
+| $a$ | $b$ | $c_2$ | $d_2$ | $e_2$ | $f_2$ |
+
+We can apply $AB \rightarrow C$ to infer $c_1 = c_2$. The resulting tableau is:
+
+| $A$ | $B$ | $C$   | $D$   | $E$   | $F$   |
+| :-: | :-: | :---: | :---: | :---: | :---: |
+| $a$ | $b$ | $c_1$ | $d_1$ | $e_1$ | $f_1$ |
+| $a$ | $b$ | $c_1$ | $d_2$ | $e_2$ | $f_2$ |
+
+Next, apply $BC \rightarrow AD$ to infer that $d_1 = d_2$, and apply $D \rightarrow E$ to infer $e_1 = e_2$. At this point, the tableau is:
+
+| $A$ | $B$ | $C$   | $D$   | $E$   | $F$   |
+| :-: | :-: | :---: | :---: | :---: | :---: |
+| $a$ | $b$ | $c_1$ | $d_1$ | $e_1$ | $f_1$ |
+| $a$ | $b$ | $c_1$ | $d_1$ | $e_1$ | $f_2$ |
+
+and we can go no further. Since the two tuples now agree in the D column, we know that $AB \rightarrow D$ does follow from the given FD's.
+
+### 3.7.2 Extending the Chase to MVD's
