@@ -871,3 +871,107 @@ Next, apply $BC \rightarrow AD$ to infer that $d_1 = d_2$, and apply $D \rightar
 and we can go no further. Since the two tuples now agree in the D column, we know that $AB \rightarrow D$ does follow from the given FD's.
 
 ### 3.7.2 Extending the Chase to MVD's
+
+The method of inferring an FD using the chase can be applied to infer MVD's as well.
+
+If we want to infer some MVD $X \twoheadrightarrow Y$ from given FD's and MVD's, we start with the tableau consisting of two tuples that agree in $X$ and disagree in all attributes not in the set $X$. We apply the given FD's to equate symbols, and we apply the given MVD's to swap the values in certain attributes between two existing rows of the tableau in order to add new rows to the tableau. If we ever discover that one of the original tuples, with its components for $Y$ replaced by those of the other original tuple, is in the tableau, then we have inferred the MVD.
+
+Let the two initial rows of the tableau for the test of $X \twoheadrightarrow Y$ have the unsubscripted letters in $X$. Let the first row also have unsubscripted letters in $Y$, and let the second row have the unsubscripted letters in all attributes not in $X$ or $Y$. Fill in the other positions of the rows with new symbols that each occur only once.
+
+Example: Suppose we have a relation $R(A, \, B, \, C, \, D)$ with given dependencies $A \rightarrow B$ and $B \twoheadrightarrow C$. We wish to prove that $A \twoheadrightarrow C$ holds in $R$. Start with the two-row tableau that represents $A \twoheadrightarrow C$:
+
+| $A$ | $B$   | $C$   | $D$   |
+| :-: | :---: | :---: | :---: |
+| $a$ | $b_1$ | $c$   | $d_1$ |
+| $a$ | $b$   | $c_2$ | $d$   |
+
+Notice that our target row is $(a, \, b, \, c, \, d)$. Both rows of the tableau have the unsubscripted letter in the column $A$. The first row has the unsubscripted letter in $C$, and the second row has unsubscripted letter in the remaining columns.  
+We first apply the FD $A \rightarrow B$ to infer that $b = b_1$. We must therefore replace the subscripted $B_1$ by the unsubscripted $b$. The tableau becomes:
+
+| $A$ | $B$ | $C$   | $D$   |
+| :-: | :-: | :---: | :---: |
+| $a$ | $b$ | $c$   | $d_1$ |
+| $a$ | $b$ | $c_2$ | $d$   |
+
+NExt,w e apply the MVD $B \twoheadrightarrow C$, since the two rows now agree in the $B$ column. We swap the $C$ columns to get two new rows which we add to the tableau, which becomes:
+
+| $A$ | $B$ | $C$   | $D$   |
+| :-: | :-: | :---: | :---: |
+| $a$ | $b$ | $c$   | $d_1$ |
+| $a$ | $b$ | $c_2$ | $d$   |
+| $a$ | $b$ | $c_2$ | $d_1$ |
+| $a$ | $b$ | $c$   | $d$   |
+
+We have now a row with all unsubscripted symbols, which proves that $A \twoheadrightarrow C$ holds in relation $R$.
+
+### 3.7.3 Why the Chase Works for MVD's
+
+The arguments are essentially the same as we have given before. Each steps of the chase, whether it equates symbols or generates new rows, is a true observation about tuples of the given relation $R$ that is justified by the FD and MVD that we apply in that step. Thus, a positive conclusion of the chase is always a proof that the concluded FD or MVD holds in $R$.
+
+When the chase ends in failure - the goal row (for an MVD) or the desired equality of symbols (for an FD) is not produced - then the final tableau is a counterexample.
+
+### 3.7.4 Projecting MVD's
+
+Recall that our reason for wanting to infer MVD's was to perform a cascade of decompositions leading to 4NF relations. To do that task, we need to be able to project the given dependencies onto the schemas of the two relations that we get in the first step of the decomposition. Only then can we know whether they are in 4NF or need to be decomposed further.
+
+Example: Suppose we have a relation $R(A, \, B, \, C, \, D, \, E)$ that we decompose, and let one of the relations of the decomposition be $S(A, \, B, \, C)$. Suppose that the MVD $A \twoheadrightarrow CD$ holds in $R$. Does this mVD imply any dependency in $S$ ? We claim that $A \twoheadrightarrow C$ holds in $S$, as does $A \twoheadrightarrow B$ (by the complementation rule).
+
+Often, our search for FD's and MVD's in the projected relations does not have to be completely exhaustive. Here are some simplifications:
+
+1. It is surely not necessary to check the trivial FD's and MVD's.
+2. For FD's, we can restrict ourselves to looking for FD's with a singleton right side, because of the combining rule for FD's.
+3. An FD or MVD whose left side does not contain the left side of any given dependency surely cannot hold, since there is no way for its chase test to get started. That is, the two rows with which you start the test are unchanged by the given dependencies.
+
+## 3.8 Summary for Chapter 3
+
+#### Functional Dependencies
+
+A `functional dependency` is a statement that two tuples of a relation that agree on some particular set of attributes must also agree on some other particular set of attributes.
+
+#### Keys of a Relation
+
+A `superkey` for a relation is a set of attributes that functionally determines all the attributes of the relation. A `key` is a superkey, no proper subset of which is also a superkey.
+
+#### Reasoning About Functional Dependencies
+
+There are many rules that let us infer that one FD $X \rightarrow A$ holds in any relation instance that satisfies some other given set of FD's. To verify that $X \rightarrow A$ holds, compute the closure of $X$, using the given FD's to expand $X$ until it includes $A$.
+
+#### Minimal Basis for a set of FD's
+
+For any set of FD's, there is at least one `minimals basis`, which is a set of FD's equivalent to the original, with singleton right sides, no FD that can be eliminated while preserving equivalence, and no attribute in a left side that can be eliminated while preserving equivalence
+
+#### Boyce-Codd Normal Form
+
+A relation is in `BCNF` if the only nontrivial FD's say that some superkey functionally determines one or more of the other attributes.
+
+#### Lossless-Join Decomposition
+
+A useful property of a decomposition is that the original relation can be recovered exactly by taking the natural join of the relations in the decomposition.
+
+#### Dependency-Preserving Decomposition
+
+Another desireable property of a decomposition is that we can check all the functional dependencies that hold in the original relation by checking FD's in the decomposed relations.
+
+#### Third Normal Form
+
+Sometimes decomposition into BCNF cal lose the dependency-preservation property. A relaxed form of BCNF, called 3NF, allows an FD $X \rightarrow A$ even if $X$ is not a superkey, provided $A$ is a member of some key.
+
+#### The Chase
+
+We can test whether a decomposition has the lossless-join property by setting up a tableau - a set of rows that represent tuples of the original relation. We chase a tableau by applying the given functional dependencies to infer that certain pairs of symbols must be the same.
+
+#### Synthesis Algorithm for 3NF
+
+If we take a minimal basis for a given set of FD's, turn each of these FD's into a relation, and add a key for the relation, if necessary, the result is a decomposition into 3NF that has the lossless-join and dependency-preservation properties.
+
+#### Multivalued Dependencies
+
+A `multivalued dependency` is a statement that two sets of attributes in a relation have sets of values that appear in all possible combinations.
+
+#### Fourth Normal Form
+
+MVD's can also cause redundancy in a relation. 4NF is like BCNF, but also forbids nontrivial MVD's whose left side is not a superkey.
+
+#### Reasoning About MVD's 
+
+We can infer MVD's and FD's from a given set of MVD's and FD's by a chase process.
