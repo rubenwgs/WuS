@@ -141,6 +141,6 @@ A simple and effective way to schedule large numbers of block requests is known 
 
 ### 13.3.6 Prefetching and Large-Scale Buffering
 
-Our final suggestion for speeding up some secondary-memory algorithm is called `prefetching`or sometimes `double buffering`. In some applications we can predict the order in which blocks will be requested from disk. If so, then we can load them into main memory buffers before they are needed.
+Our final suggestion for speeding up some secondary-memory algorithm is called `prefetching` or sometimes `double buffering`. In some applications we can predict the order in which blocks will be requested from disk. If so, then we can load them into main memory buffers before they are needed.
 
 ## 13.4 Disk Failures
