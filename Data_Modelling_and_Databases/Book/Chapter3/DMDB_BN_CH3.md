@@ -450,7 +450,7 @@ In general, we must keep applying the decomposition rule as many times as needed
 **OUTPUT:** A decomposition of $R_0$ into a collection of relations, all of which are in BCNF.
 
 **METHOD:** The following steps can be applied recursively to any relation $R$ and set of FD's $S$. Initially, apply them with $R=R_0$ and $S=S_0$.
- 
+
 1. Check whether $R$ is in BCNF. If som nothing more needs to be done. Return $\{R \}$ as the answer. 
 2. If there are BCNF violations, let one be $X \rightarrow Y$. Use Algorithm 3.7 to compute $X^+$. Choose $R_1=X^+$ as one relation schema and let $R_2$ have attributes $X$ and those attributes of $R$ that are not in $X^+$.
 3. Use Algorithm 3.12 to compute the sets of FD's for $R_1$ and $R_2$, let these be $S_1$ and $S_2$ respectively.
@@ -756,7 +756,7 @@ The redundancy that we found in Section 3.6.1 to be cause by MVD's can be elimin
 The "fourth normal form" condition is essentially the BCNF condition, but applied to MVD's instead of FD's. Formally:
 
 - A relation $R$ is in `fourth normal form (4NF)` if whenever
-    
+  
     $$
     A_1 A_2 \cdots A_n \twoheadrightarrow B_1 B_2 \cdots B_m
     $$
@@ -893,7 +893,7 @@ We first apply the FD $A \rightarrow B$ to infer that $b = b_1$. We must therefo
 | $a$ | $b$ | $c$   | $d_1$ |
 | $a$ | $b$ | $c_2$ | $d$   |
 
-NExt,w e apply the MVD $B \twoheadrightarrow C$, since the two rows now agree in the $B$ column. We swap the $C$ columns to get two new rows which we add to the tableau, which becomes:
+Next,w e apply the MVD $B \twoheadrightarrow C$, since the two rows now agree in the $B$ column. We swap the $C$ columns to get two new rows which we add to the tableau, which becomes:
 
 | $A$ | $B$ | $C$   | $D$   |
 | :-: | :-: | :---: | :---: |
@@ -975,3 +975,4 @@ MVD's can also cause redundancy in a relation. 4NF is like BCNF, but also forbid
 #### Reasoning About MVD's 
 
 We can infer MVD's and FD's from a given set of MVD's and FD's by a chase process.
+
