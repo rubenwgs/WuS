@@ -238,3 +238,50 @@ For the matrix of *Fig. 13.10*, this rule implies:
 1. The bits of disk 5 are the modulo-2 sum of the corresponding bits of disks 1, 2, and 3.
 2. The bits of disk 6 are the modulo-2 sum of the corresponding bits of disks 1, 2, and 4.
 3. The bits of disk 7 are the modulo-2 sum of the corresponding bits of disks 1, 3, and 4.
+
+## 13.5 Arranging Data on Disk
+
+We now turn to the matter of how disks are used to store databases. A data element such as a tuple or object is represented by a `record`, which consists of consecutive bytes in some disk block.
+
+It is normal for a disk block to hold only elements of one relation, although there are organizations where blocks hold on tuples of several relations.
+
+### 13.5.1 Fixed-Length Records
+
+The simplest sort of record consists of fixed-length `fields`, one for each attribute of the represented tuple.  
+It is common to begin all fields at a multiple of 4 or 8, as appropriate. Space not used by the previous field is wasted.
+
+Often, the record begins with a `header`, a fixed-length region where information about the record itself is kept. For example, we may want to keep in the record:
+
+1. A pointer to the schema for the data stored in the record.
+2. The length of the record.
+3. Timestamps indicating the time the record was last modified, or last read.
+4. Pointers to the fields of the record.
+
+```sql
+    /* Code 13.15: A SQL table declaration. */
+    CREATE TABLE MovieStar(
+        name CHAR(30) PRIMARY KEY,
+        address VARCHAR(255),
+        gender CHAR(1),
+        birthdate DATE
+    );
+```
+
+Example: *Code 13.15.* repeats our running *MovieStar* schema. Let us assume all fields must start at a byte that is a multiple of four. Tuples of this relation have a header and the following four fields:
+
+1. The first field is for *name*, and this field requires 30 bytes. We allocate therefore 32 bytes for the *name*.
+2. The next attribute is *address*. A *VARCHAR* attribute requires a fixed-length segment of bytes,w ith one more byte than the maximum length for the string's endmarker. Thus, we need 256 bytes for *address*.
+3. Attribute *gender* is a single byte. We allocate therefore 4 bytes.
+4. Attribute *birthdate* is a SQL *DATE* value, which is a 10-byte string. WE shall allocate 12 bytes to its field.
+
+The header of the record will hold:
+
+1. A pointer to the record schema.
+2. The record length.
+3. A timestamp indicating when the record was created.
+
+We shall assume each of these items is 4 bytes long. *Fig. 13.16* shows the layout of the record for a *MovieStar* tuple. The length of the record is 316 bytes.
+
+<img src="./Figures/DMDB_BN_Fig13-5.JPG" width="550px"/><br>
+
+
