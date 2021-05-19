@@ -144,3 +144,97 @@ A simple and effective way to schedule large numbers of block requests is known 
 Our final suggestion for speeding up some secondary-memory algorithm is called `prefetching` or sometimes `double buffering`. In some applications we can predict the order in which blocks will be requested from disk. If so, then we can load them into main memory buffers before they are needed.
 
 ## 13.4 Disk Failures
+
+In this section we shall consider the ways in which disks can fail and what can be done to mitigate these failures.
+
+1. The most common form of failure is an `intermittent failure`, where an attempt to read or write a sector is unsuccessful, but with repeated tries we are able to read or write successfully.
+2. A more serious form of failure is one in which a bit or bits are permanently corrupted, and it becomes impossible to read a sector correctly no matter how many times we try. This form of error is called `media decay`.
+3. A related type of error is a `write failure`, where we attempt to write a sector, but we can neither write successfully nor can we retrieve the previously written sector.
+4. The most serious form of disk failure is a `Disk crash? , where the entire disk becomes unreadable, suddenly and permanently.
+
+### 13.4.1 Intermittent Failures
+
+An intermittent failure occurs if we try to read a sector, but the correct content of that sector is not delivered to the disk controller.
+
+Similarly, the controller may attempt to write a sector, but the contents of the sector are not what was intended. The only way to check that the write was correct is to let the disk go around again and read the sector.  
+However, instead of performing the complete comparison at the disk controller, it is simpler to read the sector and see if a good sector was read.
+
+### 13.4.2 Checksums
+
+How a reading operation can determine the good/bad status of a sector may appear mysterious at first. Each sector has some additional bits, called the `checksum`, that are set depending oh the values of the data bits stored in that sector. IF, on reading, we find that the checksum is not proper for the data bits, then we know there is an error in reading.
+
+### 13.4.3 Stable Storage
+
+While checksums will almost certainly detect the existence of a media failure or a failure to read or write correctly, it does not help us correct the error.
+
+To deal with this problem, we can implement a policy known as `stable storage` on a disk or on several disks. The general idea is that sectors are paired, and each pair represents one sector-contents $X$. WE shall refer to the pair of sectors representing $X$ as the "left" and "right" copies, $X_L$ and $X_R$.
+
+We shall assume that if the read function returns a good value $w$ for either $X_L$ or $X_R$, then $w$ is the true value of $X$. The stable-storage writing policy is:
+
+1. Write the value of $X$ into $X_L$. Check that the value has status "good", ie.e. the parity-check bits are correct in the written copy. IF after a set number of write attempts, we have not successfully written $X$ into $X_L$, assume that there is a media failure in this sector.
+2. Repeat $(1)$ for $X_R$.
+
+The stable-storage reading policy is to alternate trying to read $X_L$ and $X_R$, until a good value is returned.
+
+### 13.4.4 Error-Handling Capabilities of Stable Storage
+
+The policies described in the previous section are capable of compensating for several different kinds of errors. We shall outline them here:
+
+1. `Media failures`: IF, after storing $X$ in sectors $X_L$ and $X_R$, one of them undergoes a media failure and becomes permanently unreadable, we can always read $X$ from the other.
+2. `Write failure`: Suppose that as we write $X$, there is a system failure. When the system becomes available and we examine $X_L$ and $X_R$, we are sure to be able to determine either the old or new value of $X$.
+
+### 13.4.5 Recover from Disk Crashes
+
+The most serious mode of failure for disks is the "disk crash" or "head crash", where data is permanently destroyed. If the data was not backed up on another medium, such as a tape backup system, then there is nothing we can do to recover the data.
+
+Several schemes have been developed to reduce the risk of data loss by disk crashes. The common term for this class of strategies is `Redundant Arrays of Independent Disks (RAID)`.
+
+The rate at which disk crashes occur is generally measured by the `mean time to failure`, the time after which 50% of a population of disks can be expected to fail and be unrecoverable.  
+In the remainder of this section, we shall study the most common schemes. Each of these schemes starts with one or more disks that hold the data (we call these the `data disks`) and adding one or more disks that hold information that is completely determined by the contents of the data disks. The latter are called `redundant disks`.
+
+### 13.4.6 Mirroring as a Redundancy Technique
+
+The simplest scheme is to mirror each disk. We shall call one of the disks the `data disk`, while the other is the `redundant disk`. Mirroring, as a protection against data loss, is often referred to as `RAID level 1`.
+
+### 13.4.7 Parity Blocks
+
+While mirroring disks is an effective way to reduce the probability of a disk crash involving data loss, it used as many redundant disks as there are data disks. Another approach, often called `RAID level 4`, uses only one redundant disk, no matter how many data disks there are.
+
+In the redundant disk, the $i$th block consists of parity checks for the $i$th blocks of all the data disks. That is, the $j$th bits of all the $i$th blocks, including both the data disks and the redundant disk, must have an even number of $1$'s among them.
+
+#### Reading
+
+Reading blocks from a data disk is no different from reading blocks from any disk.
+
+#### Writing
+
+When we write a new block of data disk, we need not only to change that block, but we need to change the corresponding block of the redundant disk so it continues to hold the parity checks for the corresponding blocks of all the data disks.
+
+#### Failure Recovery
+
+Let us consider what we would do if one of the disks crashed. If it is the redundant disk, we swap in anew disk, and recompute the redundant blocks. If the failed disk is one of the data disks, then we need to swap in a good disk and recompute its data from the other disks.
+
+Since we know that the number of $1$'s among corresponding bits of all disks is even, it follows that:
+
+- The bit in any position is the modulo-2 sum of all the bits in the corresponding positions of all the other disks.
+
+### 13.4.8 An Improvement: RAID 5
+
+The RAID level 4 strategy effectively preserves data unless there are two almost simultaneous disk crashes.  
+However, as we observed, the rule for recovery is the same as for the data disks and redundant disks: take the modulo-2 sum of corresponding bits of the other disks. Thus, we do not have to treat one disk as the redundant disk and the others as data disks. Rather, we could treat each disk as the redundant disk for some of the blocks. This improvement os often called `RAID level 5`.
+
+### 13.4.9 Coping With Multiple Disk Crashes
+
+There is a theory of error-correcting codes that allows us to deal with any number of disk crashes - data or redundant - if we use enough redundant disks. This strategy leads to highest RAID "level", `RAID level 6`.
+
+<img src="./Figures/DMDB_BN_Fig13-4.JPG" width="350px"/><br>
+
+*Figure 13.10: Redundancy patter for a system that can recover from two simultaneous disk crashed.*
+
+The meaning of each of the three rows of $0$'s and $1$'s is that if we look at the corresponding bits from all seven disks, and restrict our attention to those disks that have $1$ in that row, then the modulo-2 sum of these bits must be $0$.
+
+For the matrix of *Fig. 13.10*, this rule implies:
+
+1. The bits of disk 5 are the modulo-2 sum of the corresponding bits of disks 1, 2, and 3.
+2. The bits of disk 6 are the modulo-2 sum of the corresponding bits of disks 1, 2, and 4.
+3. The bits of disk 7 are the modulo-2 sum of the corresponding bits of disks 1, 3, and 4.
