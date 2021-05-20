@@ -4,11 +4,11 @@
 - Date: 18.05.2021
 - Contact: ruben.schenk@inf.ethz.ch
 
-# 13. Secondary Storage MAnagement
+# 13. Secondary Storage Management
 
 Database systems always involve secondary storage - the disks and other device that store large amounts of data that persist over time. This chapter summarizes what we need to know about how a typical computer system manages storage. We review the memory hierarchy of devices with progressively slower access but larger capacity.
 
-## 13.1 The MEmory Hierarchy
+## 13.1 The Memory Hierarchy
 
 We begin this section by examining the memory hierarchy of a computer system. We then focus on disks, by far the most common device at the "secondary-storage" level of the hierarchy.
 
@@ -167,7 +167,7 @@ How a reading operation can determine the good/bad status of a sector may appear
 
 While checksums will almost certainly detect the existence of a media failure or a failure to read or write correctly, it does not help us correct the error.
 
-To deal with this problem, we can implement a policy known as `stable storage` on a disk or on several disks. The general idea is that sectors are paired, and each pair represents one sector-contents $X$. WE shall refer to the pair of sectors representing $X$ as the "left" and "right" copies, $X_L$ and $X_R$.
+To deal with this problem, we can implement a policy known as `stable storage` on a disk or on several disks. The general idea is that sectors are paired, and each pair represents one sector-contents $X$. We shall refer to the pair of sectors representing $X$ as the "left" and "right" copies, $X_L$ and $X_R$.
 
 We shall assume that if the read function returns a good value $w$ for either $X_L$ or $X_R$, then $w$ is the true value of $X$. The stable-storage writing policy is:
 
@@ -272,7 +272,7 @@ Example: *Code 13.15.* repeats our running *MovieStar* schema. Let us assume all
 1. The first field is for *name*, and this field requires 30 bytes. We allocate therefore 32 bytes for the *name*.
 2. The next attribute is *address*. A *VARCHAR* attribute requires a fixed-length segment of bytes,w ith one more byte than the maximum length for the string's endmarker. Thus, we need 256 bytes for *address*.
 3. Attribute *gender* is a single byte. We allocate therefore 4 bytes.
-4. Attribute *birthdate* is a SQL *DATE* value, which is a 10-byte string. WE shall allocate 12 bytes to its field.
+4. Attribute *birthdate* is a SQL *DATE* value, which is a 10-byte string. We shall allocate 12 bytes to its field.
 
 The header of the record will hold:
 
@@ -284,4 +284,51 @@ We shall assume each of these items is 4 bytes long. *Fig. 13.16* shows the layo
 
 <img src="./Figures/DMDB_BN_Fig13-5.JPG" width="550px"/><br>
 
+*Figure 13.16: Layout of records for tuples of the MovieStar* relation. *
 
+### 13.5.2 Packing Fixed-Length Records into Blocks
+
+Records representing tuples of a relation are stored in blocks of the disk and moved into main memory when we need to access or update them. The layout of a block that holds records is suggested in the figure below:
+
+<img src="./Figures/DMDB_BN_Fig13-6.PNG" width="500px"/><br>
+
+*Figure 13.17: A typical block holding records.*
+
+In addition to the records, there is a `block header` holding information such as:
+
+1. Links to one or more other blocks that are part of a network of blocks.
+2. Information about the role played by this block in such a network.
+3. Information about which relation the tuples of this block belong to.
+4. A "directory" giving the offset of each record in the block.
+5. Timestamps indicating the time of the block's last modification and/or access.
+
+## 13.6 Representing Block and Record Addresses
+
+When in main memory, the address of a block is the virtual-memory address of its first byte, and the address of a record within that block is the virtual-memory address of the first byte of that record.
+
+### 13.6.1 Addresses in Client-Server Systems
+
+Commonly, a database system consists of a `server` process that provides data from secondary storage to one or more `client` processes that are applications using the data.
+
+The client application uses a conventional "virtual" address space, typically 32 bits, or about 4 billion different addresses.s
+
+The server's data lives in a `database address space`. The addresses of this space refer to blocks, and possibly to offsets within the block. There are several way that addresses in this address space can be represented:
+
+1. `Physical Addresses`. These are byte strings that let us determine the place within the secondary storage system where the block or record can be found. One or more bytes of the physical address are used to indicate each of:
+
+    - The host to which the storage is attached,
+    - An identifier for the disk or other device on which the block is located,
+    - The number of the cylinder of the disk,
+    - The number of the track within the cylinder,
+    - The number of the block within the track, and
+    - The offset of the beginning of the record within the block.
+
+2. `Logical Address`. Each block or record has a "logical address", which is an arbitrary string of bytes of some fixed length. A `map table`, stored on disk in a known location, relates logical to physical addresses, as suggested in the figure below:
+
+<img src="./Figures/DMDB_BN_Fig13-7.PNG" width="350px"/><br>
+
+*Figure 13.18: A map table translates logical to physical addresses.*
+
+### 13.6.2 Logical and Structured Addresses
+
+One might wonder what the prupose of logical addresses could be. All the infortmation needed for a physical address is found in the map table, and following logical pointers to records requires consulting the map table and then going to the phyiscal address.
