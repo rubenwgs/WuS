@@ -366,4 +366,152 @@ Therefore, when we write a block back to disk, we not only need to "unswizzle" a
 
 ## 13.7 Variable-Length Data and Records
 
+Until now, we have made the simplifying assumptions that records have a fixed schema, and that the schema is a list of fixed-length fields. However, in practice, we also may wish to represent:
 
+1. `Data items whose size varies`
+2. `Repeating fields`
+3. `Variable-format records`
+4. `Enormous fields`
+
+### 13.7.1 Records With Variable-Length Fields
+
+If one or more fields of a record have variable length, then the record must contain enough information to let us find any field of the record. A simple but effective scheme is to put all fixed-length fields ahead of the variable-length fields. We then place in the record header:
+
+1. The length of the record.
+2. Pointers to the beginnings of all the variable-length fields other than the first.
+
+### 13.7.2 Records With Repeating Fields
+
+A similar situation occurs if a record contains a variable number of occurrences of a field $F$, but the field itself is of fixed length.  It is sufficient to group all occurrences of field $F$ together and put in the record header a pointer to the first. If $F$ is of length $L$, then we add to the offset for the field $F$ all integer multiplies of $L$, starting at $0$, then $L$, $2L$, $3L$, and so on.
+
+### 13.7.3 Variable-Format Records
+
+An even more complex situation occurs when records do not have a fixed schema. The simplest representation of variable-format records is a sequence of `tagged fields`, each of which consists of the value of the field preceded by information about the role of this field, such as:
+
+1. The attribute or field name,
+2. The type of the field, if it is not apparent from the field name and some readily available schema information, and
+3. The length of the field, if it is not apparent from the type.
+
+### 13.7.4 Records That Do Not Fit in a Block
+
+Today, DBMS's frequently are used to manage datatypes with large values, often values that do not fit in one block. Typical examples are video or audio clips.
+
+The portion of a record that appears in one block is called a `record fragment`. A record with two or more fragments is called `spanned`, and records that do not cross a block boundary are `unspanned`.  
+
+### 13.7.5 BLOBs
+
+Now, let us consider the representation of truly large values for records or fields of records. The common example includes images in various formats, movies in formats such as MPEG, or signals of all sorts.  
+Such values are often called `binary, large objects` or `BLOBs`.
+
+A BLOB must be stored on a sequence of blocks. Often we prefer that these blocks are allocated consecutively on a cylinder or cylinders of the disk, so the BLOB may be retrieved efficiently.  
+Moreover, it is possible that the BLOB needs to be retrieved so quickly, that storing it on one disk does not allow us to retrieve it fast enough. Then, it is necessary to `stripe` the BLOB across several disks, that is, to alternate blocks of the BLOB among these disks.
+
+### 13.7.6 Column Stores
+
+An alternative to storing tuples as records is to store each column as a record. Since an entire column of a relation may occupy far more than a single block, these records may span many blocks, much as long files do.
+
+If we store relations by columns, it is often possible to `compress` data, then the values all have a known type. For example, an attribute *gender* in a relation might have type *CHAR(1)*, but we would use four bytes in a tuple-based record. However, if all we are storing is a sequence of *gender* values, then it would make sense to store the column by a sequence of bits. If we did so, we would compress the data by a factor of 32.
+
+## 13.8 Record Modifications
+
+Insertions, deletions, and updates of records often create special problems. These problems are most severe when the records change their length, but they come up even when records and fields are all of fixed length.
+
+### 13.8.1 Insertion
+
+If we can find room for the inserted record in the block at hand, then we simply slide the records within the block and adjust the pointers in the offset table.  
+However, there may be no room in the block for the new record, in which case we have to find room outside the block. There are two major approaches to solving this problem, as well as combinations of these approaches:
+
+1. `Find space on a "nearby" block`: For example, if block $B_1$ has no available space for a record that needs to be inserted in sorted order into that block, then look at the following block $B_2$.
+2. `Create an overflow block`: In this scheme, each block $B$ has in its header a place for a pointer to an `overflow` block where additional records that theoretically belong in $B$ can be placed.
+
+### 13.8.2 Deletion
+
+When we delete a record, we may be able to reclaim its space. We need to make use of this fact by either sliding around blocks  by changing the offset or by maintaining an available-space list in the block header.
+
+There is one additional complication involved in deletion which we must remember. There may be pointers to the deleted record, and if so, we don't want these pointers to dangle or wind up pointing to a new record that is put into the place of the deleted record.  
+The usual technique is to place a `tombstone` in place of the record. This tombstone is permanent, it must exist until the entire database is reconstructed.
+
+### 13.8.3 Update
+
+When a fixed length record is updated, there is no effect on the storage system, because we know it can occupy exactly the same space it did before the update.
+
+If the update record is longer than the old version, then we may need to create more space on its block. This process may involve sliding records or even the creation of an overflow block.  
+Conversely, if the record shrinks because of the update, we have the same opportunities as with a deletion to recover or consolidate space.
+
+## 13.9 Summary of Chapter 13
+
+#### Memory Hierarchy
+
+A computer system uses storage components ranging over many orders of magnitude in speed, capacity, and cost per bit.
+
+#### Disks/Secondary Storage
+
+`Secondary storage` devices are principally magnetic disks with multigigabyte capacities.
+
+#### Blocks and Sectors
+
+Tracks are divided into sectors, which are separated by unmagnetized gaps. Sectors are the unit of reading and writing from the disk. Blocks are logical units of storage used by an application such as DBMS.
+
+#### Disk Controller
+
+The disk controller is a processor that controls one or more disk units.
+
+#### Disk Access Time
+
+The latency of a disk is the time between a request to read or write a block, and the time the access is completed.
+
+#### Speeding Up Disk Access
+
+The techniques for accessing disk blocks faster include dividing the data among several disks (striping), mirroring disks, and organizing data that will be accessed together by tracks or cylinders.
+
+#### Elevator Algorithm
+
+We can also speed accesses by queueing access requests and handling them in an order that allows the heads to make one sweep across the disk.
+
+#### Disk Failure Modes
+
+To avoid loss of data, systems must be able to handle errors. The principal types of disk failure are intermittent, permanent, and the disk crash, where the entire disk becomes unreadable.
+
+#### Checksums
+
+By adding a parity check, intermittent failures and permanent failures can be detected, although not corrected.
+
+#### Stable Storage
+
+By making two copies of all data and being careful about the order in which those copies are written, a single disk can be used to protect against almost all permanent failures of a single sector.
+
+#### RAID
+
+These schemes allow data to survive a disk crash.
+
+#### Records
+
+Records are composed of several fields plus a record header. The header contains information about the record, possibly including such matters as a timestamp, schema information, and a record length.
+
+#### Blocks
+
+Records are generally stored within blocks. A block header, with information about that block, consumes some of the space in the block, with the remainder occupied by one or more records.
+
+#### Spanned Records
+
+If records are longer than blocks, or we wish to make use of leftover space within blocks, then we can break records into two or more fragments, one on each block.
+
+#### BLOBs
+
+Very large values, such as images and videos, are called BLOBs. These values must be stored across many blocks and many require specialized storage techniques such as reserving a cylinder or striping the blocks of the BLOB.
+
+#### Database Addresses
+
+Data managed by a DBMS is found among several storage devices, typically disks. To locate blocks and records in this storage system, we can use physical addresses, which are a description of the device number, cylinder track, sector(s), and possibly byte within a sector.
+
+#### Pointer Swizzling
+
+When disk blocks are brought to main memory, the database addresses need to be translated to memory addresses, if pointers are to be followed. The translation is called swizzling.
+
+#### Tombstones
+
+When a record is deleted, pointers to it will dangle. A tombstone in place of the deleted record warns the system that the record is no longer there.
+
+#### Pinned Blocks
+
+For various reasons, including the fact that a block may contain sizzled pointers, it may be unacceptable to copy a block from memory back to its place on disk.
