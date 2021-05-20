@@ -290,7 +290,7 @@ We shall assume each of these items is 4 bytes long. *Fig. 13.16* shows the layo
 
 Records representing tuples of a relation are stored in blocks of the disk and moved into main memory when we need to access or update them. The layout of a block that holds records is suggested in the figure below:
 
-<img src="./Figures/DMDB_BN_Fig13-6.PNG" width="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig13-6.PNG" width="550px"/><br>
 
 *Figure 13.17: A typical block holding records.*
 
@@ -331,4 +331,39 @@ The server's data lives in a `database address space`. The addresses of this spa
 
 ### 13.6.2 Logical and Structured Addresses
 
-One might wonder what the prupose of logical addresses could be. All the infortmation needed for a physical address is found in the map table, and following logical pointers to records requires consulting the map table and then going to the phyiscal address.
+One might wonder what the purpose of logical addresses could be. All the information needed for a physical address is found in the map table, and following logical pointers to records requires consulting the map table and then going to the physical address.  
+If we use a map table, then all pointers to the record refer to this map table, and all we have to do when we move or delete the record is to change the entry for that record in the table.
+
+Many combinations of logical and physical addresses are possible as well, yielding `structured address schemes`. For instance, one could use a physical address for the block, and add the key value for the record being referred to.
+
+A similar, and very useful, combination of physical and logical addresses is to keep in each block an `offset table` that holds the offsets of the records within the block as shown in the figure below:
+
+<img src="./Figures/DMDB_BN_Fig13-8.PNG" width="550px"/><br>
+
+### 13.6.3 Pointer Swizzling
+
+Often, pointers or addresses are part of records. This situation is not typical for records that represent tuples of a relation, but it is common for tuples that represent objects.s
+
+As we mentioned earlier, every block, record, object, or other referenceable data item has two forms of address: its `database address` in the server's address space, and a `memory address` if the item is currently copied in virtual memory.  
+When in secondary storage, we must use the database address. When the item is in the main memory, we can refer to the item by either its database address or its memory address.
+
+Following a database address is much more time-consuming. We need a table that translates from all those database addresses that are currently in virtual memory to their current memory address. Such a table is called a `translation table`.
+
+To avoid the cost of translating from database addresses to memory addresses, several techniques have been developed that are collectively known as `pointer swizzling`. The general idea is that when we move a block from secondary to main memory, pointers within the block may be "swizzled", that is, translated from the database address space to the virtual address space.
+
+### 13.6.4 Returning Blocks to Disk
+
+When a block is moved from memory back to disk, any pointers within that block must be "unswizzled", that is, their memory address must be replaced by the corresponding database address.
+
+### 13.6.5 Pinned Records and Blocks
+
+A block in memory is said to be `pinned` if it cannot at the moment be written back to disk safely. A bit telling whether or not a block is pinned can be located in the header of the block.
+
+If block $B_1$ has within it a swizzled pointer to some data item in block $B_2$, then we must be very careful about moving block $B_2$ back to disk and reusing its main-memory buffer. The reason is that, should we follow the pointer in $B_1$, it will lead us to the buffer, which no longer holds $B_2$.  
+A block, like $B_2$, that is referred to by a swizzled pointer from somewhere else is therefore pinned.
+
+Therefore, when we write a block back to disk, we not only need to "unswizzle" any pointers in that block, but also make sure it is not pinned.
+
+## 13.7 Variable-Length Data and Records
+
+
