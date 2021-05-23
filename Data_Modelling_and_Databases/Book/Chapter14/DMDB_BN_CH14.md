@@ -204,3 +204,60 @@ B-trees allow lookup, insertion, and deletion of records using very few disk I/O
 
 However, every search of records with a given search key requires us to go from the root down to a leaf, to find a pointer to the record. Since we are only reading B-tree blocks, the number of disk I/O's will be the number of levels the B-tree has, plus the one (for lookup) or two (for insert or delete) disk I/O's needed for manipulation of the record itself.  
 For a typical size of keys, pointers, and blocks, three levels are sufficient for all but the largest databases. Thus, we shall generally take $3$ as the number of levels for a B-tree.
+
+## 14.3 Hash Tables
+
+We assume the reader has seen the hash table used as a main-memory data structure. In such a structure there is a `hash function h` that takes a search key (the `hash key`) as an argument and computes from it an integer in the range $0$ to $B-1$, where $B$ is the number of `buckets`. A `bucket array`, which is an array indexed from $0$ to $B-1$, holds the headers of $B$ linked lists, one for each bucket of the array. If a record has a search key $K$, then we store the record by linking it to the bucket list for the bucket numbered $h(K)$.
+
+### 14.3.1 Secondary-Storage Hash Tables
+
+A `hash table` holding a very large number of records and kept in secondary storage, differs from the main-memory version in small but important ways. First, the bucket array consists of blocks, rather than pointers to the headers of lists.
+
+Records that are hashed by the has function $h$ to a certain bucket are put in the block for that bucket. If a bucket has too many records, a chain of overflow blocks can be added to the bucket to hold more records.
+
+Example: Fig. 14.20 below shows a hash table. To keep our illustrations simple, we assume that a block can hold only two records, and that $B = 4$. For example, $h(d) = 0$ and $h(b) = 2$.
+
+<img src="./Figures/DMDB_BN_Fig14-20.JPG" height="350px"/><br>
+
+*Figure 14.20: A hash table.*
+
+### 14.3.2 Insertion Into a Hash Table
+
+When a new record with search key $K$ must be inserted, we compute $h(K)$. If the bucket numbered $h(K)$ has space, then we insert the record into the block for this bucket, or into one of the overflow blocks on its chain if there is no room in the first block. If none of the blocks of the chain for bucket $h(K)$ has room, we add a new overflow block to the chain and store a new record there.
+
+Example: Suppose we add to the hash table of Fig. 14.20 a record with key $g$, and $h(g) = 1$. The insertion is shown in Fig. 14.21 below.
+
+<img src="./Figures/DMDB_BN_Fig14-21.JPG" height="350px"/><br>
+
+### 14.3.3 Hash-Table Deletion
+
+Deletion of the record with search key $K$ follows the same pattern as insertion. We go to the bucket numbered $h(K)$ and search for records with that search key. Any that we find are deleted. If we are able to move records around among blocks, then after deletion we may optionally consolidate the blocks of a bucket into one fewer block.
+
+### 14.3.4 Efficiency of Hash Table Indexes
+
+Ideally, there are enough buckets that most of them fit on one block. If so, then the typical lookup takes only one disk I/O, and insertion or deletion from the file takes only two disk I/O's.
+
+However, if the file grows, then we shall eventually reach a situation where there are many blocks in the chain for a typical bucket. If so, then we need to search a long list of blocks, taking at least one disk I/O per block.
+
+The hash tables we have examined so fare are called `static hash tables`, because $B$, the number of buckets, never changes. However, there are several kind s of `dynamic hash tables`, where $B$ is allowed to vary so it approximates the number of records divided by the number of records that fit on a block.
+
+### 14.3.5 Extensible Hash Tables
+
+Our first approach to dynamic hashing is called `extensible hash tables`. The major additions to the simpler static hash table structure are:
+
+1. There is a level of indirection for the buckets. That is, an array of pointers to blocks represents the buckets, instead of the array holding thd data blocks themselves.
+2. The array of pointers can grow. Its length is always a power of $2$, so in a growing step the number of buckets doubles.
+3. However, there does not have to be a data block for each bucket. Certain buckets can share a block if the total number or records in those buckets can fit in the block.
+4. The hash function $h$ computes for each key a sequence of $k$ bits for some large $k$, say 32. However, the bucket numbers will at all times use some smaller number of bits, say $i$ bits, from the beginning or end of this sequence. The bucket array will have $2^i$ entries when $i$ is the number of bits used.
+
+### 14.3.6 Insertion Into Extensible Hash Tables
+
+*Left out.*
+
+### 14.3.7 Linear Hash Tables
+
+*Left out.*
+
+### 14.3.8 Insertion Into Linear Hash Tables
+
+*Left out.*
