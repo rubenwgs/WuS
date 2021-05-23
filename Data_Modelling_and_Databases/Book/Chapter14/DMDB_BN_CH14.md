@@ -22,7 +22,7 @@ Since keys and pointers presumably take much less space than complete records, w
 
 Example: Fig. 14.2 below suggests a dense index on a sorted file.
 
-<img src="./Figures/DMDB_BN_Fig14-2.JPG" width="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig14-2.JPG" width="550px"/><br>
 
 *Figure 14.2: A dense index file (left) on a sequential data file (right).*
 
@@ -35,7 +35,7 @@ A `sparse index` typically has only one key-pointer pair per block of the data f
 
 Example: Fig. 14.3 below shows a sparse index.
 
-<img src="./Figures/DMDB_BN_Fig14-3.JPG" width="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig14-3.JPG" width="550px"/><br>
 
 *Figure 14.3: A sparse index on a sequential file.*
 
@@ -47,7 +47,7 @@ An index file can cover many blocks. By putting an index on the index, we can ma
 
 Fig. 14.4 below extends Fig. 14.3 by adding a second index level. The same idea would let us place a third-level index on the second level, and so on.
 
-<img src="./Figures/DMDB_BN_Fig14-4.JPG" width="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig14-4.JPG" width="550px"/><br>
 
 *Figure 14.4: Adding a second level of sparse index.*
 
@@ -59,7 +59,7 @@ Therefore, secondary indexes are always `dense`. Since they do not influence loc
 
 Example: Fig. 14.5 below shows a typical secondary file. The data file is shown with two records per block. The records have only their search key shown.
 
-<img src="./Figures/DMDB_BN_Fig14-5.JPG" width="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig14-5.JPG" width="550px"/><br>
 
 *Figure 14.5: A secondary index.*
 
@@ -96,10 +96,111 @@ A convenient way to avoid repeating values is to use a level of indirection, cal
 
 As shown in Fig. 14.7. below, there is one pair of each search key $K$. The pointer of this pair goes to a position in a "bucket file", which holds the "bucket" for $K$. Following this position, until the next position pointed to by the index, are pointers to all the records with search-key value $K$.
 
-<img src="./Figures/DMDB_BN_Fig14-7.JPG" width="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig14-7.JPG" width="550px"/><br>
 
 *Figure 14.7: Saving space by using indirection in a secondary index.*
 
 ### 14.1.8 Document Retrieval and Inverted Indexes
 
 *Left out.*
+
+## 14.2 B-Trees
+
+While one or two levels of index are often very helpful in speeding up queries, there is a more general structure that is commonly used in commercial systems. This family of data structures is called `B-trees`, and the particular variant that is most often used is known as a `B+ tree`. In essence:
+
+- B-trees automatically maintain as many levels of index as appropriate for the size of the file being indexed.
+- B-trees manage the space on the blocks they use so that every block is between half used and completely full.
+
+### 14.2.1 The Structure of B-Trees
+
+A B-tree organizes its blocks into a tree that is `balanced`, meaning that all paths from the root to a leaf have the same length. Fig. 14.13 shows an entire B-tree as an example.
+
+<img src="./Figures/DMDB_BN_Fig14-13.JPG" width="550px"/><br>
+
+*Figure 14.13: A B-tree.*
+
+There is a parameter $n$ associated with each B-tree index, and this parameter determines the layout of all blocks of the B-tree. Each block will have space for $n$ search-key values and $n+1$ pointers.
+
+There are several important rules about what can appear in the blocks of a B-tree:
+
+- The keys in leaf nodes are copies of keys from the data file.
+- At the root, there are at least two used pointers.
+- At a leaf, the last pointer points to the next block to with the next higher keys. Among the other $n$ pointers in a leaf block, at least $\lfloor (n+1) /2 \rfloor$ of these pointers are used and point to data records. An example of a leaf node is shown in Fig. 14.11.
+- At an interior node, all $n + 1$ pointers can be used to point to B-tree blocks at the next lower level. At least $\lceil (n+1) / 2 \rceil$ of them are actually used. An example of an interior node is shown in Fig. 14.12.
+
+<img src="./Figures/DMDB_BN_Fig14-11.JPG" width="400px"/><br>
+
+*Figure 14.11: A typical leaf of a B-tree.*
+
+<img src="./Figures/DMDB_BN_Fig14-12.JPG" width="400px"/><br>
+
+*Figure 14.12: A typical interior node of a B-tree.*
+
+### 14.2.2 Applications of B-Trees
+
+The B-tree is a powerful tool for building indexes. The sequence of pointers at the leaves of a B-tree can play the role of any of the pointer sequences coming out of an index file that we learned about in Section 14.1. Here are some examples:
+
+1. The search key of the B-tree is the primary key for the data file, and the index is dense. That is, there is one key-pointer pair in a leaf for every record of the data file.
+2. The data file is sorted by its primary key, and the B-tree is a sparse index with one key-pointer pair at a leaf for each block of the data file.
+3. The data file is sorted by an attribute that is not a key, and this attribute is the search key for the B-tree. For each key value $K$ that appears in the data file there is one key-pointer pair at a leaf.
+
+### 14.2.3 Lookup in B-Trees
+
+We for now suppose that the B-tree is a dense index, so every search-key value that appears in the data file will also appear at a leaf.  
+Suppose we have a B-tree index and we want to find a record with search-key value $K$. We search for $K$ recursively, starting at the root and ending at a leaf. The search procedure is:
+
+**BASIS:** If we are at a leaf, look among the keys there. If the $i$th key is $K$, then the $i$th pointer will take us to the desired record.
+
+**INDUCTION:** If we are at an interior node with keys $K_1, \, K_2,..., \, K_n$, follow the rules given in Section 14.2.1 to decide which of the children of this node should next be examined. That is, there is only one child that could lead to a leaf with key $K$. If $K < K_1$, then it is the first child, if $K_1 \leq K \leq < K_2$, it is the second child, and so on. Recursively apply the search procedure at this child.
+
+### 14.2.4 Range Queries
+
+B-trees are useful not only for queries in which a single value of the search key is sought, but for queries in which a range of values are asked for, called `range queries`.
+
+If we want to find all keys in the range $[a, \, b]$ at the leaves of a B-tree, we do a lookup to find the key $a$. Whether or not it exists, we are led to a leaf where $a$ could be, and we search the leaf for keys that are $a$ or greater. Each such key we find has an associated pointer to one of the records whose key is in the desired range. As long as we do not find a key greater than $b$ in the current block, we follow the pointer to the next leaf and repeat our search for keys in the range $[a, \, b]$.
+
+### 14.2.5 Insertion Into B-Trees
+
+The insertion is, in principle, recursive:
+
+- We try to find a place for the new key in the appropriate leaf, and we put it there if there is room.
+- If there is no room in the proper leaf, we split the leaf into two and divide the keys between the two new nodes, so each is half full or just over half full.
+- The splitting of nodes at one level appears to the level above as if a new key-pointer pair needs to be inserted at the higher level. We may just recursively apply this strategy to insert at the next level.
+- As an exception, if we try to insert into the root, and there is no room, then we split the root into two nodes and create a new root at the next higher level.
+
+When we split a node and insert it into its parent, we need to be careful how the keys are managed. First, suppose $N$ is a leaf whose capacity is $n$ keys. Also suppose we are trying to insert an $(n+1)$st key and its associated pointer. We create a new node $M$, which will be the sibling of $N$, immediately to its right. The first $\lceil (n+1) / 2 \rceil$ key-pointer pairs, in sorted order of the keys, remain with $N$, while the other key-pointer pairs move to $M$. Note that both nodes $N$ and $M$ are left with a sufficient number of key-pointer pars - at least $\lfloor (n+1) / 2 \rfloor$ pairs.  
+Now, suppose $N$ is an interior node whose capacity is $n$ keys and $n+1$ pointers, and $N$ has just been assigned $n+2$ pointers because of a node splitting below. We do the following:
+
+1. Create a new node $M$, which will be the sibling of $N$, immediately to its right.
+2. Leave at $N$ the first $\lceil (n+2) / 2 \rceil$ pointers, in sorted order, and move to $M$ the remaining $\lfloor (n+2) / 2 \rfloor$ pointers.
+3. The first $\lceil n / 2 \rceil$ keys stay with $N$, while the last $\lfloor n / 2 \rfloor$ keys move to $M$. Note that there is always one key in the middle left over, it goes with neither $N$ nor $M$. The leftover key $K$ indicates the smallest key reachable via the first of $M$'s children. Although this key doesn't appear in $N$ or $M$, it is associated with $M$, in the sense that it represents the smallest key reachable via $M$. Therefore $K$ will be inserted into the parent of $N$ and $M$ to divide searches between those two nodes.
+
+Example: Fig. 14.15 and Fig. 14.16 below show how the insertion of key $40$ would work in our example B-tree.
+
+<img src="./Figures/DMDB_BN_Fig14-15.JPG" width="550px"/><br>
+
+*Figure 14.15: Beginning the insertion of key 40.*
+
+<img src="./Figures/DMDB_BN_Fig14-16.JPG" width="550px"/><br>
+
+*Figure 14.16: Completing the insertion of key 40.*
+
+### 14.2.6 Deletion From B-Trees
+
+If the B-tree node from which a deletion occurred still has at least the minimum number of keys and pointers, then there is nothing more to be done. However, it is possible that the node was right at the minimum occupancy before the deletion, so after deletion the constraint on the number of keys is violated. We then need to do one of two things for a node $N$ whose contents are subminimum, one case requires a requires a recursive deletion up the tree:
+
+1. If one of the adjacent siblings of node $N$ has more than the minimum number of keys and pointers, then one key-pointer can be moved to $N$, keeping the order of keys intact. Possibly, the keys at the parent of $N$ must be adjusted to reflect the new situation. 
+2. The hard case is when neither adjacent sibling can be used ot provide an extra key for $N$. However, in that case, we have two adjacent nodes, $N$ and a sibling $M$, the latter has the minimum number of keys and the former has fewer than the minimum. Therefore, together they have no more keys and pointers than are allowed in a single node. We merge these two nodes, effectively deleting one of them. We need to adjust the keys at the parent, and then delete a key and pointer at the parent. If the parent is still full enough, then we are done. If not, then we recursively apply the deletion algorithm at the parent.
+
+Example: Fig. 14.17 below shows hwo deleting of key $7$ would look like in our example B-tree.
+
+<img src="./Figures/DMDB_BN_Fig14-17.JPG" width="550px"/><br>
+
+*Figure 14.17: Deletion of key 7.*
+
+### 14.2.7 Efficiency of B-Trees
+
+B-trees allow lookup, insertion, and deletion of records using very few disk I/O's per file operation. First, we should observe that if $n$, the number of keys per block, is reasonably large, then splitting and merging of blocks will be rare events.
+
+However, every search of records with a given search key requires us to go from the root down to a leaf, to find a pointer to the record. Since we are only reading B-tree blocks, the number of disk I/O's will be the number of levels the B-tree has, plus the one (for lookup) or two (for insert or delete) disk I/O's needed for manipulation of the record itself.  
+For a typical size of keys, pointers, and blocks, three levels are sufficient for all but the largest databases. Thus, we shall generally take $3$ as the number of levels for a B-tree.
