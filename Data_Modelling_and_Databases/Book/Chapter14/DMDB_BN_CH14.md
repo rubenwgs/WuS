@@ -261,3 +261,45 @@ Our first approach to dynamic hashing is called `extensible hash tables`. The ma
 ### 14.3.8 Insertion Into Linear Hash Tables
 
 *Left out.*
+
+## 14.4 Multidimensional Indexes
+
+*Left out, does not seem relevant for the course.*
+
+## 14.5 Hash Structures for Multidimensional Data
+
+*Left out, does not seem relevant for the course.*
+
+## 14.6 Tree Structures for Multidimensional Data
+
+*Left out, does not seem relevant for the course.*
+
+## 14.7 Bitmap Indexes
+
+*Left out, does not seem relevant for the course.*
+
+## 14.8 Summary of Chapter 14
+
+#### Sequential Files
+
+Several simple file organizations begin by sorting the data file according to some sort key and placing an index on this file.
+
+#### Dense and Sparse Indexes
+
+Dense indexes have a key-pointer pair for every record in the data file, while sparse indexes have one key-pointer pair for each block of the data file.
+
+#### Multilevel Indexes
+
+It is sometimes useful to put an index on the index file itself, an index file on that, and so one. Higher levels of index must be sparse.
+
+#### Secondary Indexes
+
+An index on a search key $K$ can be created even if the data file is not sorted by $K$. Such an index must be dense.
+
+#### B-trees
+
+These structures are essentially multilevel indexes, with graceful growth capabilities. Blocks with $n$ keys and $n+1$ pointers are organized in a tree, with the leaves pointing to records.
+
+#### Hash Tables
+
+We can create hash tables out of blocks in secondary memory, much as we can create main-memory hash tables. A hash function maps search-key values to buckets, effectively partitioning the records of a data file into many small groups.
