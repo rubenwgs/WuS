@@ -347,3 +347,30 @@ Notice that the requirements for sort-based and the corresponding hash-based alg
 2. Sort-based algorithms sometimes allow us to produce a result in sorted order and take advantage of that sort later.
 3. Hash-based algorithms depend on the buckets being of equal size.
 4. In sort-based algorithms, the sorted sublists may be written to consecutive blocks of the disk if we organize the disk properly. Thus, one of the three disk I/O's per block my require little rotational latency or seek time.
+
+## 15.6 Index-Based Algorithms
+The existence of an index on one or more attributes of a relation make available some algorithms that would not be feasible without the index.
+
+### 15.6.1 Clustering and Nonclustering Indexes
+
+Recall from Section 15.1.3 that a relation is "clustered" if its tuples are packed into roughly as few blocks as can possibly hold those tuples.
+
+We may also speak of `clustering indexes`, which are indexes on an attribute or attributes such that all the tuples with a fixed value for the search key of this index appear on roughly as few blocks can hold them.
+
+<img src="./Figures/DMDB_BN_Fig15-14.PNG" width="500px"/><br>
+
+### 15.6.2 Index-Based Selection
+
+Suppose that the condition $C$ is of the form $a = v$, where $a$ is an attribute for which an index exists, and $v$ is a value. Then one can search the index with value $v$ and get pointers to exactly those tuples of $R$ that have $a$-value $v$. These tuples constitute the result $\phi_{a = v}(R)$, so all we have to do is retrieve them.  
+If the index on $R.a$ is a clustering index, then the number of disk I/O's to retrieve the set $\phi_{a = v}(R)$ will average $B(R)/V(R, \, a)$. Let us consider what happens when the index on $R.a$ is nonclustering. To a first approximation, each tuple we retrieve will be on a different block, and we must access $T(R)/V(R, \, a)$ tuples. Thus, $T(R)/V(R, \, a)$ is an estimate of the number of disk I/O's we need.
+
+### 15.6.3 Joining by Using an Index
+
+Let us examine the natural join $R(X, \, Y) \Join S(Y, \, Z)$.  
+For our first index-based join algorithm, suppose that $S$ has an index on the attributes $Y$. Then one way to compute the join is to examine each block of $R$, and within each block consider each tuple $t$. Let $t_Y$ be the component or components of $t$ corresponding to the attributes $Y$. Use the index to find all those tuples of $S$ that have $t_Y$ in their $Y$-components. These are exactly the tuples of $S$ that join with tuple $t$ of $R$, so we output the join of each of these tuples with $t$.
+
+### 15.6.4 Joins USing a Sorted Index
+
+When the index is a B-tree, or any other structure from which we easily can extract the tuples of a relation in sorted order, we have a number of other opportunities to use the index. Perhaps the simplest is when we want to compute $R(X, \, Y) \Join S(Y, \, Z)$, and we have such an index on $Y$ for either $R$ or $S$. WE can then perform an ordinary sort-join, but we do not have to perform the intermediate step of sorting one of the relations on $Y$.
+
+As an extreme case, if we have sorting indexes on $Y$ for both $R$ and $S$, then we need to perform only the final step of the simple sort-based join of Section 15.4.6. This method is sometimes called `zig-zag join`.
