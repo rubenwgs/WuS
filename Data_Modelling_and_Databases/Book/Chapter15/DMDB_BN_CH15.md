@@ -128,3 +128,49 @@ Example: Let us consider another example of how iterators can be combined by cal
 ```
 
 *Figure 15.4: Building a union iterator from iterators $\mathcal{R}$ and $\mathcal{S}$.*
+
+## 15.2 One-Pass Algorithms
+
+The choice of algorithm for each operator is an essential part of the process of transforming a logical query plan into a physical query plan. While many algorithms for operators have been proposed, they largely fall into three classes:
+
+1. Sorting-based methods
+2. Hash-based methods
+3. Index-based methods
+
+In addition, we can divide algorithms for operators into three "degrees" of difficulty and cost:
+
+1. Some methods involve reading the data only once from disk. These are the `one-pass` algorithms.
+2. Some methods work for data that is too large to fit in available main memory bur not for the largest imaginable data sets. These `two-pass` algorithms are characterized by reading data a first time from disk, processing it in some way, writing it to disk, and then reading it a second time for further processing during the second pass.
+3. Some methods work without a limit on the size of the data. These methods use three or more passes to do their jobs, and are natural, recursive generalizations of the two-pass algorithms.
+
+In this section, we shall concentrate on the one-pass methods. HEre and subsequently, we shall classify operators into three broad groups:
+
+1. `Tuple-at-a-time, unary operations`. These operations - selection and projection - do not require an entire relation, or even a large part of it, in memory at once.
+2. `Full-relation, unary operations`. These one-argument operations require seeing all or most of the tuples in memory at once, so one-pass algorithms are limited to relations that are approximately of size $M$ or less. The operations of this class are $\gamma$ (the grouping operator) and $\delta$ (the duplicate-elimination operator).
+3. `Full-relation, binary operations`. All other operations are in this class: set and bag versions of union, intersection, difference, joins, and products.
+
+### 15.2.1 One-Pass Algorithms for Tuple-at-a-Time Operations
+
+The tuple-at-a-time operations $\phi (R)$ and $\pi (R)$ have obvious algorithms, regardless of whether the relation fits in main memory. WE read the blocks of $R$ one at a time into an input buffer, perform the operation on each tuple, and move the selected tuple or the projected tuples to the output buffer.
+
+### 15.2.2 One-Pass Algorithms for Unary, Full-Relation Operations
+
+Now, let us consider the unary operations that apply to relations as a whole, rather than to one tuple at a time: duplicate elimination ($\sigma$) and grouping ($\gamma$).
+
+#### Duplicate Elimination
+
+To eliminate duplicates, we can read each block of $R$ one at a time, but for each tuple we need to make a decision as to whether we have already seen this tuple before or not. To support this decision, we need to keep in memory one copy of every tuple we have seen. One memory buffer holds one block of $R$'s tuples, and the remaining $M-1$ buffers can be used to hold a single copy of every tuple seen so far.  
+When a new tuple from $R$ is considered, we compare it with all tuples seen so far, and if it is not equal to any of these tuples we both copy it to the output and add it to the in-memory list of tuples we have seen.
+
+<img src="./Figures/DMDB_BN_Fig15-6.PNG" width="400px"/><br>
+
+*Figure 15.6: Managing memory for a one-pass duplicate-elimination.*
+
+#### Grouping
+
+A grouping operation $\gamma_L$ gives us zero or more grouping attributes and presumably one or more aggregated attributes. If we create in main memory one entry for each group, then we can scan the tuples of $R$, one block at a time. The `entry` for a group consists of values for the grouping attributes and an accumulated value or values for each aggregations.  
+When all tuples of $R$ have been read into the input buffer and contributed to the aggregations for their group, we can produce the output by writing the tuple for each group.
+
+### 15.2.3 One-Pass Algorithms for Binary Operations
+
+*Left out.*
