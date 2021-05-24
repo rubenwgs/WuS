@@ -4,4 +4,4 @@
 - Date: 24.05.2021
 - Contact: ruben.schenk@inf.ethz.ch
 
-# 15.
+# 15. Query Execution
