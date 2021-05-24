@@ -174,3 +174,67 @@ When all tuples of $R$ have been read into the input buffer and contributed to t
 ### 15.2.3 One-Pass Algorithms for Binary Operations
 
 *Left out.*
+
+## 15.3 Nested-Loop Joins
+
+### 15.3.1 Tuple-Based Nested-Loop Join
+
+The simplest variation of nested-loop join has loops that range over individual tuples of the relations involved. In this algorithm, which we call `tuple-based nested-loop join`, we compute the join $R(X, \, Y) \Join S(Y, \, Z)$ as follows:
+
+```
+    FOR each tuple s in S DO
+        FOR each tuple r in R DO
+            IF r and s join to make a tuple t THEN
+                output t;
+```
+
+If we are careless about how we buffer the blocks of relations $R$ and $S$, then this algorithm could require as many as $T(R)T(S)$ disk I/O's.
+
+### 15.3.2 An Iterator for Tuple-Based Nested-Loop Join
+
+One advantage of a nested-loop join is that it fits well into an iterator framework, and thus allows us to avoid storing intermediate relations on disk in some situations.
+
+### 15.3.3 Block-Based Nested-Loop Join Algorithm
+
+We can improve on the tuple-based nested-loop join of Section 15.3.1 if we compute $R \Join S$ by:
+
+1. Organizing access to both argument relations by blocks, and
+2. Using as much main memory as we can store tuples belonging to the relation $S$, the relation of the outer loop.
+
+The algorithm of Fig. 15.8 is sometimes called "nested-block join". We shall continue to call it simply `nested-loop join`, since it is the variant of the nested-loop idea most commonly implemented in practice.
+
+```
+    FOR each chunk of M-1 block of S DO BEGIN
+        read these blocks into main-memory buffers;
+        organize their tuples into a search structure whose
+            search key is the common attributes of R and S;
+        FOR each block b of R DO BEGIN
+            read b into main memory;
+            FOR each tuple t of b DO BEGIN
+                find the tuples of S in main memory that join with t;
+                output the join of t with each of these tuples;
+            END;
+        END;
+    END;
+```
+
+*Figure 15.8: The nested-loop join algorithm.*
+
+### 15.3.4 Analysis of Nested-Loop Join
+
+*Left out.*
+
+### 15.3.5 Summary of Algorithms so Far
+
+The main-memory and disk I/O's requirements for the algorithms we have discussed in Sections 15.2 and 15.3 are shown in Fig. 15.9 below:
+
+| Operators                                  | Approximate $M$ required | Disk I/O      | Section |
+| :----------------------------------------- | :----------------------: | :-----------: | :-----: |
+| $\phi, \, \pi$                             | 1                        | $B$           | 15.2.1  |
+| $\gamma, \, \delta$                        | $B$                      | $B$           | 15.2.2  |
+| $\cup, \, \cap, \, -, \, \times. \, \Join$ | $\min(B(R), \, B(S))$    | $B(R) + B(S)$ | 15.2.3  |
+| $\Join$                                    | any $M \geq 2$           | $B(R)B(S)/M$  | 15.3.3  |
+
+*Figure 15.9: Main memory and disk I/O requirements for one-pass and nested-loop algorithms.*
+
+## 15.4 Two-Pass Algorithms Based on Sorting
