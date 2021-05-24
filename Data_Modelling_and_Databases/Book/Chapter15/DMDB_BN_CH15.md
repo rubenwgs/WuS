@@ -238,3 +238,112 @@ The main-memory and disk I/O's requirements for the algorithms we have discussed
 *Figure 15.9: Main memory and disk I/O requirements for one-pass and nested-loop algorithms.*
 
 ## 15.4 Two-Pass Algorithms Based on Sorting
+
+We shall now concentrate on `two-pass algorithms`, where data from the operand relations is read into main memory, processed in some way, written out to disk again, and then reread from disk to complete the operation.
+
+### 15.4.1 Two-Phase, Multiway Merge-Sort
+
+It is possible to sort very large relations in two passes using an algorithm called `Two-Phase, Multiway Merge-Sort (TPMMS)`. Suppose we have $M$ main-memory buffers to use for the sort. TPMMS sorts a relation $R$ as follows:
+
+- *Phase 1:* Repeatedly fill the $M$ buffers with new tuples from $R$ and sort them, using any main-memory sorting algorithm. Write out each *sorted sublist* to secondary storage.
+- *Phase 2:* Merge the sorted sublists. For this phase to work, there can be at most $M-1$ sorted sublists, which limits the size of $R$.
+
+### 15.4.2 Duplicate Elimination Using Sorting
+To perform the $\delta(R)$ operation in two passes, we sort the tuples of $R$ in sublists as in TPMMS. In the second pass, we use the available main memory to hold one block from each sorted sublist and one output block, as we did for TPMMS.  
+However, instead of sorting on the second pass, we repeatedly select the first unconsidered tuple $t$ among all the sorted sublists. We write one copy of $t$ to the output and eliminate from the input blocks all occurrences of $t$. Thus, the output will consist of exactly one copy of any tuple in $R$. They will in fact be produced in sorted order.
+
+### 15.4.3 Grouping and Aggregation Using Sorting
+
+*Left out.*
+
+### 15.4.4 A Sort-Based Union Algorithm
+
+*Left out.*
+
+### 15.4.5 Sort-Based Intersection and Difference
+
+*Left out.*
+
+### 15.4.6 A Simple Sort-Based Join Algorithm
+
+There are several ways that sorting can be used to join large relations. Given relations $R(X, \, Y)$ and $S(Y, /, Z)$ to join, and given $M$ blocks of main memory for buffers,w e do the following:
+
+1. Sort $R$, using TPMMS with $Y$ as the sort key.
+2. Sort $S$ similarly.
+3. Merge the sorted $R$ and $S$. We use only two buffers: one for the current block of $R$ and the other for the current block of $S$. The following steps are done repeatedly:
+   1. Find the least value $y$ of the join attributes $Y$ that is currently at the front of the blocks of $R$ and $S$.
+   2. If $y$ does not appear at the front of the other relation, then remove the tuples with sort key $y$.
+   3. Otherwise, identify all the tuples from both relations having sort key $y$. If necessary, read blocks from the sorted $R$ and/or $S$, until we ware sure there are no more $y$'s in either relation.
+   4. Output all the tuples that can be formed by joining tuples from $R$ and $S$ that have a common $Y$-value $y$.
+   5. If either relation has no more unconsidered tuples in main memory, reload the buffer for that relation.
+   
+### 15.4.7 Analysis of Simple Sort-Join
+
+*Left out.*
+
+### 15.4.8 A More Efficient Sort-Based Join
+
+*Left out.*
+
+### 15.4.9 Summary of Sort-Based Algorithms
+
+In Fig. 15.11 is a table of the analysis of the algorithms we have discussed in Section 15.4.
+
+| Operators                    | Approximate $M$ required     | Disk I/O         | Section                 |
+| :--------------------------- | :--------------------------: | :--------------: | :---------------------: |
+| $\tau, \, \gamma, \, \delta$ | $\sqrt{B}$                   | $3B$             | 15.4.1, 15.4.2, 15.4.3  |
+| $\cup, \, \cap, \, -$        | $\sqrt{B(R) + B(S)}$         | $3(B(R) + B(S))$ | 15.4.4, 15.4.5          |
+| $\Join$                      | $\sqrt{\max(B(R), \, B(S))}$ | $5(B(R)+B(S))$   | 15.4.6                  |
+| $\Join$                      | $\sqrt{B(R)+B(S)}$           | $3(B(R)+B(S))$   | 15.4.8                  |
+
+*Figure 15.11: Main memory and disk I/O requirements for sort-based algorithms.*
+
+## 15.5 Two-Pass Algorithms Based on Hashing
+There is a family of hash-based algorithms that attack the same problems as in Section 15.4. The essential idea behind all these algorithms is as follows.  
+If the data is too big to store in main-memory buffers, hash all the tuples of the argument to arguments using an appropriate hash key. For all the common operations, there is a way to select the hash key so all the tuples that need to be considered together when we perform the operation fall into the same bucket. We then perform the operation by working on one bucket at a time.
+
+In effect, we have reduced the size of the operands by a factor equal to the number of buckets, which is roughly $M$.
+
+### 15.5.1 Partitioning Relations by Hashing
+
+To begin, let us review the way we would take a relation $R$ and, using $M$ buffers, partition $R$ into $M-1$ buckets of roughly equal size. We associate one buffer with each bucket. Each tuple $t$ in the block is hashed to bucket $h(t)$ and copied to the appropriate buffer. If that buffer is full, we write it out to disk, and initialize another block for the same bucket.
+
+### 15.5.2 A Hash-Based Algorithm for Duplicate Elimination
+
+Consider duplicate elimination, that is, the operation $\delta(R)$. We hash $R$ to $M-1$ buckets. Note that two copies of the same tuple $t$ will hash to the same bucket. Thus, we can examine one bucket at a time, perform $\delta$ on that bucket in isolation, and take as the answer the union of $\delta(R_i)$, where $R_i$ is the portion of $R$ that hashes to the $i$th bucket. The one-pass algorithm of Section 15.2.2 can be used to eliminate duplicates from each $R_i$ in turn and write out the resulting unique tuples.
+
+### 15.5.3 Hash-Based Grouping and Aggregation
+
+To perform the $\gamma_L(R)$ operation, we again start by hashing all the tuples of $R$ to $M-1$ buckets. However, in order to make sure that all tuples of the same group wind up in the same bucket, we must choose a hash function that depends only on the grouping attributes of the list $L$.
+
+Having partitioned $R$ into buckets, we can then use the one-pass algorithm for $\gamma$ from Section 15.2.2 to process each bucket in turn.
+
+### 15.5.4 Hash-Based Union, Intersection, and Difference
+
+*Left out.*
+
+### 15.5.5 The Hash-Join Algorithm
+
+To compute $R(X, \, Y) \Join S(Y, \, Z)$ using a two-pass, hash-based algorithm, we act almost as for the other binary operations discussed in Section 15.5.4. The only difference is that we must use as the hash key just the join attributes $Y$. Then we can be sure that if tuples of $R$ and $S$ join, they will wind up in corresponding buckets $R_i$ and $S_i$ for sone $i$. A one-pass join of all pairs of corresponding buckets completes this algorithm, which we call `hash-join`.
+
+### 15.5.6 Saving Some Disk I/O's
+
+*Left out.*
+
+### 15.5.7 Summary of Hash-Based Algorithms
+
+Fig. 15.13 gives the memory requirements and disk I/O's needed by each of the algorithms discussed in this section.
+
+| Operators             | Approximate $M$ required | Disk I/O                   | Section        |
+| :-------------------- | :----------------------: | :------------------------: | :------------: |
+| $\gamma, \, \delta$   | $\sqrt{B}$               | $3B$                       | 15.5.2, 15.5.3 |
+| $\cup, \, \cap, \, -$ | $\sqrt{B(S)}$            | $3(B(R) + B(S))$           | 15.5.4         |
+| $\Join$               | $\sqrt{B(S)}$            | $3(B(R)+B(S))$             | 15.5.5         |
+| $\Join$               | $\sqrt{B(S)}$            | $(3-2M/B(S))(B(R) + B(S))$ | 15.5.6         |
+
+Notice that the requirements for sort-based and the corresponding hash-based algorithms are almost the same. The significant differences between the two approaches are:
+
+1. Hash-based algorithms for binary operations have a size requirement that depends only on the smaller of two arguments rather than on the sum of the argument sizes.
+2. Sort-based algorithms sometimes allow us to produce a result in sorted order and take advantage of that sort later.
+3. Hash-based algorithms depend on the buckets being of equal size.
+4. In sort-based algorithms, the sorted sublists may be written to consecutive blocks of the disk if we organize the disk properly. Thus, one of the three disk I/O's per block my require little rotational latency or seek time.
