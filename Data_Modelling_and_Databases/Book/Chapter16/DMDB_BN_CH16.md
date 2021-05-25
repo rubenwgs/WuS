@@ -164,3 +164,16 @@ We substitute the tree of Fig. 16.7 for the leaf *ParamountMovies* in Fig 16.8. 
 ## 16.2 Algebraic Laws for Improving Query Plans
 
 ### 16.2.1 Commutative and Associative Laws
+
+A `commutative law` about an operator says that it does not matter in which order you present the arguments of the operator, the result will be the same. For instance, $+$ and $\times$ are commutative operators of arithmetic. More precisely, $x+y = y+x$ and $x \times y = y \times x$ for any number $x$ and $y$.
+
+An `associative law` about an operator says that we may group two uses of the operator either from the left or the right. For instance $+$ and $\times$ are associative arithmetic operations, meaning that $(x + y) + z = (x + (y + z))$ and $(x \times y) \times z = x \times (y \times z)$.
+
+Several operators of relational algebra are both associative and commutative. Particularly:
+
+- $R \times S = S \times R$ and $(R \times S) \times T = R \times (S \times T)$
+- $R \Join S = S \Join R$ and $(R \Join S) \Join T = R \Join (S \Join T)$
+- $R \cup S = S \cup R$ and $(R \cup S) \cup T = R \cup (S \cup T)$
+- $R \cap S = S \cap R$ and $(R \cap S) \cap T = R \cap (S \cap T)$
+
+Note that these laws hold for both sets and bags.
