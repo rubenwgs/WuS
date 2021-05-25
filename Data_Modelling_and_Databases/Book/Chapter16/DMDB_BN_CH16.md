@@ -177,3 +177,11 @@ Several operators of relational algebra are both associative and commutative. Pa
 - $R \cap S = S \cap R$ and $(R \cap S) \cap T = R \cap (S \cap T)$
 
 Note that these laws hold for both sets and bags.
+
+### 16.2.2 Laws Involving Selection
+
+Since selections tend to reduce the size of relations markedly, one of the most important rules of efficient query processing is to move the selections down the tree as far as they will go without changing what the expression does.
+
+Our first two laws for $\sigma$ are the `splitting laws`:
+
+- $

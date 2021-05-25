@@ -151,7 +151,7 @@ In this section, we shall concentrate on the one-pass methods. HEre and subseque
 
 ### 15.2.1 One-Pass Algorithms for Tuple-at-a-Time Operations
 
-The tuple-at-a-time operations $\phi (R)$ and $\pi (R)$ have obvious algorithms, regardless of whether the relation fits in main memory. WE read the blocks of $R$ one at a time into an input buffer, perform the operation on each tuple, and move the selected tuple or the projected tuples to the output buffer.
+The tuple-at-a-time operations $\sigma (R)$ and $\pi (R)$ have obvious algorithms, regardless of whether the relation fits in main memory. WE read the blocks of $R$ one at a time into an input buffer, perform the operation on each tuple, and move the selected tuple or the projected tuples to the output buffer.
 
 ### 15.2.2 One-Pass Algorithms for Unary, Full-Relation Operations
 
@@ -230,7 +230,7 @@ The main-memory and disk I/O's requirements for the algorithms we have discussed
 
 | Operators                                  | Approximate $M$ required | Disk I/O      | Section |
 | :----------------------------------------- | :----------------------: | :-----------: | :-----: |
-| $\phi, \, \pi$                             | 1                        | $B$           | 15.2.1  |
+| $\sigma, \, \pi$                             | 1                        | $B$           | 15.2.1  |
 | $\gamma, \, \delta$                        | $B$                      | $B$           | 15.2.2  |
 | $\cup, \, \cap, \, -, \, \times. \, \Join$ | $\min(B(R), \, B(S))$    | $B(R) + B(S)$ | 15.2.3  |
 | $\Join$                                    | any $M \geq 2$           | $B(R)B(S)/M$  | 15.3.3  |
@@ -361,8 +361,8 @@ We may also speak of `clustering indexes`, which are indexes on an attribute or 
 
 ### 15.6.2 Index-Based Selection
 
-Suppose that the condition $C$ is of the form $a = v$, where $a$ is an attribute for which an index exists, and $v$ is a value. Then one can search the index with value $v$ and get pointers to exactly those tuples of $R$ that have $a$-value $v$. These tuples constitute the result $\phi_{a = v}(R)$, so all we have to do is retrieve them.  
-If the index on $R.a$ is a clustering index, then the number of disk I/O's to retrieve the set $\phi_{a = v}(R)$ will average $B(R)/V(R, \, a)$. Let us consider what happens when the index on $R.a$ is nonclustering. To a first approximation, each tuple we retrieve will be on a different block, and we must access $T(R)/V(R, \, a)$ tuples. Thus, $T(R)/V(R, \, a)$ is an estimate of the number of disk I/O's we need.
+Suppose that the condition $C$ is of the form $a = v$, where $a$ is an attribute for which an index exists, and $v$ is a value. Then one can search the index with value $v$ and get pointers to exactly those tuples of $R$ that have $a$-value $v$. These tuples constitute the result $\sigma_{a = v}(R)$, so all we have to do is retrieve them.  
+If the index on $R.a$ is a clustering index, then the number of disk I/O's to retrieve the set $\sigma_{a = v}(R)$ will average $B(R)/V(R, \, a)$. Let us consider what happens when the index on $R.a$ is nonclustering. To a first approximation, each tuple we retrieve will be on a different block, and we must access $T(R)/V(R, \, a)$ tuples. Thus, $T(R)/V(R, \, a)$ is an estimate of the number of disk I/O's we need.
 
 ### 15.6.3 Joining by Using an Index
 
