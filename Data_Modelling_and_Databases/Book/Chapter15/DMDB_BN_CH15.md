@@ -379,3 +379,120 @@ As an extreme case, if we have sorting indexes on $Y$ for both $R$ and $S$, then
 
 We have assumed that operators on relations have available some number $M$ of main-memory buffers that they can use to store needed data.  
 The central task of making main-memory buffers available to processes, such as queries, that act on the database is given to the `buffer manager`. It is the responsibility of the buffer manager to allow processes to get the memory they need, while minimizing the delay and unsatisfiable requests.
+
+### 15.7.1 Buffer Management
+
+There are two broad architectures for a buffer manager:
+
+1. The buffer manager controls main memory directly, as in many relational DBMS's, or
+2. The buffer manager allocates buffers in virtual memory, allowing the operating system to decide which buffers are actually in main memory at any time and which are in the "swap space" on disk that the operating system manages.
+
+Whichever approach a DBMS uses, the same problem arises: the buffer manager should limit the number of buffers in use so they fit in the available main memory.  
+Normally, the number of buffers is a parameter set when the DBMS is initialized. We would expect that this number is set so that the buffers occupy the available main memory, regardless of whether the buffers are allocated in main or virtual memory. In what follows, we shall not concern ourselves with which mode of buffering is used, and simply assume that there is a fixed-size `buffer pool`, a set of buffers available to queries and other database actions.
+
+### 15.7.2 Buffer Management Strategies
+
+The critical choice that the buffer manager must make is what block to throw out of the buffer pool when a buffer is needed for a newly requested block. The `buffer-replacement strategies` in common use may be familiar to you from other applications of scheduling policies, such as in operating systems. These include:
+
+#### Least-Recently Used (LRU)
+
+The `LRU` rule is to throw out the block that has not been read or written for the longest time. This method requires that the buffer manager maintain a table indicating the last time the block in each buffer was accessed.
+
+#### First-In-First-Out (FIFO)
+
+When a buffer is needed, under the FIFO policy the buffer that has been occupied the longest by the same block is emptied and used for the new block. In this approach, the buffer manager needs to know only the time at which the block currently occupying a buffer was loaded into that buffer.
+
+#### The "Clock" Algorithm ("Second Chance")
+
+This algorithm is a commonly implemented, efficient approximation to LRU. Think of the buffers as arranged in a circle. A "hand" points to one of the buffers, and will rotate clockwise if it needs to find a buffer in which to place a disk block. Each buffer has an associated "flag", which is either 0 or 1. Buffers with a 0 flag are vulnerable to having their contents sent back to disk, buffers with a 1 are not. When a block us read into a buffer, its flag is set to 1. Likewise, when the contents of a buffer is accessed, its flag is set to 1. When the buffer manager needs a buffer for a enw block, it looks for the first 0 it can find, rotating clockwise. If it passes 1's,it sets them to 0.
+
+<img src="./Figures/DMDB_BN_Fig15-17.PNG" width="350px"/><br>
+
+*Figure 15.17: The clock algorithm visits buffers in a round-robin fashion and replaces $01 \cdots 1$ with $10 \cdots 0$.
+
+### 15.7.3 The Relationship Between Physical Operator Selection and Buffer Management
+
+The query optimizer will eventually select a set of physical operators that will be used to execute a given query. This selection of operators may assume that a certain number of buffers $M$ is available for execution of each of these operators. However, as we have seen, the buffer manager may not be willing or able to guarantee the availability of these $M$ buffers when the query is executed.
+
+## 15.8 Algorithms Using More Than Two Passes
+
+While two passes are enough for operations on all but the largest relations, we should observe that the principal techniques discussed in Section 15.4 and 15.5 generalize to algorithms that, by using an many passes as necessary, can process relations of arbitrary size.
+
+#### 15.8.1 Multipass Sort-Based Algorithms
+
+Suppose we have $M$ main-memory buffers available to sort a relation $R$, which we shall assume is stored clustered. Then do the following:
+
+**BASIS:** If $R$ fits in $M$ blocks, then read $R$ into main memory, sort it using any main-memory sorting algorithm, and write the sorted relation to disk.
+
+**INDUCTION:** If $R$ does not fit into main memory, partition the blocks holding $R$ into $M$ groups, which we shall call $R_1, \, R_2,..., \, R_M$. Recursively sort $R_i$ for each $i = 1, \, 2,..., \, M$. Then, merge the $M$ sorted sublists, as in Section 15.4.1.
+
+If we are not merely sorting $R$, but performing a unary operation such as $\gamma$ or $\delta$ on $R$, then we modify the above in the following way:
+
+- For $\delta$, output one copy of each distinct tuple, and skip over copies of the tuple.
+- For a $\gamma$, sort on the grouping attributes only, and combine the tuples with a given value of these grouping attributes in the appropriate manner.
+
+### 15.8.2 Performance of Multipass, Sort-Based Algorithms
+
+*Left out.*
+
+### 15.8.3 Multipass Hash-Based Algorithms
+
+There is a corresponding recursive approach to using hashing for operations on large relations. We hash the relation or relations into $M-1$ buckets. WE then apply the operation to each bucket individually. We can describe this approach recursively as:
+
+**BASIS:** For a unary operation, if the relation fits in $M$ buffers, read it into memory and perform the operation. FOr a binary operation, if either relation fits in $M-1$ buffers, perform the operation by reading this relation into main memory and then read the second relation, one block at a time, into the $M$th buffer.
+
+**INDUCTION:** If no relation fits in main memory, then hash each relation into $M-1$ buckets. Recursively perform the operation on each bucket or corresponding pair of buckets, and accumulate the output from each bucket or pair.
+
+### 15.8.4 Performance of Multipass Hash-Based Algorithms
+
+*Left out.*
+
+## 15.9 Summary of Chapter 15
+
+#### Query Processing
+
+Queries are compiled, which involves extensive optimization, and then executed.
+
+#### Query Plans
+
+Queries are compiled first into `logical query plans`, which are often like expressions of relational algebra, and then converted to a `physical query plan` by selecting an implementation for each operation, ordering joins and making other discussions.
+
+#### Table Scanning
+
+To access the tuples of a relation, there are several possible physical operators. The `table-scan` operator simply reads each block holding tuples of the relation. `Index-scan` uses an index to find tuples, and `sort-scan` produces the tuples in sorted order.
+
+#### Iterators
+
+Several operations involved in the execution of a query can be meshed conveniently if we think of their execution as performed by an iterator. This mechanism consists of three methods, to open the construction of a relation, to produce the next tuple of the relation, and to close the construction.
+
+#### One-Pass Algorithms
+
+As long as one of the arguments of a relational-algebra operator can fit in main memory, we can execute the operator by reading the smaller relation to memory, and reading the other argument one block at a time.
+
+#### Nested-Loop Join
+
+This simple join algorithm works even when neither argument fits in main memory. It reads as much as it can of the smaller relation into memory, and compares that with the entire argument. This process is repeated until all of the smaller relation has had its run in memory.
+
+#### Two-Pass Algorithms
+
+Except for nested-loop join, most algorithms for arguments that are too large to fit into memory are either sort-based, hash-based, or index-based.
+
+#### Sort-Based Algorithms
+
+These partition their arguments into main-memory-sized, sorted sublists. The sorted sublists are then merged appropriately to produce the desired result.
+
+#### Hash-Based Algorithms
+
+These use a hash function to partition the arguments into buckets. The operation is then applied to the buckets individually or in pairs.
+
+#### Index-Based Algorithms
+
+The use of an index is an excellent way to speed up a selection whose condition equates the indexed attribute to a constant.
+
+#### The Buffer Manager
+
+The availability of blocks of memory is controlled by the buffer manager. When a new buffer is needed in memory, the buffer manager uses one ot the familiar replacement policies to decide which buffer is returned to disk.
+
+#### Multipass Algorithms
+
+The two-pass algorithms based on sorting or hashing have natural recursive analogs that take three or more passes and will work for larger amounts of data.
