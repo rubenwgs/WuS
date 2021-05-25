@@ -184,4 +184,109 @@ Since selections tend to reduce the size of relations markedly, one of the most 
 
 Our first two laws for $\sigma$ are the `splitting laws`:
 
-- $
+- $\sigma_{C_1 \text{ AND } C_2} (R) = \sigma_{C_1}(\sigma_{C_2}(R))$
+- $\sigma_{C_1 \text{ OR } C_2} = (\sigma_{C_1}(R)) \cup_S (\sigma_{C_2}(R))$
+
+However, the second law, for $\text{OR}$, only work if the relation $R$ is a set.  
+Notice that the order of $C_1$ and $C_2$ is flexible. WE can swap the order of any sequence of $\sigma$ operators:
+
+- $\sigma_{C_1}(\sigma_{C_2}(R)) = \sigma_{C_2}(\sigma_{C_1}(R))$
+
+The next family of laws involving $\sigma$ allows us to push selections through the binary operators: product, union, intersection, difference, and join. There are three types of laws:
+
+1. For union, the selection must be pushed to both arguments.
+2. For a difference, the selection must be pushed to the first argument and optionally may be pushed to the second.
+3. For the other operators it is only required that the selection be pushed to one argument.
+
+Thus, the law for union is:
+
+- $\sigma_{C}(R \cup S) = \sigma_{C}(R) \cup \sigma_C (S)$
+
+For difference, one version of the law is:
+
+- $\sigma_C(R - S) = \sigma_C(R) - S$
+- $\sigma_C(R - S) = \sigma_C(R) - \sigma_C(S)$
+
+The next laws allow the selection to be pushed to one or both arguments. We shall show the laws below assuming that the relation $R$ has all the attributes mentioned in $C$:
+
+- $\sigma_C(R \times S) = \sigma_C(R) \times S$
+- $\sigma_C(R \Join S) = \sigma_C(R) \Join S$
+- $\sigma_C (R \Join_D S) = \sigma_C(R) \Join_D S$
+- $\sigma_C(R \cap S) = \sigma_C(R) \cap S$
+
+If $C$ has only attributes of $S$, then we can instead write:
+
+- $\sigma_C(R \times S) = R \times \sigma_C(S)$
+
+Should relations $R$ and $S$ both happen to have all attributes of $C$, then we can use laws such as:
+
+- $\sigma_C(R \Join S) = \sigma_C(R) \Join \sigma_C(S)$
+
+### 16.2.3 Pushing Selections
+
+As we illustrated, pushing a selection down an expression tree is oen of the most powerful tools of the query optimizer. However, when queries involve virtual views, it is sometimes necessary to first move a selection as far up the tree as it can go, and then push the selection down all possible branches.
+
+### 16.2.4 Laws Involving Projection
+
+Projections, like selections, can be pushed down through many other operators. Pushing projections differs from pushing selections in that when we push projections, it is quite usual for the projection also to remain where it is.
+
+To describe the transformations of extended projection, we need to introduce some terminology. Consider e term $R \rightarrow x$ on the list for a projection, where $E$ is an attribute or an expression involving attributes and constants. We say all attributes mentioned in $E$ are `input attributes` of the projection, and $x$ is an `output attribute`.  
+If a projection list consists only of attributes, with no renaming or expressions other than a single attribute, then we say the projection is `simple`.
+
+The principle behind laws for projection is that:
+
+- We may introduce a projection anywhere in an expression tree, as long as it eliminates only attributes that are neither used by an operator above nor are in the result of the entire expression.
+
+We introduce the following laws:
+
+- $\pi_L(R \Join S) = \pi_L(\pi_M(R) \Join \pi_N(S))$, where $M$ and $N$ are the join attributes and the input attributes in $L$ that are found among the attributes of $R$ and $S$, respectively.
+- $\pi_L(R \Join_C S) = \pi_L(\pi_M(R) \Join_C \pi_N(S))$, where $M$ and $N$ are the join attributes and the input attributes of $R$ and $S$, respectively.
+- $\pi_L(R \times S) = \pi_L(\pi_M(R) \times \pi_N(S))$, where $M$ and $N$ are the lists of all attributes of $R$ and $S$, respectively, that are input attributes of $L$.
+
+We can perform a projection entirely before a bag union. That is:
+
+- $\pi_L(R \cup_B S) = \pi_L(R) \cup_B \pi_L (S)$
+
+It is also possible to push a projection below a selection:
+
+- $\pi_L(\sigma_C(R)) = \pi_L(\sigma_C(\pi_M(R)))$, where $M$ is the list of attributes that are either input attributes of $L$ or mentioned in condition $C$.
+
+### 16.2.5 Laws About Joins and Products
+
+There are a few additional laws that follow directly from the definition of the join:
+
+- $R \Join_C S = \sigma_C(R \times S)$
+- $R \Join S = \pi_L(\sigma_C(R \times S))$, where $C$ is the condition that equates each pair of attributes from $R$ and $S$ with the same name, and $L$ is a list that includes one attribute from each equated pair and all other attributes of $R$ and $S$.
+
+### 16.2.6 Laws Involving Duplicate Elimination
+
+The operator $\delta$, which eliminates duplicates from a bag, can be pushed thorough many, but not all operators.
+
+- $\delta(R) = R$ if $R$ has no duplicates.
+
+Several laws that push $\delta$ through other operators are:
+
+- $\delta(R \times S) = \delta(R) \times \delta (S)$
+- $\delta(R \Join S) = \delta(R) \Join \delta(S)$
+- $\delta(R \Join_C S) = \delta(R) \Join_C \delta(S)$
+- $\delta(\sigma_C(R)) = \sigma_C(\delta(R))$
+
+We can also move the $\delta$ to either or both of the arguments of an intersection:
+
+- $\delta(R \cap_B S) = \delta(R) \cap_B S = R \cap_B \delta(S) = \delta(R) \cap_B \delta(S)$
+
+On the other hand, $\delta$ generally cannot be pushed through the operators $\cup_B$, $-_B$, or $\pi$.
+
+### 16.2.7 Laws Involving Grouping and Aggregation
+
+When we consider the operator $\gamma$, we cannot state laws in the generality that we used for the other operators. One exception is the law, that $\gamma$ absorbs a $\delta$. Precisely:
+
+- $\delta(\gamma_L(R)) = \gamma_L(R)$
+
+Another general rule is:
+
+- $\gamma_L(R) = \gamma_L(\pi_M(R))$ if $M$ is a list containing at least all those attributes of $R$ that are mentioned in $L$.
+
+Furthermore, let us call an operator $\gamma_L$ `duplicate-impervious` if the only aggregations in $L$ are $\text{MIN}$ and/or $\text{MAX}$. Then:
+
+- $\gamma_L(R) = \gamma_L(\delta(R))$ provided $\gamma_L$ is duplicate-impervious.
