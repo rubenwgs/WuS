@@ -395,3 +395,5 @@ We can also compare methods for their effect on the ability of transactions to c
 - Locking delays transactions but avoids rollbacks, even when interaction is high. Timestamps and validation to not delay transactions, but can cause them to rollback, which is a more serious from of delay and also wastes resources.
 - If interference is low, then neither timestamps nor validation will cause many rollbacks.
 - When a rollback is necessary, timestamps catch some problems earlier than validation, which always lets a transaction do all its internal work before considering whether the transaction must rollback.
+
+## 18.10 Summary of Chapter 18
