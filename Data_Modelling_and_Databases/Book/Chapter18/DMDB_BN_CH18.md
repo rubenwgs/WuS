@@ -308,3 +308,24 @@ Next, we shall consider two methods other than locking that are used in some sys
 Both these approaches are `optimistic`, in the sense that they assume that no unserializable behavior will occur and only fix things up when a violation is apparent.
 
 ### 18.8.1 Timestamps
+
+To use timestamping as a concurrency-control method, the scheduler needs to associate with each transaction $T$ its `timestamp` $\text{TS}(T)$, and each database element $X$ two timestamps and an additional bit:
+
+1. $\text{RT}(X)$, the `read time` of $X$, which is the highest timestamp of a transaction that has read $X$.
+2. $\text{WT}(X)$, the `write time` of $X$, which is the highest timestamp of a transaction that has written $X$.
+3. $\text{C}(X)$, the `commit bit` for $X$, which is true if and only if the most recent transaction to write $X$ has already committed.
+
+### 18.8.2 Physically Unrealizable Behaviors
+
+Another job of the scheduler is to check that whenever a read or write occurs, what happens in real time could have happened if each transaction had executed instantaneously at the moment of its timestamp. If not, we say the behavior is `physically unrealizable`. There are two kinds of problems that can occur:
+
+1. `Read too late`: Transaction $T$ tries to read database element $X$, but the write time of $X$ indicates that the current value of $X$ was written after $T$ theoretically expired. That is, $\text{TS}(T) < \text{WT}(X)$.
+2. `Write too late`: Transaction $T$ tries to write database element $X$. However, the read time of $X$ indicates that some other transaction should have read the value written by $T$, but read some other value instead. That is, $\text{WT}(X) < \text{TS}(T) < \text{RT}(X)$.
+
+### 18.8.3 Problems With Dirty Data
+
+There is a class of problems that the commit bit is designed to solve. One of these problems is a `dirty read`. There. transaction $T$ reads $X$, and $X$ was last written by $U$. The timestamp of $U$ is less than that of $T$, and the read by $T$ occurs after the write by $U$ in real time, so the event seems to be physically realizable. However, it is possible that after $T$ reads the value of $X$ written by $U$, transaction $U$ will abort. Perhaps, $U$ encounters an error condition in its own data.
+
+Thus, although there is nothing physically unrealizable about $T$ reading $X$, it is better to delay $T$'s read until $U$ commits or aborts. We can tell that $U$ is not committed because the commit bit $\text{C}(X)$ will be false.
+
+### 18.8.4 The Rules for Timestamp-Based Scheduling
