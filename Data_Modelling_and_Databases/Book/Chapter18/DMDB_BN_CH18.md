@@ -356,3 +356,42 @@ The rules are as follows:
 ### 18.8.6 Timestamps Versus Locking
 
 *Left out.*
+
+## 18.9 Concurrency COntrol by Validation
+
+Validation is another type of optimistic concurrency control, where we allow transactions to access data without locks, and at the appropriate time we check that the transaction has behave in a serializable manner. Validation differs from timestamping principally in that the scheduler maintains a record of what active transactions are doing, rather than keeping read and write times for all database elements.
+
+### 18.9.1 Architecture of a Validation-Based Scheduler
+
+When validation is used as the concurrency-control mechanism, the scheduler must be told for each transaction $T$ the sets of database elements $T$ reads and writes, the `read set`, $\text{RS}(T)$, and the `write set`, $\text{WS}(T)$, respectively. Transactions are executed in three phases:
+
+1. `Read`: In the first phase, the transaction reads from the database all the elements in its read set.
+2. `Validate`: In the second phase, the scheduler validates the transaction by comparing its read and write sets with those of other transactions.
+3. `Write`: In the third phase, the transaction writes to the database its values for the elements in its write set.
+
+To support the decision whether to validate a transaction, the scheduler maintains three sets:
+
+1. $\text{START}$, the set of transactions that have started, but not yet completed validation. For each transaction $T$ in this set, the scheduler maintains $\text{START}(T)$, the time at which $T$ started.
+2. $\text{VAL}$, the set of transactions that have been validated but not yet finished the writing of phase 3. For each transaction $T$ in this set, the scheduler maintains both $\text{START}(T)$ and $\text{VAL}(T)$, the time at which $T$ validated.
+3. $\text{FIN}$, the set of transactions that have completed phase 3. For these transactions $T$, the scheduler records $\text{START}(T)$, $\text{VAL}(T)$, and $FIN(T)$, the time at which $T$ finished. In principle this set grows, but as we shall see, we do not have to remember transactions $T$ if $\text{FIN}(T) < \text{START}(U)$ for any active transaction $U$.
+
+### 18.8.2 The Validation Rules
+
+We may summarize with the following rules for validating a transaction $T$:
+
+- Check that $\text{RS}(T) \cap \text{WS}(U) = \emptyset$ for any previously validated $U$ that did not finish before $T$ started, i.e., if $\text{FIN}(U) > \text{START}(T)$.
+- Check that $\text{WS}(T) \cap \text{WS}(U) = \emptyset$ for any previously validated $U$ that did not finish before $T$ validated, i.e., if $\text{FIN}(U) > \text{VAL}(T)$.
+
+### 18.9.3 Comparison of Three Concurrency-Control Mechanisms
+
+The three approaches to serializability that we have considered - locks, timestamps, and validation - each have their advantages. First, they can be compared for their storage utilization:
+
+- *Locks*: Space in the lock table is proportional to the number of database elements locked.
+- *Timestamps*: In a naive implementation, space is needed for read- and write-times with every database element, whether or not it is currently accessed.
+- *Validation*: Space is used for timestamps and read/write sets for each currently active transaction.
+
+We can also compare methods for their effect on the ability of transactions to complete without delay. The performance of the three methods depends on whether `interaction` among transactions, that is the likelihood that a transaction will access an element that is also being accessed by a concurrent transaction, is high or low:
+
+- Locking delays transactions but avoids rollbacks, even when interaction is high. Timestamps and validation to not delay transactions, but can cause them to rollback, which is a more serious from of delay and also wastes resources.
+- If interference is low, then neither timestamps nor validation will cause many rollbacks.
+- When a rollback is necessary, timestamps catch some problems earlier than validation, which always lets a transaction do all its internal work before considering whether the transaction must rollback.
