@@ -329,3 +329,30 @@ There is a class of problems that the commit bit is designed to solve. One of th
 Thus, although there is nothing physically unrealizable about $T$ reading $X$, it is better to delay $T$'s read until $U$ commits or aborts. We can tell that $U$ is not committed because the commit bit $\text{C}(X)$ will be false.
 
 ### 18.8.4 The Rules for Timestamp-Based Scheduling
+
+We can now summarize the rules that a scheduler using timestamps must follow to make sure that nothing physically unrealizable may occur.
+
+The rules are as follows:
+
+1. Suppose the scheduler receives a request $r_T(X)$
+   1. If $\text{TS}(T) \geq \text{WT}(X)$, the read is physically realizable.
+      1. If $\text{C}(X)$ is true, grant the request. If $\text{TS}(T) > \text{RT}(X)$, set $\text{RT}(x) := \text{TS}(T)$, otherwise do not change $\text{RT}(X)$.
+      2. If $\text{C}(X)$ is false, delay $T$ until $\text{C}(X)$ becomes true, or the transaction that wrote $X$ aborts.
+   2. If $\text{TS}(T) < \text{WT}(X)$, the read is physically unrealizable. Rollback $T$, that is, abort $T$ and restart it with a new, larger timestamp.
+2. Suppose the scheduler receives a request $w_T(X)$.
+   1. If $\text{TS} \geq \text{RT}(X)$ and $\text{TS}(T) \geq \text{WT}(X)$, the write is physically realizable and must be performed.
+      1. Write the new value for $X$,
+      2. Set $\text{WT}(X) := \text{TS}(T)$, and
+      3. Set $\text{C}(X) := \text{false}$.
+   2. If $\text{TS}(T) \geq \text{RT}(X)$, but $\text{TS}(T) < \text{WT}(X)$, then the write is physically realizable, but there is already a later value in $X$. If $\text{C}(X)$ is true, then the previous writer of $X$ is committed, and we simply ignore the write by $T$. We allow $T$ to proceed and make no change to the database. However, if $\text{C}(X)$ is false, then we must delay $T$ as in point $1.1.2$.
+   3. If $\text{TS}(T) < \text{RT}(X)$, then the write is physically unrealizable, and $T$ must be rolled back.
+3. Suppose the scheduler receives a request to commit $T$. It must find all the database elements $X$ written by $T$, and set $\text{C}(X) := \text{true}$.
+4. Suppose the scheduler receives a request to abort $T$ or decides to rollback $T$ as in $1.2$ or $2.3$. Then any transaction that was waiting on an element $X$ that $T$ wrote must repeat its attempt to read or write.
+
+### 18.8.5 Multiversion Timestamps
+
+*Left out.*
+
+### 18.8.6 Timestamps Versus Locking
+
+*Left out.*
