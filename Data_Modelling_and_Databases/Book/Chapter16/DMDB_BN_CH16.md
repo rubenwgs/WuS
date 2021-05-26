@@ -290,3 +290,132 @@ Another general rule is:
 Furthermore, let us call an operator $\gamma_L$ `duplicate-impervious` if the only aggregations in $L$ are $\text{MIN}$ and/or $\text{MAX}$. Then:
 
 - $\gamma_L(R) = \gamma_L(\delta(R))$ provided $\gamma_L$ is duplicate-impervious.
+
+## 16.3 From Parse Trees to Logical Query Plans
+
+We now resume our discussion of the query compiler. Having constructed a parse tree for a query, we next need to turn thr parse tree into the preferred logical query plan.
+
+The first step is to replace the nodes and structures of the parse tree by an operator or operators of relational algebra.  
+The second step is to take the relational-algebra expression produced by the first step and to turn it into an expression that we expect can be converted to the most efficient physical query plan.
+
+### 16.3.1 Conversion to Relational Algebra
+
+We shall now describe informally some rules for transforming SQL parse trees to algebraic logical query plans.
+
+- If we have $<\text{Query}>$ with a $<\text{Condition}>$ that has no subqueries, then we may replace the entire construct - the select-list, from-list, and condition - by a relational-algebra expression consisting from bottom to top of:
+    1. The product of all the relations mentioned in the $<\text{FromList}>$, which is the argument of:
+    2. A selection $\sigma_C$, where $C$ is the $<\text{Condition}>$ expression in the construct being replaced, which in turn is the argument of:
+    3. A projection $\pi_L$, where $L$ is the list of attributes in the $<\text{SelList}>$
+
+### 16.3.2 Removing Subqueries From Conditions
+
+For parse trees with a $<\text{Condition}>$ that has a subquery, we shall introduce an intermediate form of operator, between the syntactic categories of the parse tree and the relational-algebra  operators that apply to relations. This operator is often called `two-argument selection`. We shall represent a two-argument selection in a transformed parse tree by a node labeled $\sigma$, with no parameter. Below this node is a left child that represents the relation $R$ upon which the selection is being performed, and a right child that is an expression for the condition applied to each tuple of $R$.
+
+### 16.3.3 Improving the Logical Query Plan
+
+When we convert our query to relational algebra we obtain one possible logical query plan. The next step is to rewrite the plan using the algebraic laws outlined in Section 16.2.
+
+### 16.3.4 Grouping Associative/Commutative Operators
+
+An operator that is associative and commutative operators may be thought of as having any number of operands. Thinking of an operator such as join as having any number of operands lets us reorder those operands so that when the multiway join is executed as a sequence of binary joins, they take less time than if we had executed the joins in the order implied by the parse tree.
+
+Natural joins and theta-joins can also be combined with each other under certain circumstances:
+
+1. We must replace the natural joins with theta-joins that equate the attributes of the same name.
+2. We must add a projection to eliminate duplicate copies of attributes of the same name.
+3. The theta-join conditions must be associative.
+
+## 16.4 Estimating the Cost of Operations
+
+*Left out.*
+
+## 16.5 Introduction to Cost-Based Plan Selection
+
+*Left out.*
+
+## 16.6 Choosing an Order for Joins
+
+*Left out.*
+
+## 16.7 Completing the Physical-Query-Plan
+
+We have parsed the query, converted it to an initial logical query plan, and improved that logical query plan.
+
+There are still several steps needed to turn the logical plan into a complete physical plan. The principle issues that we must yet cover are:
+
+1. Selection of algorithms to implement the operations of the query plan.
+2. Decisions regarding when intermediate results will be *materialized*, and when they will be *pipelined*.
+3. Notation for physical-query-plan operators, which must include details regarding access methods for stored relations and algorithms for implementation of relational-algebra operators.
+
+### 16.7.1 Choosing a Selection Method
+
+*Left out.*
+
+### 16.7.2 Choosing a Join Method
+
+*Left out.*
+
+### 16.7.3 Pipelining Versus Materialization
+
+*Left out.*
+
+### 16.7.4 Pipelining Unary Operations
+
+*Left out.*
+
+### 16.7.5 Pipelining Binary Operations
+
+*Left out.*
+
+### 16.7.6 Notation for Physical Query Plans
+
+We shall now catalog the various operators that are typically found in physical query plans. Unlike the relational algebra, whose notation is fairly standard, each DBMS will use its own internal notation for physical query plans.
+
+#### Operators for Leaves
+
+Each relation $R$ that is a leaf operand of the logical-query-plan tree will be replaced by a scan operator. The options are:
+
+1. $\text{TableScan}(R):$ All blocks holding tuples of $R$ are read in arbitrary order.
+2. $\text{SortScan}(R, \, L):$ Tuples of $R$ are read in order, sorted according to the attributes on list $L$.
+3. $\text{IndexScan}(R, \, C):$ Here, $C$ is a condition of the form $A \theta c$, where $A$ is an attribute of $R$, $\theta$ is a comparison such as $=$ or $<$, and $c$ is a constant. Tuples of $R$ are accessed through and index an attribute $A$.
+4. $\text{IndexScan}(R, \, A):$ Here, $A$ is an attribute of $R$. The entire relation $R$ is retrieved via an index on $R.A$. This operator behaves like $\text{TableScan}$.
+
+#### Physical Operators for Selection
+
+A logical operator $\sigma_C(R)$ is often combined, or partially combined, with the access method for relation $R$, when $R$ is a stored relation.  
+The notation we shall use for the various selection implementations are:
+
+1. We may simply replace $\sigma_C(R)$ by the operator $\text{Filter}(C)$. If $R$ is a stored or materialized relation, we must use an operator, $\text{TableScan}$ or $\text{SortScan}(R, \, L)$, to access $R$.
+2. If condition $C$ can be expressed as $A \theta c \text{ AND } D$ for some other condition $D$, and there is an index on $R.A$, then we may:
+   1. Use the operator $\text{IndexScan}(R, \, A \theta c)$ to access $R$, and
+   2. Use $\text{Filter}(D)$ in place of the selection $\sigma_C(R)$.
+
+#### Physical Sort Operators
+
+Sorting of a relation can occur at any point in the physical query plan. We have already introduced the $\text{SortScan}(R, \, L)$ operator, which reads a stored relation $R$ and produces it sorted according to the list of attributes $L$.
+
+#### Other Relational-Algebra Operations
+
+All other operations are replaced by a suitable physical operator. These operators can be given designations that indicate:
+
+1. The operation being performed, e.g., join or grouping.
+2. Necessary parameters, e.g., the condition in theta-join or the list of elements in a grouping.
+3. A general strategy for the algorithm: sort-based, hash-based, or index-based, e.g.
+4. A decision about the number of passes to be used: one-pass, two-pass, or multipass.
+5. An anticipated number of buffers the operation will require.
+
+Example: Fig 16.39 shows a physical plan for a previously introduced example:
+
+<img src="./Figures/DMDB_BN_Fig16-39.PNG" width="350px"/><br>
+
+*Figure 16.39: A physical plan from a previous example.*
+
+#### 16.7.7 Ordering of Physical Operations
+
+Our final topic regarding physical query plans is the matter of order of operations. The physical query plan is generally represented as a tree, and trees imply something about the order of operations, since data must flow up the tree.
+
+The following rules summarize the ordering of events implicit in a physical-query-plan tree:
+
+1. Break the tree into subtrees at each edge that represents materialization. The subtrees will be executed one-at-a-time.
+2. Order the execution of the subtrees in a bottom-up, left-to-right manner.
+3. Execute all nodes of each subtree using a network of iterators. Thus, all the nodes in one subtree are executed simultaneously, with $\text{GetNext}$ calls among their operators determining the exact order of events.
