@@ -297,3 +297,14 @@ The following restrictions on locks from the `tree protocol`. We assume that the
 ### 18.7.3 Why the Tree Protocol Works
 
 *Left out.*
+
+## 18.8 Concurrency Control by Timestamps
+
+Next, we shall consider two methods other than locking that are used in some systems to assure serializability of transactions:
+
+1. `Timestamping`: Assign a "timestamp" to each transaction. Record the timestamps of the transactions that last read and write each database element, and compare these values with the transactions timestamps, to assure that the serial schedule according to the transactions' timestamps is equivalent to the actual schedule of the transactions.
+2. `Validation`: Examine timestamps of the transaction and the database elements when a transaction is about to commit. This process is called "validation" of the transaction. The serial schedule that orders transactions according to their validation time must be equivalent to the actual schedule.
+
+Both these approaches are `optimistic`, in the sense that they assume that no unserializable behavior will occur and only fix things up when a violation is apparent.
+
+### 18.8.1 Timestamps
