@@ -235,3 +235,39 @@ Example: Fig. 18.14 is the compatibility matrix for shared ($S$) and exclusive (
 ### 18.4.5 Increment Locks
 
 *Left out.*
+
+## 18.5 An Architecture for a Locking Scheduler
+
+*Left out.*
+
+## 18.6 Hierarchies of Database Elements
+
+### 18.6.1 Locks With Multiple Granularity
+
+Recall that the term "database element" was purposely left undefined, because different systems use different sizes of database elements to lock, such as tuples, pages or blocks, and relations.
+
+### 18.6.2 Warning Locks
+
+The solution to the problem of managing locks at different granularities involves a new kind of lock called a "warning". These locks are useful when the database elements form a nested or hierarchical structure. There, we see three levels of database elements:
+
+1. Relations are the largest lockable elements.
+2. Each relation is composed of one or more block or pages, on which its tuples are stored.
+3. Each block contains one or more tuples.
+
+The rules for managing locks on a hierarchy of database elements constitute the `warning protocol`, which involves both "ordinary" locks and "warning" locks. We shall describe the lock scheme where the ordinary locks are $S$ and $X$ (shared and exclusive). The warning locks will be denoted by prefix $I$ (for "intention to") to the ordinary locks, for example $IS$ represents the intention to obtain a shared lock on a subelement. The rules of the warning protocol are:
+
+1. To place and ordinary $S$ or $X$ lock on any element, we must begin at the root of the hierarchy.
+2. If wea re at the element that we want to lock, we need look no further. We request an $S$ or $X$ lock on that element.
+If the element we wish to lock is further down the hierarchy, then we place a warning at this node. That is, if we want to get a shared lock on a subelement we request an $IS$ lock at this node, and if we want an exclusive lock on a subelement, we request an $IX$ lock on this node. When the lock on the current node is granted, we proceed to the appropriate child. We then repeat step $(2)$ or step $(3)$, as appropriate, until we reach the desired node.
+
+In order to decide whether or not one of these locks can be granted, we use the compatibility matrix of Fig. 18.28 below:
+
+<img src="./Figures/DMDB_BN_Fig18-28.PNG" width="350px"/><br>
+
+*Figure 18.28: Compatibility matrix for shared, exclusive, and intention locks.*
+
+### 18.6.3 Phantoms and Handling Insertions Correctly
+
+When transactions create new subelements of a lockable element, there are some opportunities to go wrong. The problem is that we can only lock existing items. There is no way to lock database elements that do not exist but might later be inserted.
+
+A `phantom tuple` is one that should have been locked but wasn't, because it didn't exist at the time the locks were taken. There is, however, a simple way to avoid the occurrence of phantoms. We must regard the insertion or deletion of a tuple as a write operation on the relation as a whole. Thus,w e must obtain an $X$ on the relation before executing a insertion or deletion.
