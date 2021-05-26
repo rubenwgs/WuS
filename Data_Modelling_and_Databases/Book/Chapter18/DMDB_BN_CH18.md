@@ -29,7 +29,7 @@ A schedule is `serial` if its actions consist of all the actions of one transact
 
 Example: Fig. 18.3 shows one of the two possible serial schedules of the transactions in Fig. 18.2:
 
-<img src="./Figures/DMDB_BN_Fig18-3.PNG" height="400px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-3.PNG" width="400px"/><br>
 
 *Figure 18.3: Serial schedule in which $T_1$ precedes $T_2$.*
 
@@ -39,13 +39,13 @@ In general, we say a schedule $S$ is `serializable` if there is a serial schedul
 
 Example: Fig. 18.5 below shows a schedule of our previous example that is serializable but not serial. Since all consistent database states have $A = B = c$ for some constant $c$, it is not hard to deduce that in the schedule of Fig. 18.5, both $A$ and $B$ will be left with the value $2(c + 100)$, and thus consistency is preserved.
 
-<img src="./Figures/DMDB_BN_Fig18-5.PNG" height="400px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-5.PNG" width="400px"/><br>
 
 *Figure 18.5: A serializable, but not serial, schedule.*
 
 On the other hand, consider the schedule of Fig 18.6 below, which is not serializable. The reason we can be sure it is not serializable is that it takes the consistent state $A = B = 25$ and leaves the database in an inconsistent state, where $A = 250$ and $B = 150$.
 
-<img src="./Figures/DMDB_BN_Fig18-6.PNG" height="400px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-6.PNG" width="400px"/><br>
 
 *Figure 18.6: A nonserializable schedule.*
 
@@ -101,7 +101,7 @@ $$
 
 from our previous example. We claim this schedule is conflict-serializable. Fig. 18.8 below shows the sequence of swaps in which this schedule is converted to the serial schedule $(T_1, \, T_2)$, where all of $T_1$'s actions precede all those of $T_2$.
 
-<img src="./Figures/DMDB_BN_Fig18-8.PNG" height="500px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-8.PNG" width="500px"/><br>
 
 *Figure 18.8: Converting a conflict-serializable schedule to a serial schedule by swaps of adjacent actions.*
 
@@ -124,7 +124,7 @@ $$
 If we look at the actions involving $A$,w e find several reason why $T_2 <_S T_3$. For example, $r_2(A)$ comes ahead of $w_3(A)$. Similarly, if we look at the actions involving $B$, we find that there are several reasons why $T_1 <_S T_2$. For instance, the action $r_1(B)$ comes before $w_2(B)$.  
 We therefore end up with the following precedence graph:
 
-<img src="./Figures/DMDB_BN_Fig18-9.PNG" height="350px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-9.PNG" width="350px"/><br>
 
 *Figure 18.9: The precedence graph for the schedule $S$ of the example above.*
 
@@ -160,7 +160,7 @@ The `legality of schedules` is stated as: "*If there are actions $l_i(X)$ follow
 
 Example: Let us consider the two transactions $T_1$ and $T_2$ that were introduce at the beginning of this chapter. Then Fig. 18.12 below shows one legal schedule of these two transactions:
 
-<img src="./Figures/DMDB_BN_Fig18-12.PNG" height="400px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-12.PNG" width="400px"/><br>
 
 *Figure 18.12: A legal schedule of consistent transactions. Unfortunately it is not serializable.*
 
@@ -176,7 +176,7 @@ There is a surprising condition, called `two-phase locking (2PL)` under which we
 
 The "two phases" referred to by 2PL are thus the first phase, where locks are obtained, and the second phase, where locks are relinquished. A transaction that obeys the 2PL condition is said to be a `two-phase-locked transaction`, or 2PL transaction.
 
-<img src="./Figures/DMDB_BN_Fig18-13.PNG" height="450px"/><br>
+<img src="./Figures/DMDB_BN_Fig18-13.PNG" width="450px"/><br>
 
 *Figure 18.13: The locking scheduler delays requests that would result in an illegal schedule.*
 
@@ -191,3 +191,47 @@ The locking scheme of Section 18.3 illustrates the important ideas behind lockin
 We are thus motivated to introduce the most common locking scheme, where there are two different kinds of locks, one for reading (called a `shared lock`), and one for writing (called an `exclusive lock`).
 
 ### 18.4.1 Shared and Exclusive Locks
+
+Let us consider a locking scheduler that uses two different kinds of locks: `shared locks` and `exclusive locks`. For any database element $X$ there can be either one exclusive lock on $X$, or no exclusive locks but any number of shared locks. If we want to write $X$, we need to have an exclusive lock on $X$, but if we wish only to read $X$ we may have either a shared or exclusive lock on $X$.
+
+We shall use $sl_i(X)$ to mean "transaction $T_i$ requests a shared lock on database element $X$" and $xl_i(X)$ for "$T_i$ requests an exclusive lock on $X$". We continue to use $u_i(X)$ to mean that $T_i$ unlocks $X$.
+
+The three kinds of requirements - consistency and 2PL for transactions, and legality of schedules - each have their counterpart for a shared/exclusive lock system. We summarize these requirements here:
+
+1. `Consistency of transactions`: A transaction may not write without holding an exclusive lock, and you may not read without holding some lock. More precisely, in any transaction $T_i$,
+   1. A read action $r_i(X)$ must be preceded by $sl_i(X)$ or $xl_i(X)$, with no intervening $u_i(X)$.
+   2. A write action $w_i(X)$ must be preceded by $xl_i(X)$, with no intervening $u_i(X)$.
+
+    All locks must be followed by an unlock of the same element.
+2. `Two-phase locking of transactions`: Locking must precede unlocking. To be more precise, in any two-phase locked transaction $T_i$, no action $sl_i(X)$ or $xl_i(X)$ can be preceded by an action $u_i(Y)$, for any $Y$.
+3. `Legality of schedules`: An element may either be locked exclusively by one transaction or by several in shared mode, but not both. More precisely:
+   1. If $xl_i(X)$ appears in a schedule, then there cannot be a following $xl_j(X)$ or $sl_j(X)$, for some $j$ other than $i$, without an intervening $u_i(X)$.
+   2. If $sl_i(X)$ appears in a schedule, then there cannot be a following $xl_j(X)$, for $j \neq i$, without an intervening $u_i(X)$.
+
+Note that we do allow one transaction to request and hold both shared and exclusive locks on the same element, provided its doing so does not conflict with the locks of other transactions.
+
+### 18.4.2 Compatibility Matrices
+
+A `compatibility matrix` is a convenient way to describe lock-management policies. It has a row and column for each lock mode.
+
+The rule for using a compatibility matrix for lock-granting decisions is:
+
+- We can grant the lock on $X$ in mode $C$ if and only if for every row $R$ such that there is already a lock on $X$ in mode $R$ by some other transaction, then there is a "Yes" in column $C$.
+
+Example: Fig. 18.14 is the compatibility matrix for shared ($S$) and exclusive ($X$) locks. The column for $S$ says that we can grant a shared lock on an element if the only locks held on that element currently are shared locks. The column for $X$ says that we can grant an exclusive lock only if there are no other locks held currently.
+
+<img src="./Figures/DMDB_BN_Fig18-14.PNG" width="350px"/><br>
+
+*Figure 18.16: The compatibility matrix for shared and exclusive locks.*
+
+### 18.4.3 Upgrading Locks
+
+*Left out.*
+
+### 18.4.4 Update Locks
+
+*Left out.*
+
+### 18.4.5 Increment Locks
+
+*Left out.*
