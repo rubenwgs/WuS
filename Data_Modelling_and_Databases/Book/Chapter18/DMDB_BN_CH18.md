@@ -71,3 +71,67 @@ To make the notation precise:
 1. An `action` is an expression of the form $r_i(X)$ or $w_i(X)$, meaning that transaction $T_i$ reads or writes, respectively, the database element $X$.
 2. A `transaction` $T_i$ is a sequence of actions with subscript $i$.
 3. A `schedule` $S$ of a set of transactions $\mathcal{T}$ is a sequence of actions, in which for each transaction $T_i$ in $\mathcal{T}$, the actions of $T_i$ appear in $S$ in the same order that they appear in the definition of $T_i$ itself. We say that $S$ is an `interleaving` of the actions of the transactions of which it is composed.
+
+## 18.2 Conflict-Serializability
+
+Schedulers in commercial systems generally enforce a condition, called "`conflict-serializability`". It is based on the idea of a `conflict`: a pair of consecutive actions in a schedule such that, if their order is interchanged, then the behavior of at least one of the transactions involved can change.
+
+### 18.2.1 Conflicts
+
+In what follows, we assume that $T_i$ and $T_j$ are different transactions, i.e., $i \neq j$:
+
+1. $r_i(X); \, r_j(Y)$ is never a conflict, even if $X = Y$, since neither of these steps change the value of any database element.
+2. $r_i(X); \, w_j(Y)$ is not a conflict provided $X \neq Y$, since if $T_j$ should write $Y$ before $T_i$ reads $X$, the value of $X$ is not changed. Also, the read of $X$ by $T_i$ has no effect on the value $T_j$ writes for $Y$.
+3. $w_i(X); \, r_j(Y)$ is not a conflict if $X \neq Y$, for the same reason as $(2)$.
+4. Similarly, $w_i(X); \, w_j(Y)$ is not a conflict as long as $X \neq Y$.
+
+On the other hand, there are three situations where we may not swap the order of actions:
+
+1. Two actions of the same transaction, e.g., $r_i(X); \, w_i(Y)$, always conflict. The reason is that the order of actions of a single transaction are fixed and may not be recorded.
+2. Two writes of the same database element by different transactions conflict. That is, $w_i(X); \, w_j(X)$ is a conflict. If we swap the order, then we leave $X$ with the value computed by $T_i$ instead of $T_j$ as before.
+3. A read and a write of the same database element by different transactions also conflict. That is, $r_i(X); \, w_j(X)$ is a conflict, and so is $w_i(X); \, r_j(X)$.
+
+We say that two schedules are `conflict-equivalent` if they can be turned one into the other by a sequence of nonconflicting swaps of adjacent actions. We shall call a schedule `conflict-serializable` if its is conflict-equivalent to a serial schedule. Note that conflict-serializable is a sufficient condition for serializability.
+
+Example: Consider the schedule
+
+$$
+r_1(A); \, w_1(A); \, r_2(A); \, w_2(A); \, r_1(B); \, w_1(B); \, r_2(B); \, w_2(B);
+$$
+
+from our previous example. We claim this schedule is conflict-serializable. Fig. 18.8 below shows the sequence of swaps in which this schedule is converted to the serial schedule $(T_1, \, T_2)$, where all of $T_1$'s actions precede all those of $T_2$.
+
+<img src="./Figures/DMDB_BN_Fig18-8.PNG" height="500px"/><br>
+
+*Figure 18.8: Converting a conflict-serializable schedule to a serial schedule by swaps of adjacent actions.*
+
+### 18.2.2 Precedence Graphs and a Test for Conflict-Serializability
+
+Given a schedule $S$, involving transactions $T_1$ and $T_2$, perhaps among other transactions, we say that $T_1$ `takes precedence over`$T_2$, written $T_1 <_S T_2$, if there are actions $A_1$ of $T_1$ and $A_2$ of $T_2$, such that:
+
+1. $A_1$ is ahead of $A_2$ in $S$,
+2. Both $A_1$ and $A_2$ involve the same database element, and
+3. At least one of$A_1$ and $A_2$ is a write action.
+
+We can summarize these precedences in a `precedence graph`. The nodes of the precedence graph are the transactions of a schedule $S$. When the transactions are $T_i$ for various $i$, we shall label the node for $T_i$ by only the integer $i$. There is an arc from node $i$ to $j$ if $T_i <_S T_j$.
+
+Example: The following schedule $S$ involves three transactions, $T_1$, $T_2$, and $T_3$:
+
+$$
+S: \, r_2(A); \, r_1(B); \, w_2(A); \, r_3(A); \, w_1(B); \, w_3(A); \, r_2(B); \, w_2(B);
+$$
+
+If we look at the actions involving $A$,w e find several reason why $T_2 <_S T_3$. For example, $r_2(A)$ comes ahead of $w_3(A)$. Similarly, if we look at the actions involving $B$, we find that there are several reasons why $T_1 <_S T_2$. For instance, the action $r_1(B)$ comes before $w_2(B)$.  
+We therefore end up with the following precedence graph:
+
+<img src="./Figures/DMDB_BN_Fig18-9.PNG" height="350px"/><br>
+
+*Figure 18.9: The precedence graph for the schedule $S$ of the example above.*
+
+To tell whether a schedule $S$ is conflict-serializable, construct the precedence graph for $S$ and ask if there are any cycles. IF so, then $S$ is not conflict-serializable. But if the graph is acyclic, then $S$ is conflict-serializable, and moreover, any topological order of the nodes is conflict-equivalent serial order.
+
+### 18.2.3 Why the Precedence-Graph Test Works
+
+*Left out.*
+
+
