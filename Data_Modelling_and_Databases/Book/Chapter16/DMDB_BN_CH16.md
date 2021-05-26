@@ -419,3 +419,41 @@ The following rules summarize the ordering of events implicit in a physical-quer
 1. Break the tree into subtrees at each edge that represents materialization. The subtrees will be executed one-at-a-time.
 2. Order the execution of the subtrees in a bottom-up, left-to-right manner.
 3. Execute all nodes of each subtree using a network of iterators. Thus, all the nodes in one subtree are executed simultaneously, with $\text{GetNext}$ calls among their operators determining the exact order of events.
+
+## 16.8 Summary of Chapter 16
+
+#### Compilation of Queries
+
+`Compilation` turns a query into a physical query plan, which is a sequence of operations that can be implemented by the query-execution engine.
+
+#### The Parser
+
+The first step in processing a SQL is to `parse` it, as one would for code in any programming language. The result of parsing is a `parse tree`.
+
+#### View Expansion
+
+Queries that refer to virtual views must have these references in the parse tree replaced by the tree for the expression that defines the view.
+
+#### Semantic Checking
+
+A `preprocessor` examines the parse tree, checks that the attributes, relation names, and types make sense, and resolves attribute references.
+
+#### Conversion to a Logical Query Plan
+
+The query processor must convert the semantically checked parse tree to an algebraic expression. Much of the conversion to relational algebra is straight forward.
+
+#### Algebraic Transformations
+
+There are many ways that a logical query plan can be transformed to a better plan using algebraic transformations.
+
+#### Choosing a Logical Query Plan
+
+The query processor must select that query plan that is most likely to lead to an efficient physical plan.
+
+#### Physical Plans for Selection
+
+If possible, a selection should be broken into an index scan of the relation to which the selection is applied, followed by a filter operation.
+
+#### Pipelining Versus Materialization
+
+Ideally, the result of each physical operator is consumed by another operator, with the result being passed between the two in main memory, perhaps using an iterator to control the flow of data from one to the other. However, sometimes there is an advantage to storing the result of one operator to save space in main memory for other operators.
