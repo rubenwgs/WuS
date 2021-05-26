@@ -183,3 +183,11 @@ The "two phases" referred to by 2PL are thus the first phase, where locks are ob
 ### 18.3.4 Why Two-Phase Locking Works
 
 *Left out.*
+
+## 18.4 Locking Systems With Several Lock Modes
+
+The locking scheme of Section 18.3 illustrates the important ideas behind locking, but it is too simple to be a practical scheme. The main problem is that a transaction $T$ must take a lock on a database element $X$ even if it only wants to read $X$ and not write it.
+
+We are thus motivated to introduce the most common locking scheme, where there are two different kinds of locks, one for reading (called a `shared lock`), and one for writing (called an `exclusive lock`).
+
+### 18.4.1 Shared and Exclusive Locks
