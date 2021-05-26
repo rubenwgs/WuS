@@ -139,3 +139,47 @@ To tell whether a schedule $S$ is conflict-serializable, construct the precedenc
 In this section, we introduce the concept of locking with a simple locking scheme. In this scheme, there is only one kind of lock, which transactions must obtain on a database element if they want to perform any operation whatsoever on that element.
 
 ### 18.3.1 Locks
+
+A locking scheduler, like most types of scheduler, enforces conflict-serializability, which as we leaned is a more stringent condition that correctness, or even serializability.
+
+When a scheduler uses `locks`, transactions must request and release locks, in addition to reading and writing database elements. The use of locks must be proper in two senses:
+
+- `Consistency of Transactions`: Actions and locks must relate in the expected ways:
+    1. A transaction can only read or write an element if it previously way granted a lock on that element and hasn't yet released the lock.
+    2. If a transaction locks an element, it must later unlock that element.
+- `Legality of Schedules`: Locks must have their intended meaning: no two transactions may have locked the same element without having first released the lock.
+
+We shall extend our notation for actions to include locking and unlocking actions:
+
+- $l_i(X):$ Transaction $T_i$ requests a lock on database element $X$.
+- $u_i(X):$ Transaction $T_i$ releases its lock on database element $X$.
+
+Thus, the `consistency` condition for transactions can be stated as: "*Whenever a transaction $T_i$ has an action $r_i(X)$ or $w_i(X)$, then there is a previous action $l_i(X)$ with no intervening action $u_i(X)$, and there is a subsequent $u_i(X)$.*"
+
+The `legality of schedules` is stated as: "*If there are actions $l_i(X)$ followed by $l_j(X)$ in a schedule, then somewhere between these actions there must be an action $u_i(X)$.*"
+
+Example: Let us consider the two transactions $T_1$ and $T_2$ that were introduce at the beginning of this chapter. Then Fig. 18.12 below shows one legal schedule of these two transactions:
+
+<img src="./Figures/DMDB_BN_Fig18-12.PNG" height="400px"/><br>
+
+*Figure 18.12: A legal schedule of consistent transactions. Unfortunately it is not serializable.*
+
+### 18.3.2 The Locking Scheduler
+
+It is the job of the a scheduler based on locking to grant requests if and only if the request will result in a legal schedule. If a request is not granted, the requesting transaction is delayed. It waits until the scheduler grants its request at a later time. To aid its decisions, the scheduler has a `lock table` that tells, for every database element, the transaction that currently holds a ock on that element.
+
+### 18.3.3 Two-Phase Locking
+
+There is a surprising condition, called `two-phase locking (2PL)` under which we can guarantee that a legal schedule of consistent transactions is conflict-serializable:
+
+- In every transaction, all lock actions precede all unlock actions.
+
+The "two phases" referred to by 2PL are thus the first phase, where locks are obtained, and the second phase, where locks are relinquished. A transaction that obeys the 2PL condition is said to be a `two-phase-locked transaction`, or 2PL transaction.
+
+<img src="./Figures/DMDB_BN_Fig18-13.PNG" height="450px"/><br>
+
+*Figure 18.13: The locking scheduler delays requests that would result in an illegal schedule.*
+
+### 18.3.4 Why Two-Phase Locking Works
+
+*Left out.*
