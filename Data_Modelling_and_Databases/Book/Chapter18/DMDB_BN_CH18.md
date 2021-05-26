@@ -271,3 +271,29 @@ In order to decide whether or not one of these locks can be granted, we use the 
 When transactions create new subelements of a lockable element, there are some opportunities to go wrong. The problem is that we can only lock existing items. There is no way to lock database elements that do not exist but might later be inserted.
 
 A `phantom tuple` is one that should have been locked but wasn't, because it didn't exist at the time the locks were taken. There is, however, a simple way to avoid the occurrence of phantoms. We must regard the insertion or deletion of a tuple as a write operation on the relation as a whole. Thus,w e must obtain an $X$ on the relation before executing a insertion or deletion.
+
+## 18.7 The Tree Protocol
+
+Like section 18.6, this section deals with data in the form of a tree. However, here, the nodes of the tree do not from a hierarchy based on containment. Rather, database elements are disjoint pieces of data, but the only way to get to a node is through its parents. B-trees are an important example of this sort of data.
+
+### 18.7.1 Motivation for Tree-Based Locking
+
+Let us consider a B-tree index in a system that treats individual nodes as lockable database elements.
+
+If we use a standard set of lock modes, like shared, exclusive, and update locks, and we use two-phase locking, then concurrent use of the B-tree is almost impossible.
+
+In most situations, we can deduce almost immediately that a B-tree node will not be rewritten, even if the transaction inserts or deletes a tuple.  
+Thus, as soon as a transaction moves to a child of the root and observes the situation that rules out a rewrite of the root, we would like to release the lock on the root. The same observation applies to the lock on any interior node of the B-tree.
+
+### 18.7.2 Rules for Access to Tree-Structured Data
+
+The following restrictions on locks from the `tree protocol`. We assume that there is only one kind of lock, represented by lock requests of the form $l_i(X)$. 
+
+1. A transaction's first lock may be at any node of the tree.
+2. Subsequent locks may be only acquired if the transaction currently has a lock on the parent node.
+3. Nodes may be unlocked at any time.
+4. A transaction may not relock a node on which it has released a lock, even if it still holds a lock on the node's parent.
+
+### 18.7.3 Why the Tree Protocol Works
+
+*Left out.*
