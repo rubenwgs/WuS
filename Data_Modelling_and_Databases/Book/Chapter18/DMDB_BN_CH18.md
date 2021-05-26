@@ -134,4 +134,8 @@ To tell whether a schedule $S$ is conflict-serializable, construct the precedenc
 
 *Left out.*
 
+## 18.3 Enforcing Serializability by Locks
 
+In this section, we introduce the concept of locking with a simple locking scheme. In this scheme, there is only one kind of lock, which transactions must obtain on a database element if they want to perform any operation whatsoever on that element.
+
+### 18.3.1 Locks
