@@ -104,3 +104,35 @@ However, if there is a cycle, then no transaction in the cycle can ever make pro
 *Left out.*
 
 ## 19.4 Summary of Chapter 19
+
+#### Dirty Data
+
+Data that has been written, either into main-memory buffers or on disk, by a transaction that has not yet committed is called `dirty`.
+
+#### Cascading Rollback
+
+A combination of logging and concurrency control that allows a transaction to read dirty data may have to `roll back` transactions that read such data from a transaction that alter aborts.
+
+#### Strict Locking
+
+The `strict locking` policy requires transactions to hold their locks until not only have they committed, but the commit record on the log has been flushed to disk.
+
+#### Group Commit
+
+We can relax the strict-locking condition that requires commit record to reach disk if we assure that log records are written to disk in the order that they are written.
+
+#### Restoring Database State After an Abort
+
+If a transaction aborts but has written values to buffers, then we can restore old values either from the log or from the disk copy of the database.
+
+#### Logical Logging
+
+For large database elements such as fisk blocks, it saves much space if we record old and new values of the log incrementally, that is, by indicating only the changes.
+
+#### Deadlocks
+
+`Deadlocks` occur when each of a set of transactions is waiting for a resource, such as a lock, currently held by another transaction in the set.
+
+#### Waits-For Graphs
+
+Create a node for each waiting transaction, with an arc to the transaction it is waiting for. The existence of a deadlock is the same as the existence of one or more cycles in the waits-for graph.
