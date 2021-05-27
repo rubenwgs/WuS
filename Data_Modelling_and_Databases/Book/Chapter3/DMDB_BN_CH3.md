@@ -975,4 +975,3 @@ MVD's can also cause redundancy in a relation. 4NF is like BCNF, but also forbid
 #### Reasoning About MVD's 
 
 We can infer MVD's and FD's from a given set of MVD's and FD's by a chase process.
-
