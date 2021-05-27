@@ -397,3 +397,55 @@ We can also compare methods for their effect on the ability of transactions to c
 - When a rollback is necessary, timestamps catch some problems earlier than validation, which always lets a transaction do all its internal work before considering whether the transaction must rollback.
 
 ## 18.10 Summary of Chapter 18
+
+#### Consistent Database States
+
+Database states that obey whatever implied or declared constraints the designers intended are called `consistent`.
+
+#### Consistency of Concurrent Transactions
+
+It is normal for several transactions to have access to a database at the same time. It is the job of the scheduler to assure that concurrently operating transactions also preserve the consistency of the database.
+
+### Schedules
+
+Transactions are broken into actions, mainly reading and writing from the database. A sequence of these actions from one or more transactions is called a `schedule`.
+
+#### Serial Schedules
+
+If transactions execute one at a time, the schedule is said to be `serial`.
+
+#### Serializable Schedules
+
+A schedule that is equivalent in its effect on the database to some serial schedule is said to be `serializable`.
+
+#### Conflict-Serializability
+
+A simple-to-test, sufficient condition for serializability is that the schedule can be made serial by a sequence of swaps of adjacent actions without conflicts. Such a schedule is called `conflict-serializable`.
+
+#### Precedence Graphs
+
+An easy test for conflict-serializability is to construct a `precedence graph` for the schedule. Nodes correspond to transactions, and there is an arc $T \rightarrow U$ if some action $T$ in the schedule conflicts with a later action of $U$. A schedule is conflict-serializable if and only if the precedence graph is acyclic.
+
+#### Locking
+
+The most common approach to assuring serializable schedules is to lock database elements before accessing them, and to release the lock after finishing access to the element.
+
+#### Two-Phase Locking
+
+Locking by itself does not assure serializability. However, `two-phase locking`, in which all transactions first enter a phase where they only acquire locks, and then enter a phase where they only release locks, will guarantee serializability.
+
+#### Lock Modes
+
+To avoid locking out transactions unnecessarily, systems usually use several lock modes, with different rules for each mode about when a lock can be granted.
+
+#### Compatibility Matrices
+
+A compatibility matrix is a useful summary of when it is legal to grant a lock in a certain lock mode.
+
+#### Locking Elements With a Granularity Hierarchy
+
+When both large and small elements - relations, disk blocks, and tuples, perhaps - may need to be locked, a warning system of locks enforces serializability.
+
+#### Locking Elements Arranged in a Tree
+
+If database elements are only accessed by moving down a tree, as in a B-tree index, then a non-two-phase locking strategy can enforce serializability.
