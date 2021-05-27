@@ -70,3 +70,37 @@ Group commit, like the policy of requiring "recoverable schedules" as discussed 
 ### 19.1.8 Recovery From Logical Logs
 
 *Left out.*
+
+## 19.2 Deadlocks
+
+A `deadlock` occurs when each of several transactions is waiting for a resource held by one of the others, and none can make progress.
+
+### 19.2.1 Deadlock Detection by Timeout
+
+When a deadlock exists, it is generally impossible to repair the situation so that all transactions involved can proceed. Thus, at least one of the transactions will have to be aborted and restarted.  
+The simplest way to detect and resolve deadlocks is with a `timeout`. Put a limit on how long a transaction may be active, and if a transaction exceeds this time, roll it back.
+
+### 19.2.2 The Waits-For Graph
+
+Deadlocks that are caused by transactions waiting for locks held by another can be detected by a `waits-for graph`, indicating which transactions are waiting for locks held by another transaction. This graph can be used either to detect deadlocks after they have formed or to prevent deadlocks from ever forming.
+
+If there are no cycles in the waits-for graph, then each transaction can complete eventually.  
+However, if there is a cycle, then no transaction in the cycle can ever make progress, so there is a deadlock.
+
+### 19.2.3 Deadlock Prevention by Ordering Elements
+
+*Left out.*
+
+### 19.2.4 Detecting Deadlocks by Timestamps
+
+*Left out.*
+
+### 19.2.5 Comparison of Deadlock-Management Methods
+
+*Left out.*
+
+## 19.3 Long-Duration Transactions
+
+*Left out.*
+
+## 19.4 Summary of Chapter 19
