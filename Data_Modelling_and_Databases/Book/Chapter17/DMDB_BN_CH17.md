@@ -78,3 +78,32 @@ There are several forms of log record that are used with each of the types of lo
 3. $< \text{ABORT } T$ : Transaction $T$ could not complete successfully.
 
 For an undo log, the only other kind of log record we need is an `update record`, which is a triple $< T, \, X, \, v>$. The meaning of this record is: transaction $T$ has changed database element $X$, and its former value was $v$.
+
+### 17.2.2 The Undo-Logging Rules
+
+An undo log is sufficient to allow recovery from a system failure, provided transactions and the buffer manager obey two rules:
+
+- $U_1$ : If transaction $T$ modifies database element $X$, then the log record of the form $<T, \, X, \, v>$ must be written to the disk *before* the new value of $X$ is written to disk.
+- $U_2$ : If a transaction commits, then its $\text{COMMIT}$ log record must be written to disk only *after* all database elements changed by the transaction have been written to disk, but as soon thereafter as possible.
+
+In order to force log records to disk, the log manager needs a `flush-log` command that tells the buffer manager to copy to disk any log blocks that have not previously been copied to disk or that have been changed since they were last copied.
+
+The following figure shows an example of some actions and their log entries:
+
+<img src="./Figures/DMDB_BN_Fig17-3.JPG" width="450px"/><br>
+
+*Figure 17.3: Actions and their log entries.*
+
+### 17.2.3 Recovery Using Undo Logging
+
+Suppose now that a system failure occurs. The `recovery manager` must use the log to restore the database to some consistent state.
+
+The first task of the recovery manager is to divide the transactions into committed and uncommitted transactions. If there is a log record $< \text{COMMIT } T>$, then by undo rule $U_2$ all changes made by transaction $T$ were previously written to disk.  
+However, suppose that we find a $< \text{START } T>$ record on the log but no $< \text{COMMIT } T>$ record. Then there could have been some changes to the database made by $T$ that were written to disk before the crash, while other changes by $T$ either were not made, or were made in the main-memory buffers but not copied to disk. In this case, $T$ is an `incomplete transaction` and must be `undone`.
+
+The recovery manager must scan the log from the end. As it travels, it remembers all those transactions $T$ for which it has seen a $< \text{COMMIT } T>$ record or an $< \text{ABORT } T>$ record. Also, if it sees a record $<T, \, X, \, v>$, then:
+
+1. If $T$ is a transaction whose $\text{COMMIT}$ record has been seen, then do nothing.
+2. OTherwise, $T$ is an incomplete transaction, or an aborted transaction. The recover manager must change the value of $X$ in the database to $v$, in case $X$ had been altered just before the crash.
+
+After making these changes, the recovery manager must write a log record $< \text{ABORT } T$ for each incomplete transaction $T$ that was not previously aborted, and then flush the log.
