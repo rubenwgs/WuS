@@ -262,4 +262,52 @@ We perform the following steps:
    2. If there are later incremental dumps, modify the database according to each, earlier first.
 2. Modify the database using the surviving log. Use the method of recovery appropriate to the log method being used.
 
-### 17.6 Summary of Chapter 17
+## 17.6 Summary of Chapter 17
+
+#### Logging
+
+A record of every important action of a transaction - beginning, changing a database element, committing, or aborting - is stored on a log.
+
+#### Recovery
+
+When a system crash occurs, the log is used to repair the database, restoring it to a consistent state.
+
+#### Logging Methods
+
+The three principal methods for logging are undo, redo, and undo/redo, named for the ways that they are allowed to fix the database during recovery.
+
+#### Undo Logging
+
+This methods logs the old value, each time a database element is changed. With `undo logging`, a new value of a database element can be written to disk only after the log record for the change has reached disk, but before the commit record for the transaction performing the change reaches disk.
+
+#### Redo Logging
+
+Here, only the new value of database elements is logged. With this form of logging, values of a database element can be written to disk only after both the log record of its change and the commit record for its transaction have reached disk.
+
+#### Undo/Redo Logging
+
+In this method, both old and new values are logged. Undo/redo logging is more flexible than the other methods, since it requires only that the log record of a change appear on the disk before the change itself does. There is no requirement about when the commit record appears.
+
+#### Checkpointing
+
+Since all recovery methods require, in principle, looking at the entire log, the DBMS must occasionally checkpoint the log, to assure that no log records prior to the checkpoint will be needed during a recovery.
+
+#### Nonquiescent Checkpointing
+
+To avoid shutting down the system while a checkpoint is made, techniques associated with each logging method allow the checkpoint to be made while the system is in operation and database changes are occurring.
+
+#### Archiving
+
+While logging protects against system failures involving only the loss of main memory, archiving is necessary to protect against failures where the contents of disk are lost. Archives are copies of the database stored in a safe place.
+
+#### Incremental Backups
+
+Instead of copying the entire database to an archive periodically, a single complete backup can be followed by several incremental backups, where only the changed data is copied to the archive.
+
+#### Nonquiescent Archiving
+
+We can create a backup of the data while the database is in operation. The necessary techniques involve making log records of the beginning and end of the archiving, as well as performing a checkpoint for the log during the archiving.
+
+#### Recovery From Media Failures
+
+When a disk is lost, it may be restored by starting with a full backup of the database, modifying it according to any later incremental backups, and finally recovering to a consistent database state by using an archived copy of the log.
