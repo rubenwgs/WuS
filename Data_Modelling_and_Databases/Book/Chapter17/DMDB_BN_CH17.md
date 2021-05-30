@@ -224,4 +224,42 @@ Example: Fig. 17.10 below shows an undo/redo log analogous to the redo log of Fi
 
 ## 17.5 Protecting Against Media Failures
 
-The log can protect us against system failures, where nothing is lost from disk, but temporary data in main memory is lost. 
+The log can protect us against system failures, where nothing is lost from disk, but temporary data in main memory is lost.  An archiving system, which we cover next, is needed to enable a database to survive losses involving disk-resident data.
+
+### 17.5.1 The Archive
+
+To protect against media failures, we are thus led to a solution involving `archiving` - maintaining a copy of the database separate from the database itself.
+
+Since writing an archive is a lengthy process, we try to avoid copying the entire database at each archiving step. Thus, we distinguish between two levels of archiving:
+
+1. A `full dump`, in which the entire database is copied.
+2. An `incremental dump`, in which only those database elements changed since the previous full or incremental dump are copied.
+
+### 17.5.2 Nonquiescent Archiving
+
+The problem with the simple view of archiving in Section 17.5.1 is that most databases cannot be shut down for the period of time (possibly hours) needed to make a backup copy. We thus need to consider `nonquiescent archiving`, which is analogous to nonquiescent checkpointing.
+
+A nonquiescent dump tries to make a copy of the database that existed when the dump began, but database activity may change many database elements ond isk during the minutes or hours that the dump takes.
+
+In more detail, the process of making an archive can be broken into the following steps. We assume that the logging method is either redo or undo/redo. An undo log is not suitable for use with archiving.
+
+1. Write a log record $<\text{START DUMP}>$.
+2. Perform a checkpoint appropriate for whichever logging method is being used.
+3. Perform a full or incremental dump of the data disks.
+4. Make sure that enough of the log has been copied to the secure, remote site that at least the prefix of the log up and including the checkpoint in item will survive a media failure of the database.
+5. Write a log record $<\text{END DUMP}>.
+
+Example: Fig. 17.13 below shows a possible undo/redo log of the events during a dump:
+
+<img src="./Figures/DMDB_BN_Fig17-13.JPG" height="250px"/><br>
+
+### 17.5.3 Recovery Using an Archive and Log
+
+We perform the following steps:
+
+1. Restore the database from the archive.
+   1. Find the most recent full dump and reconstruct the database from it (i.e., copy the archive into the database).
+   2. If there are later incremental dumps, modify the database according to each, earlier first.
+2. Modify the database using the surviving log. Use the method of recovery appropriate to the log method being used.
+
+### 17.6 Summary of Chapter 17
