@@ -1,4 +1,4 @@
-# Computer Networks - Week 1 (Book)
+# Computer Networks - Chapter 1 (Book)
 - Author: Ruben Schenk
 - Date: 02.03.2021
 - Contact: ruben.schenk@inf.ethz.ch
