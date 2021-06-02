@@ -133,8 +133,125 @@ The problem of `reordering` depends on the type of ACKs used:
 
 - Individual: No problem
 - Full feedback: No problem
-- Cumulative: 
+- Cumulative: Can lead to creating duplicate ACKs
+
+#### Delays
+
+Long `delays` can lead to useless timeouts, for *all* designs.
+
+#### Duplicates
+
+Packet `duplicates` can lead to duplicate ACKs whose effects will depend on the type of ACKs used:
+
+- Individual: No problem
+- Full feedback: No problem
+- Cumulative: Same problem as with reordering
+
+### 3.2.7 Go-Back-N Protocol
+
+The `Go-Back-N (GBN)` protocol is a simple sliding window protocol using cumulative ACKs:
+
+- Principle: Receiver should be as simple as possible.
+- Receiver: Delivers packets in-order to the upper layer. For each received segment, the receiver ACKs the last in-order packet delivered (cumulative).
+- Sender: Uses a single timer to detect loss, resets the timer at each ACK. Upon a timeout, the sender resend all $W$ packets, starting with the lost one, where $W$ is the size of the sliding window.
+
+### 3.2.8 Selective Repeat
+
+The `Selective Repeat (SR)` protocol avoids unnecessary retransmissions by using per-packet ACKs.
+
+- Principle: Avoids unnecessary retransmissions
+- Receiver: Acknowledge each packet, in-order or not, buffer out-of-order packets.
+- Sender: Uses a per-packet timer to detect loss. Upon a loss, only the lost packet is resent.
 
 ## 3.3 How does the Internet's transport work?
+
+### 3.3.1 UDP
+
+`UDP` is a simple extension of IP that only allows for data delivery to the correct application (optionally with checksums for corruption detection).
+
+A UDP packet simply consists of 4 header fields and one variable length data field, as seen in the figure below:
+
+<img src="./Figures/CoNe_LN_Fig7-3.JPG" width="300px"/><br>
+
+UDP is thus an unreliable, connectionless protocol for data transfer. Although there is no recovery from losses, reordering, etc., UDP is very good for certain types of application like DNS, Gaming or VoIP, due to the following reasons:
+
+- There is no connection establishment delay like in TCP (3-way handshake)
+- The small header leads to a small packet overhead which results in faster delivery.
+- Since there is no connection state, no timers, etc., UDP provides better scalability.
+
+### 3.3.2 TCP
+
+> `TCP` is a *connection-oriented, reliable byte-stream* transport service.
+
+Reliability requires keeping the state at both the sender (in the form of timers and send buffers) and at the receiver (in the form of a receive buffer). Each byte-stream is called `connection/session` and has their own connection state.
+
+#### TCP Design Choices
+
+- **ACKs**: TCP uses byte sequence number and cumulative ACKs
+- **Checksums**: TCP does checksum
+- **Timeout/Retransmission**: Retransmission are based on timeouts and duplicate ACKs. Timeouts are based on an estimate of the RTT.
+- **Sliding Window Flow Control**: Allows for $W$ contiguous bytes to be in transfer.
+- **Timer**: When a timer for a packet goes off, we resend the packet and double the timeout period. On three duplicate ACKs we can initiate a `fast retransmit`.
+
+#### TCP Header
+
+In order for a TCP packet to be sent over the network, it has to be wrapped into an IP packet, which cannot be bigger than the `maximum transmission unit (MTU)` (e.g. 1500 bytes for Ethernet).  
+A TCP packet consists of a `TCP header` of at least 20 bytes, shown in the figure below, and the TCP segment, which contains the data. Thus, the TCP segment is at most `maximum segment size (MSS)` bytes long, where $\text{MSS} = \text{MTU} - \text{(IP header size)} - \text{(TCP header size)}$.
+
+<img src="./Figures/CoNe_LN_Fig7-4.JPG" width="300px"/><br>
+
+#### ACKing and Sequence Numbers
+
+If the sender sends a packet containing $B$ bytes and starting at sequence number $X$, then the bytes in the packet are $X, \, X+1,..., \, X+B-1$.  
+Upon the receipt of the packet, the receiver sends an ACK:
+
+- If all data prior to $X$ was already received, then the ACK acknowledges $X + B$, since $X + B$ is *the next expected byte*.
+- If the highest contiguous byte received is $Y$ (smaller than $X$), then the ACK acknowledges $Y + 1$, even if it has been ACKed before.
+
+The `sequence number` field thus holds the starting byte offset of the data carried in the segment. The `acknowledgment number` field denotes what byte is expected next.
+
+#### Sliding Window Flow Control
+
+The `Advertised Window` field holds the number $W$ of bytes which can be sent beyond the *next expected byte*. The receiver uses this field to prevent the sender from overflowing its buffer since it limits the number of bytes the sender can have in flight.
+
+#### Transfer Speed
+
+We finish our discussion of TCP with a simple example of computing the transfer speed. Assume the following:
+
+- $W$ in bytes is the sliding window size, assumed to be constant
+- $RTT$ in seconds is the round-trip-time, assumed to be constant
+- $B$ in bytes/second is the bandwidth of the link
+
+We distinguish two cases:
+
+- $W/RTT < B$, then the transfer speed is $W / RTT$
+- Otherwise, the transfer speed is $B$
+
+### 3.3.3 Connection Establishment
+
+To establish a TCP connection, each host generates its `ISN (initial sequence number)` and then they exchange it in a so called `3-way handshake`:
+
+1. Host $A$ sends a `SYN` packet (with the SYN flag set) and its ISN in the sequence number field.
+2. Host $B$ returns a `SYN ACK` packet (with the SYN and ACK flag set) and its ISN in the sequence number field. The acknowledgment number is set to $A$'s ISN + 1.
+3. Host $A$ sends an ACK to acknowledge the SYN ACK and can now start sending data.
+
+If the SYN packet gets lost, no SYN ACK will arrive and thus the SYN packet will be simply retransmitted. The only problem with this is that it's totally unclear how far away the receiver is and it therefore is hard to set a timeout period. The default wait is 3 seconds.
+
+### 3.3.4 Connection Teardown
+
+#### Normal Termination - One Side at a Time
+
+Host $A$ sends a packet with the `FIN` flag set and waits to receive an ACK from host $B$. As soon as that happens, $A$ closes its side of the connection, the connection is now *half-closed*. $A$ can still receive bytes from $B$.  
+If $B$ sends a FIN as well, the connection is fully closed as soon as $A$ sends back an ACK.
+
+#### Normal Termination - Both Together
+
+Same as before, but when $A$ sends its FIN packet, $B$ responds with both FIN and ACK set. A then sends back a final packet with ACK flag set and the connection is closed.
+
+### 3.3.5 TCP State Transition Diagram
+
+The following figure shows a summary of the TCP state transitions:
+
+<img src="./Figures/CoNe_LN_Fig7-5.JPG" width="650px"/><br>
 
 ## 3.4 Sockets: the application and the transport interface
