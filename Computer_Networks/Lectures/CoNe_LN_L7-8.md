@@ -1,4 +1,4 @@
-**Computer Networks - Lecture 5 & 6**
+**Computer Networks - Lecture 7 & 8**
 
 - Author: Ruben Schenk
 - Date: 01.06.2021
@@ -253,5 +253,3 @@ Same as before, but when $A$ sends its FIN packet, $B$ responds with both FIN an
 The following figure shows a summary of the TCP state transitions:
 
 <img src="./Figures/CoNe_LN_Fig7-5.JPG" width="650px"/><br>
-
-## 3.4 Sockets: the application and the transport interface
