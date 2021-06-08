@@ -71,7 +71,7 @@ Most of the fields of a IPv4 datagram are self-explanatory, the rest is explaine
 - *Protocol*: Specifies the transport layer protocol (TCP or UDP).
 - *Options* Allows the IP header to be extended but leads to processing overhead (not included in IPv6 anymore).
 
-<img src="./Figures/CoNe_LN_Fig13-1.JPG" width="650px"/><br>
+<img src="./Figures/CoNe_LN_Fig13-1.JPG" width="400px"/><br>
 
 ### 5.2.2 IP Addresses and Prefixes
 
@@ -89,3 +89,114 @@ The first and last address of a prefix are typically not used since they have a 
 Prefixes are also specified by using a `network mask`. Performing a logical AND on the two produces the prefix (i.e. the network identifier). Example: `255.255.255.0` is the network mask for a 24-bit prefix.
 
 ### 5.2.3 IP Forwarding
+
+Each router uses a forwarding table that lists the next-hop address for *IP prefixes*. Note that this may lead to overlapping prefixes in the table, i.e., an entry might list a more specific prefix than another entry. This leads to the following rule:
+
+> The `Longest Prefix Matching` forwarding rule is described as follows: For each packet, find the longest (most specific) prefix that contains the destination address and forward the packet to the next-hop router for that prefix.
+
+<img src="./Figures/CoNe_LN_Fig13-2.JPG" width="550px"/><br>
+
+#### Host Forwarding
+
+Since routers do all the routing, hosts have to send remote traffic to the nearest router. For that, they use a small forwarding table, consisting only of two entries: Note that `0.0.0.0/0` represents a `default route`. Any other prefix is more specific and is thus captured first by the longest prefix matching rule.
+
+| **Prefix**            | **Next-Hop Destination** |
+| :-------------------- | :----------------------- |
+| My own network prefix | Directly send to that IP |
+| `0.0.0.0/0`           | Send to router           |
+
+### 5.2.4 IP Helper Protocols
+
+In order for IP forwarding to work, we still need to fill in some gaps, namely how, e.g., hosts get their IP addresses and how IP is mapped to link addresses.
+
+#### Getting IP Addresses - Dynamic Host Configuration Protocol (DHCP)
+
+When a node wakes up for the first time it doesn't know its IP address, the network prefix or the IP of the default router and the address of the DNS resolver. We use `DHCP` to automatically configure those addresses.
+
+DHCP leases IP addresses to nodes and provides other important parameters, such as the network prefix, the `default gateway (local router address)` and various servers (DNS, time, etc.). DHCP is a client-server application that uses UDP ports 67 and 68 and can therefore snoop on these ports for messages. DHCP works as follows:
+
+1. The client sends a $\text{DISCOVER}$ broadcast message with the address bits all being $1$, i.e. the IP address `255.255.255.255` and `ff:ff:ff:ff:ff:ff` for Ethernet/MAC address.
+2. The server answers with an $\text{OFFER}$ message, offering a few IP addresses as well as other options.
+3. The client chooses one of the offers and requests with a $\text{REQUEST}$ message.
+4. The server responds with an $\text{ACK}$ such that the client can use the configuration.
+
+Renewing an existing lease is as easy as sending a $\text{REQUEST}$ message and getting back an $\text{ACK}$.
+
+#### Address Resolution Protocol - ARP
+
+We consider the following problem: A node needs the link layer address to send a frame over a local link, but how does it get the destination link address from the destination IP address?
+
+An ARP module is a sending host that takes any IP address *on the same LAN* as input, and returns the corresponding MAC address, meaning that it only resolves IP addresses for hosts and router interfaces that are on the same subnet. This works as follows:
+
+1. The node sends a $\text{REQUEST}$ broadcast message with an IP address.
+2. The target that uses this IP address replies with its MAC address.
+
+### 5.2.5 Packet Fragmentation and MTU
+
+When connecting networks with different maximum packet sized we need to split up packets, or discover the largest size we can use.  
+We can thus either use `fragmentation` to split up large packets or use `discovery` to find the largest packet size that fits on the network path.
+
+#### IPv4 Fragmentation
+
+Routers fragment packets that are too large and the receiving host reassembles to reduce the load on routers. For that, there are multiple fields in the IP header (identification, flags, fragment offset, fragment length, etc.). The splitting procedure works as follows:
+
+1. Break the data that is contained into pieces.
+2. Copy the IP header into the previously split pieces and adjust the length.
+3. Set the offset to indicate the position and set the MF flag on all pieces except for the last.
+
+<img src="./Figures/CoNe_LN_Fig13-3.JPG" width="550px"/><br>
+
+#### Path MTU Discovery
+
+IP uses `path MTU discovery` today. The host tests the path with a large packet and the routers provide feedback. If the packet is too large, the router tells the host what size would fit. This is implemented in ICMP with the DF flag, such that ICMP can provide the necessary feedback messages and error messages in general, e.e., when something goes wrong during forwarding.
+
+### 5.2.6 Internet Control Message Protocol (ICMP)
+
+ICMP is a companion protocol to IP, they are implemented together and ICMP sits on to of IP.  
+IF the router encounters some error while forwarding, the ICMP sends back a report to the IP source address and discards the problematic packet.
+
+#### ICMP Message Format
+
+A ICMP message is carried in an IP packet and has a type, code, and a checksum. As a payload it often carries the start of the offending packet:
+
+<img src="./Figures/CoNe_LN_Fig13-4.JPG" width="550px"/><br>
+
+## 5.3 Network Address Translation (NAT)
+
+The layering principle means that routers should not look beyond the IP header, e.g., the TCP segment is not looked at. However, in modern networks there are many `middleboxes` that sit inside the network but perform processing beyond what IP does on packets to add new functionality. Examples are NAT boxes, Firewalls or Intrusion Detection Systems.
+
+### 5.3.1 NAT box
+
+A `NAT box` connects an internal network to an external network. That way, many internal hosts can be connected to the external network using a single external IP address. This way, the home network looks like a single computer.
+
+### 5.3.2 How NAT works
+
+The NAT box keeps a table where it stores a mapping between internal and external (address, port) tuples.
+
+| **Internal IP : Port** | **External IP : Port** |
+| :--------------------: | :--------------------: |
+| `192.168.1.12:5523`    | `44.25.80.3:1500`      |
+| `192.168.1.13:1234`    | `44.25.80.3:1501`      |
+| `192.168.2.20:1234`    | `44.25.80.3:1502`      |
+
+The mapping is created as the first packet from the client into the external network is being sent, i.e., when a new TCP connection is opened. If connections go to different destinations, it is possible to use the same port numbers, since returning packets will also contain the destinations IP address and thus make it able to distinguish the connection using the same port.
+
+#### Sending a Packet
+
+<img src="./Figures/CoNe_LN_Fig13-5.JPG" width="550px"/><br>
+
+#### Receiving a Packet
+
+<img src="./Figures/CoNe_LN_Fig13-6.JPG" width="550px"/><br>
+
+## 5.4 IPv6
+
+Since the IPv4 address space is running out and there is still room for different improvements there is IPv6, which features 128-bit addresses, which are denoted in 8 groups of 4 hexadecimal digits. Leading zeros are omitted and groups of zeros can be replaced by a second colon.
+
+<img src="./Figures/CoNe_LN_Fig13-7.JPG" width="350px"/><br>
+
+Some important changes in the header are:
+
+- *Streamlined header processing*: No option fields mean fixed size of 40 bytes in the header, which allows for faster processing.
+- *Flow labelling*: Allows for grouping of packets that belong to the same floe, e.g. packets in a video stream or for a high-priority user.
+- *Traffic class*: Allows to give priority to certain datagrams within a flow from certain applications.
