@@ -191,8 +191,6 @@ The mapping is created as the first packet from the client into the external net
 
 ## 5.4 IPv6
 
-Since the IPv4 address space is running out and there is still room for different improvements there is IPv6, which features 128-bit addresses, which are denoted in 8 groups of 4 hexadecimal digits. Leading zeros are omitted and groups of zeros can be replaced by a second colon.
-
 <img src="./Figures/CoNe_LN_Fig13-7.JPG" width="350px"/><br>
 
 Some important changes in the header are:
