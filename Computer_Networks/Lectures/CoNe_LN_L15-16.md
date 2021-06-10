@@ -62,3 +62,44 @@ Some techniques to scale routing are:
 2. Network hierarchy (route to network regions)
     - The idea is to introduce a larger routing unit. We then route first to the region, then to the IP prefix within the region.
 3. IP prefix aggregation (combine and split prefixes)
+
+The idea is to create subnets (*splitting*) and joining (*aggregation*) IP's based on their prefix, such that we may address a "pool" of IP's and once in there, route to the more specific IP's in the subnet. More specific:
+
+- `Subnets`: Internally split one less specific prefix into multiple more specific prefixes.
+- `Aggregation`: Externally join multiple more specific prefixes into one large prefix.
+
+### 5.5.3 Distance Vector Routing
+
+The `distance vector routing` algorithm follows a distributed BEllman-Ford approach. It works well and was used in RIP, but converges slowly after some types of failures:
+
+- Setting: Nodes know only the cost to neighbors, not the topology. They can communicate with their neighbors via messages.
+- Process: Each node maintains a `vector of distances` and next-hops to all destinations. The algorithm proceeds as follows:
+    1. Initialize each vector with cost to oneself = 0 and cost to others = $\infty$.
+    2. Periodically send this vector to the neighbors.
+    3. Every round, after receiving the vectors of all neighbors:
+       1. For each neighbor, add the cost of the link to the neighbor to the vector received from that neighbor.
+       2. Set all vector entries (except the oneself) to the minimum of all received values and set the corresponding neighbor as the next-hop.
+
+### 5.5.4 Flooding
+
+`Flooding` is used to broadcast a message to all nodes in a network in a very simple but highly inefficient way:
+
+1. Send an incoming message to all neighbors, but
+2. Remember the message (using sequence numbers) such that a message is flooded only once to the neighbors.
+
+### 5.5.5 Link State Routing
+
+The `Link State Routing Algorithm` works as follows:
+
+1. The nodes flood the topology in the form of link state packets such that each node learns the full topology.
+2. Each node computes its own forwarding table by running Dijkstra (or equivalent)
+
+### 5.5.6 Distance Vector Routing vs. Link State Routing
+
+| **Goal**         | **Distance Vector**             | **Link State**                  |
+| :--------------- | :------------------------------ | :------------------------------ |
+| Correctness      | Distributed Bellman-Ford        | Replicated Dijkstra             |
+| Efficient Paths  | Approximate with shortest paths | Approximate with shortest paths |
+| Fair paths       | Approximate with shortest paths | Approximate with shortest paths |
+| Fast convergence | Slow (many exchanges)           | Fast (flood and compute)        |
+| Scalability      | Excellent                       | Moderate                        |
