@@ -103,6 +103,129 @@ Signals that are sent over `wireless` travel at the speed of light, spread out a
 
 We need signals to represent bits. One way to do this is the `Non-Return to Zero (NRZ)` scheme. In this scheme, high voltage ($+V$) represents a $1$, low voltage ($-V$) represents a $0$.
 
-This simple scheme uses only 2 levels, if we were to increase it to 4 levels, it could support 2 bits per symbol
+This simple scheme uses only 2 levels, if we were to increase it to 4 levels, it could support 2 bits per symbol.
+
+### 7.3.1 Clock Recovery
+
+The receiver needs frequent signal transitions to decode bits. It needs to know how many $0$'s in a row were transmitted. This can be hard for very long sequences of $0$'s.
+
+For that reason, the `4B/5B Clock Recovery` maps every 4 data bits into 5 code bits while eliminating long runs of $0$'s. This is done with an encoding table, and each string that is mapped to has at most 3 zeros in a row.  
+Another approach is to invert signal on a $1$ to break long runs of $1$'s, which is called `NRZI`.
+
+### 7.3.2 Passband Modulation
+
+We have so far only seen `baseband modulation` for wires, which can be applied when a signal is sent directly on a wire.  
+However, these signals do not propagate well on fiber or on wireless, so we need to send at higher frequencies. This is exactly what `passband modulation` does: It carries a signal by modulating a carrier (a signal oscillated at a desired frequency). This modulation happens by changing *amplitude, frequency*, and *phase*.
 
 ## 7.4 Fundamental Limits
+
+Key properties of a channel include bandwidth $B$, signal strength $S$, and noise strength $N$. It holds that:
+
+- The rate of transitions is limited by $B$
+- The number of signal levels that can be distinguished is limited by $S$ and $N$.
+
+### 7.4.1 Nyquist Limit
+
+The maximum symbol rate is $2B$ (on alternating $1$s and $0$s). Thus, if there are $V$ signal levels, ignoring noise, the maximum bit rate is:
+
+$$
+R = 2B \log_2 B \, [\text{bits / sec}]
+$$
+
+### 7.4.2 Shannon Capacity
+
+How many levels that can be distinguished depends on the `signal-to-noise ration` (or $S/N$). `SNR` is given on a log-scale in deciBEls according to:
+
+$$
+\text{SNR}_{\text{dB}} = 10 \log_{10}(S / N)
+$$
+
+The `Shannon limit` for a capacity $C$ is the maximum information carrying rate of the channel and is given by:
+
+$$
+C = B \log_2 \Big (1 + \frac{S}{N} \Big ) \, [\text{bits / sec}]
+$$
+
+### 7.4.3 Digital Subscriber Line (DSL)
+
+`DSL` reuses a twisted pair telephone line to the home. Since only the lowest $4 \text{ kHz}$ of approximately $2 \text{ MHz}$ of bandwidth are used by the telephone service, the rest can be used for different purposes.
+
+DSL uses passband modulation which creates separate bands for up- and downstream with different bandwidth sizes. The modulation varies both amplitude and phase. On high SNR, there are up to 15 bits per symbol, where as on low SNR, there is only 1 bit per symbol, so the connection is slower.
+
+# 8. Routing Security
+
+## 8.1 Basic Security Properties
+
+### 8.1.1 Terminology
+
+We define the following meanings for the 4 key terms:
+
+- `Secrecy`: Keep data hidden from unintended receivers.
+- `Confidentiality`: Keep someone else's data secret.
+- `Privacy`: Keep data about a person secret.
+- `Anonymity`: Keep the identity of a protocol participant secret.
+
+Furthermore, we want to distinguish the following terms:
+
+- `Data Integrity`: Ensure that data is *correct* and prevent unauthorized or improper changes.
+- `Entity Authentication/Identification`: Verifies the identity of another protocol participant.
+- `Data Authentication`: Ensures that data originates from a claimed sender.
+
+## 8.2 Basic Cryptographic Mechanisms
+
+### 8.2.1 Symmetric Encryption Primitives
+
+In this protocol, the following holds:
+
+- Encryption key $E_K$ = decryption key $D_K$
+- *Encryption*: $E_K$(plaintext) = ciphertext
+- *Decryption*: $D_K$(ciphertext) = plaintext
+
+We write $\{\text{plaintext} \}_K$ for $E_K$(plaintext).
+
+<img src="./Figures/CoNe_LN_Fig21-1.JPG" width="450px"/><br>
+
+### 8.2.2 Asymmetric Encryption Primitives
+
+In this protocol, the following holds:
+
+- Encryption key $K$ is publicly know: `public key`
+- Decryption key $K^{-1}$ is secret: `private key`
+- *Encryption*: $E_K$(plaintext) = ciphertext
+- *Decryption*: $D_{K^{-1}}$(ciphertext) = plaintext
+
+We write $\{\text{plaintext} \}_K$ for $E_K$(plaintext).
+
+<img src="./Figures/CoNe_LN_Fig21-2.JPG" width="450px"/><br>
+
+### 8.2.3 Symmetric vs Asymmetric Encryption
+
+We make the following observations:
+
+- *Symmetric Encryption*
+  - Need shared secret key
+  - 100'000'000 ops/s
+
+- *Asymmetric Encryption*
+  - Need authentic public key
+  - 1000 signatures/s or 10'000 verify/s
+
+## 8.3 Security For Routing Protocols
+
+### 8.3.1 Intra-Domain Routing
+
+To perform an attack on link-state protocols, one only needs to compromise *one* router or one routing adjacency since link-state protocols rely on flooding.
+
+In both cases, the attacker obtains a complete network view and the ability to inject messages network-wide.
+
+The solution is quite simple: One simply needs to rely on cryptography. We only need to send authenticated announcements and cryptographically protect topology information.
+
+### 8.3.2 Inter-Domain Routing
+
+We look at the lack of security of `BGP`, the problems that follow from this and their solutions.
+
+#### BGP does not validate the origin of advertisements
+
+Regional Internet Registries assign IP address blocks. However, the origination of a prefix into BGP must be proper, i.e., by the AS who owns the prefix.
+
+This is, however, not checked by BGP. So what's to stop someone else, i.e. another AS, from originating the prefix? This process is known as `Prefix Hijacking`.
