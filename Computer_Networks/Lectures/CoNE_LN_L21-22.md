@@ -90,6 +90,19 @@ We introduce the following different types of media:
 
 Analog signals are used to encode digital bits. A signal over time can be represented by its frequency components (called *Fourier analysis*). As signals `propagate over a wire`, the following happens:
 
+1. The signal is delayed (since it propagates at $\frac{2c}{3}$)
+2. The signal is attenuated
+3. Frequencies above a cutoff are highly attenuated
+4. Noise is added to the signal
+
+When a signal, however, is `propagated over fiber`, the light propagates with very low loss in three very wide frequency bands (furthermore, at these frequencies the attenuation is very low).
+
+Signals that are sent over `wireless` travel at the speed of light, spread out and attenuate at a fast rate. Multiple signals on the same frequency
+
 ## 7.3 Modulation Schemes
+
+We need signals to represent bits. One way to do this is the `Non-Return to Zero (NRZ)` scheme. In this scheme, high voltage ($+V$) represents a $1$, low voltage ($-V$) represents a $0$.
+
+This simple scheme uses only 2 levels, if we were to increase it to 4 levels, it could support 2 bits per symbol
 
 ## 7.4 Fundamental Limits
